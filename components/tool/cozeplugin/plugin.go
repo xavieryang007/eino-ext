@@ -58,19 +58,28 @@ func InitStreamCallOpts(opts ...streamcall.Option) {
 }
 
 type Config struct {
+	// If API isn't nil, sdk will use API directly instead of using PluginID and APIID to query.
+	API *plugin.API
+
 	PluginID int64
 	APIID    int64
 }
 
 // NewTool you can get a InvokableTool or StreamableTool from this function, and the decision of which type of tool to get depends entirely on the tool information obtained from coze.
 func NewTool(ctx context.Context, config *Config) (tool.BaseTool, error) {
-	api, err := getCozePluginInfo(ctx, config.PluginID, config.APIID)
-	if err != nil {
-		return nil, fmt.Errorf("get coze plugin info error: %w", err)
+	var err error
+	api := config.API
+	if api == nil {
+		api, err = getCozePluginInfo(ctx, config.PluginID, config.APIID)
+		if err != nil {
+			return nil, fmt.Errorf("get coze plugin info error: %w", err)
+		}
 	}
 
 	if api.RunMode == plugin.RunMode_Streaming {
 		return &streamCozePlugin{
+			API: config.API,
+
 			PluginName: api.PluginName,
 			PluginID:   api.PluginId,
 			APIName:    api.Name,
@@ -78,6 +87,8 @@ func NewTool(ctx context.Context, config *Config) (tool.BaseTool, error) {
 		}, nil
 	}
 	return &cozePlugin{
+		API: config.API,
+
 		PluginName: api.PluginName,
 		PluginID:   api.PluginId,
 		APIName:    api.Name,
@@ -119,6 +130,8 @@ func apiFilter(pluginInfos []*plugin.PluginInfo, pluginID, apiID int64) (*plugin
 }
 
 type cozePlugin struct {
+	API *plugin.API
+
 	PluginName string
 	PluginID   int64
 	APIName    string
@@ -126,9 +139,13 @@ type cozePlugin struct {
 }
 
 func (c *cozePlugin) Info(ctx context.Context) (*schema.ToolInfo, error) {
-	api, err := getCozePluginInfo(ctx, c.PluginID, c.APIID)
-	if err != nil {
-		return nil, fmt.Errorf("get coze plugin info error: %w", err)
+	var err error
+	api := c.API
+	if api == nil {
+		api, err = getCozePluginInfo(ctx, c.PluginID, c.APIID)
+		if err != nil {
+			return nil, fmt.Errorf("get coze plugin info error: %w", err)
+		}
 	}
 
 	param := constructParams(api.Parameters)
@@ -178,6 +195,8 @@ func (c *cozePlugin) InvokableRun(ctx context.Context, argumentsInJSON string, o
 }
 
 type streamCozePlugin struct {
+	API *plugin.API
+
 	PluginName string
 	PluginID   int64
 	APIName    string
@@ -185,9 +204,13 @@ type streamCozePlugin struct {
 }
 
 func (s *streamCozePlugin) Info(ctx context.Context) (*schema.ToolInfo, error) {
-	api, err := getCozePluginInfo(ctx, s.PluginID, s.APIID)
-	if err != nil {
-		return nil, fmt.Errorf("get coze plugin info error: %w", err)
+	var err error
+	api := s.API
+	if api == nil {
+		api, err = getCozePluginInfo(ctx, s.PluginID, s.APIID)
+		if err != nil {
+			return nil, fmt.Errorf("get coze plugin info error: %w", err)
+		}
 	}
 
 	param := constructParams(api.Parameters)

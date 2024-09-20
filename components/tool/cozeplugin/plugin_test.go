@@ -113,7 +113,7 @@ func TestStreamable(t *testing.T) {
 		}, nil).Build().Patch().UnPatch()
 
 	ctx := context.Background()
-	tool, err := NewTool(ctx, &Config{pluginID, apiID})
+	tool, err := NewTool(ctx, &Config{PluginID: pluginID, APIID: apiID})
 	assert.NoError(t, err)
 	info, err := tool.Info(ctx)
 	assert.NoError(t, err)
