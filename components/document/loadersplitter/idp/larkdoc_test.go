@@ -47,7 +47,7 @@ func TestLarkDocInGraph(t *testing.T) {
 	l := NewIDPLoaderSplitter(&Config{})
 
 	t.Run("test larkDocx in graph", func(t *testing.T) {
-		graph := compose.NewGraph[document.Source, []*schema.Document](compose.RunTypePregel)
+		graph := compose.NewGraph[document.Source, []*schema.Document]()
 
 		err := graph.AddLoaderSplitterNode("larkDoc", l)
 		assert.Nil(t, err)

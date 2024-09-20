@@ -1,14 +1,21 @@
-module code.byted.org/flow/eino-ext/components/document/loadersplitter/idp
+module code.byted.org/flow/eino-ext/components/tool/fornaxplugin
 
-go 1.18
+go 1.20
+
+replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
-	code.byted.org/flow/eino v0.0.0-20240919091809-034091a4c61d
-	code.byted.org/gopkg/lang v0.21.8
-	code.byted.org/lark_ai/idp_sdk v0.0.0-20240703094640-9ac71589a994
-	code.byted.org/overpass/lark_ai_davinci v0.0.0-20240705053244-4917f91e70cc
-	code.byted.org/overpass/larkai_workflow_facade v0.0.0-20240702085803-a956a6458138
-	github.com/larksuite/oapi-sdk-go/v3 v3.3.0
+	code.byted.org/flow/eino v0.0.0-20240909085143-b409c4094153
+	code.byted.org/flow/eino/components/tool/fornaxplugin v0.0.0-20240919091809-034091a4c61d
+	code.byted.org/gopkg/asynccache v0.0.0-20210422090342-26f94f7676b8
+	code.byted.org/gopkg/logs/v2 v2.2.0-beta.9
+	code.byted.org/kite/kitex v1.16.0
+	code.byted.org/kite/kitutil v3.8.7+incompatible
+	code.byted.org/lang/gg v0.18.0
+	code.byted.org/overpass/flow_devops_plugin v0.0.0-20240821000551-3a50ed64f224
+	github.com/bytedance/mockey v1.2.10
+	github.com/bytedance/sonic v1.12.1
+	github.com/cloudwego/kitex v0.10.0
 	github.com/stretchr/testify v1.9.0
 )
 
@@ -29,7 +36,6 @@ require (
 	code.byted.org/bytedtrace/serializer-go v1.0.1-pre // indirect
 	code.byted.org/duanyi.aster/gopkg v0.0.3 // indirect
 	code.byted.org/gopkg/apm_vendor_interface v0.0.3 // indirect
-	code.byted.org/gopkg/asynccache v0.0.0-20210422090342-26f94f7676b8 // indirect
 	code.byted.org/gopkg/consul v1.2.6 // indirect
 	code.byted.org/gopkg/ctxvalues v0.6.0 // indirect
 	code.byted.org/gopkg/debug v0.10.1 // indirect
@@ -38,7 +44,6 @@ require (
 	code.byted.org/gopkg/etcdproxy v0.1.1 // indirect
 	code.byted.org/gopkg/logid v0.0.0-20211104042040-f78600e482f2 // indirect
 	code.byted.org/gopkg/logs v1.2.23 // indirect
-	code.byted.org/gopkg/logs/v2 v2.2.0-beta.9 // indirect
 	code.byted.org/gopkg/metainfo v0.1.4 // indirect
 	code.byted.org/gopkg/metrics v1.4.25 // indirect
 	code.byted.org/gopkg/metrics/v3 v3.1.31 // indirect
@@ -48,15 +53,10 @@ require (
 	code.byted.org/gopkg/stats v1.2.12 // indirect
 	code.byted.org/gopkg/tccclient v1.5.0-beta.11 // indirect
 	code.byted.org/gopkg/thrift v1.14.2 // indirect
-	code.byted.org/gopkg/tos v1.5.9 // indirect
-	code.byted.org/hystrix/hystrix-go v0.0.0-20190214095017-a2a890c81cd5 // indirect
-	code.byted.org/iespkg/bytedkits-go/goext v0.4.0 // indirect
-	code.byted.org/iespkg/retry-go v0.1.2 // indirect
-	code.byted.org/kite/kitex v1.16.0 // indirect
-	code.byted.org/kite/kitex-overpass-suite v0.0.26 // indirect
+	code.byted.org/kite/endpoint v3.7.5+incompatible // indirect
+	code.byted.org/kite/kitc v3.10.26+incompatible // indirect
 	code.byted.org/kite/rpal v0.1.16 // indirect
 	code.byted.org/lang/trace v0.0.3 // indirect
-	code.byted.org/lark_ai/idp_common v0.0.0-20240701122047-54360ca8048f // indirect
 	code.byted.org/lidar/profiler v0.3.9 // indirect
 	code.byted.org/lidar/profiler/kitex v0.0.0-20240515095433-9c7e047c4f64 // indirect
 	code.byted.org/log_market/gosdk v0.0.0-20230524072203-e069d8367314 // indirect
@@ -65,8 +65,6 @@ require (
 	code.byted.org/log_market/ttlogagent_gosdk v0.0.6 // indirect
 	code.byted.org/log_market/ttlogagent_gosdk/v4 v4.0.53 // indirect
 	code.byted.org/middleware/fic_client v0.2.8 // indirect
-	code.byted.org/overpass/common v0.0.0-20230608113610-5b75c582b89e // indirect
-	code.byted.org/overpass/lark_idl_common v0.0.0-20240705040127-d51d3e9397b4 // indirect
 	code.byted.org/security/go-spiffe-v2 v1.0.8 // indirect
 	code.byted.org/security/memfd v0.0.2 // indirect
 	code.byted.org/security/sensitive_finder_engine v0.3.18 // indirect
@@ -76,14 +74,13 @@ require (
 	code.byted.org/ttarch/byteconf-cel-go v0.0.3 // indirect
 	github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible // indirect
 	github.com/antonmedv/expr v1.15.5 // indirect
-	github.com/apache/thrift v0.19.0 // indirect
+	github.com/apache/thrift v0.16.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bits-and-blooms/bitset v1.13.0 // indirect
 	github.com/bits-and-blooms/bloom/v3 v3.6.0 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/bufbuild/protocompile v0.8.0 // indirect
 	github.com/bytedance/gopkg v0.0.0-20240514070511-01b2cbcf35e1 // indirect
-	github.com/bytedance/sonic v1.12.1 // indirect
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
 	github.com/caarlos0/env/v6 v6.10.1 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
@@ -92,7 +89,6 @@ require (
 	github.com/cloudwego/fastpb v0.0.4 // indirect
 	github.com/cloudwego/frugal v0.1.15 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
-	github.com/cloudwego/kitex v0.10.0 // indirect
 	github.com/cloudwego/localsession v0.0.2 // indirect
 	github.com/cloudwego/netpoll v0.6.1 // indirect
 	github.com/cloudwego/runtimex v0.1.0 // indirect
@@ -105,21 +101,20 @@ require (
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
-	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
-	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/google/pprof v0.0.0-20240207164012-fb44976bdcd5 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/goph/emperror v0.17.2 // indirect
+	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/gorilla/mux v1.8.1 // indirect
 	github.com/hashicorp/golang-lru v1.0.2 // indirect
 	github.com/hbollon/go-edlib v1.6.0 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/jhump/protoreflect v1.15.6 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
+	github.com/jtolds/gls v4.20.0+incompatible // indirect
 	github.com/klauspost/compress v1.17.7 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
-	github.com/kr/pretty v0.3.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/gls v0.0.0-20220109145502-612d0167dce5 // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
@@ -131,9 +126,12 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
+	github.com/sashabaranov/go-openai v1.26.3 // indirect
 	github.com/shirou/gopsutil/v3 v3.24.2 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/slongfield/pyfmt v0.0.0-20220222012616-ea85ff4c361f // indirect
+	github.com/smarty/assertions v1.15.0 // indirect
+	github.com/smartystreets/goconvey v1.8.1 // indirect
 	github.com/tidwall/gjson v1.17.1 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect
@@ -158,5 +156,3 @@ require (
 	google.golang.org/protobuf v1.34.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/apache/thrift => github.com/apache/thrift v0.13.0

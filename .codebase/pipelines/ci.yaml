@@ -1,0 +1,61 @@
+name: eino_ext_ci
+trigger: [ change ]
+jobs:
+  unit_test:
+    name: "unit test"
+    image: hub.byted.org/codebase/ci_go_1_22:latest
+    runs-on:
+      env: boe
+    steps:
+      - name: unit test
+        uses: actions/codecov
+        inputs:
+          driver: go
+          commands:
+            - modules=`find . -name "go.mod" -exec dirname {} \;`
+            - echo $modules
+            - list=""
+            - coverpkg=""
+            - if [[ ! -f "go.work" ]];then go work init;fi
+            - for module in $modules; do go work use $module; list=$module"/... "$list; coverpkg=$module"/...,"$coverpkg; done
+            - go work sync
+            - go test -coverprofile=coverage.out -gcflags="all=-l -N" -coverpkg=$coverpkg $list
+          config:
+            status:
+              project:
+                eino:
+                  minimum_coverage: 60%
+                  paths:
+                    - "!tests"
+                    - "!examples/**"
+                    - "!*/examples/**"
+                    - "!*/mock/**"
+                eino-changed:
+                  base: "change"
+                  threshold: 0.6%
+                  paths:
+                    - "!tests"
+                    - "!examples/**"
+                    - "!*/examples/**"
+                    - "!*/mock/**"
+              diff:
+                eino:
+                  line_limit: 10 # 增量行数少于多少行时，默认置成功
+                  minimum_coverage: 50%
+                  paths:
+                    - "!tests"
+                    - "!examples/**"
+                    - "!*/examples/**"
+                    - "!*/mock/**"
+      - name: Sonar
+        uses: actions/sonar@v1
+        inputs:
+          coverage_path: /tmp/coverage.out
+          coverage_type: go
+          disable_quality_gates: true
+          exclusions_list:
+            - "!tests"
+            - "examples/**"
+            - "*/mock/**"
+          language: go
+
