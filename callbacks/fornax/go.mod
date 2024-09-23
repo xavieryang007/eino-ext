@@ -1,4 +1,4 @@
-module code.byted.org/flow/eino-ext/fornax
+module code.byted.org/flow/eino-ext/callbacks/fornax
 
 go 1.18
 
@@ -12,7 +12,7 @@ require (
 	code.byted.org/lang/gg v0.19.1
 	code.byted.org/obric/flow_telemetry_go v0.4.1
 	github.com/bytedance/mockey v1.2.12
-	github.com/json-iterator/go v1.1.12
+	github.com/bytedance/sonic v1.12.1
 	github.com/smartystreets/goconvey v1.8.1
 	github.com/stretchr/testify v1.9.0
 )
@@ -126,7 +126,6 @@ require (
 	github.com/bufbuild/protocompile v0.8.0 // indirect
 	github.com/bytedance/go-tagexpr/v2 v2.9.2 // indirect
 	github.com/bytedance/gopkg v0.0.0-20240514070511-01b2cbcf35e1 // indirect
-	github.com/bytedance/sonic v1.12.1 // indirect
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
 	github.com/caarlos0/env/v6 v6.10.1 // indirect
 	github.com/cenk/backoff v2.2.1+incompatible // indirect
@@ -180,6 +179,7 @@ require (
 	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/jhump/protoreflect v1.15.6 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
+	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/jtolds/gls v4.20.0+incompatible // indirect
 	github.com/klauspost/compress v1.17.7 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
