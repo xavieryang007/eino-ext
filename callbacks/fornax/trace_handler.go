@@ -227,6 +227,7 @@ func (l *einoTracer) setRunInfo(_ context.Context, span *ob.FornaxSpanImpl, info
 
 func (l *einoTracer) setFornaxTags(ctx context.Context, span *ob.FornaxSpanImpl) {
 	span.SetTag(make(spanTags).
+		set(obtag.SpaceID, itoa(l.identity.GetSpaceID())).
 		set(obtag.FornaxSpaceID, itoa(l.identity.GetSpaceID())).
 		set(obtag.Runtime, toJson(getStaticRuntimeTags())),
 	)
