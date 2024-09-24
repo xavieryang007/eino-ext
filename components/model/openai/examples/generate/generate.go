@@ -4,13 +4,11 @@ import (
 	"context"
 	"os"
 
+	"code.byted.org/flow/eino-ext/components/model/openai"
+	"code.byted.org/flow/eino/schema"
 	"code.byted.org/gopkg/ctxvalues"
 	"code.byted.org/gopkg/logid"
 	"code.byted.org/gopkg/logs/v2"
-
-	"code.byted.org/flow/eino/schema"
-
-	"code.byted.org/flow/eino-ext/components/model/openai"
 )
 
 func main() {

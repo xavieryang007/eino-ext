@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"testing"
 
-	"code.byted.org/flow/eino/components/embedding"
 	. "github.com/bytedance/mockey"
 	"github.com/smartystreets/goconvey/convey"
 	"github.com/volcengine/volcengine-go-sdk/service/arkruntime"
 	"github.com/volcengine/volcengine-go-sdk/service/arkruntime/model"
+
+	"code.byted.org/flow/eino/components/embedding"
 )
 
 func Test_EmbedStrings(t *testing.T) {
