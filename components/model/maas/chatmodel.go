@@ -113,7 +113,11 @@ func (cm *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ..
 		}
 	}()
 
-	req := cm.genRequest(in, opts...)
+	req, err := cm.genRequest(in, opts...)
+	if err != nil {
+		return nil, err
+	}
+
 	reqConf := &fmodel.Config{
 		Model:       req.Model,
 		MaxTokens:   req.MaxTokens,
@@ -162,7 +166,10 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...f
 		}
 	}()
 
-	req := cm.genRequest(in, opts...)
+	req, err := cm.genRequest(in, opts...)
+	if err != nil {
+		return nil, err
+	}
 	req.Stream = true
 	reqConf := &fmodel.Config{
 		Model:       req.Model,
@@ -250,7 +257,7 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...f
 	return outStream, nil
 }
 
-func (cm *ChatModel) genRequest(in []*schema.Message, opts ...fmodel.Option) (req model.ChatCompletionRequest) {
+func (cm *ChatModel) genRequest(in []*schema.Message, opts ...fmodel.Option) (req model.ChatCompletionRequest, err error) {
 	req = model.ChatCompletionRequest{
 		MaxTokens:         cm.config.MaxTokens,
 		Temperature:       cm.config.Temperature,
@@ -268,8 +275,13 @@ func (cm *ChatModel) genRequest(in []*schema.Message, opts ...fmodel.Option) (re
 		ResponseFormat:    cm.config.ResponseFormat,
 	}
 	for _, msg := range in {
+		content, e := toMaasContent(msg.Content, msg.MultiContent)
+		if e != nil {
+			return req, e
+		}
+
 		req.Messages = append(req.Messages, &model.ChatCompletionMessage{
-			Content:    &model.ChatCompletionMessageContent{StringValue: gptr.Of(msg.Content)},
+			Content:    content,
 			Role:       string(msg.Role),
 			ToolCallID: msg.ToolCallID,
 			ToolCalls:  toMaasToolCalls(msg.ToolCalls),
@@ -310,7 +322,7 @@ func (cm *ChatModel) genRequest(in []*schema.Message, opts ...fmodel.Option) (re
 		req.Model = cm.config.Model
 	}
 
-	return req
+	return req, nil
 }
 
 func (cm *ChatModel) resolveChatResponse(resp model.ChatCompletionResponse) (msg *schema.Message, usage *fmodel.TokenUsage, err error) {
@@ -413,6 +425,38 @@ func toMessageToolCalls(toolCalls []*model.ToolCall) []schema.ToolCall {
 	}
 
 	return ret
+}
+
+func toMaasContent(content string, multiContent []schema.ChatMessagePart) (*model.ChatCompletionMessageContent, error) {
+	if len(multiContent) == 0 {
+		return &model.ChatCompletionMessageContent{StringValue: gptr.Of(content)}, nil
+	}
+
+	parts := make([]*model.ChatCompletionMessageContentPart, 0, len(multiContent))
+
+	for _, part := range multiContent {
+		switch part.Type {
+		case schema.ChatMessagePartTypeText:
+			parts = append(parts, &model.ChatCompletionMessageContentPart{
+				Type: model.ChatCompletionMessageContentPartTypeText,
+				Text: part.Text,
+			})
+		case schema.ChatMessagePartTypeImageURL:
+			parts = append(parts, &model.ChatCompletionMessageContentPart{
+				Type: model.ChatCompletionMessageContentPartTypeImageURL,
+				ImageURL: &model.ChatMessageImageURL{
+					URL:    part.ImageURL.URL,
+					Detail: model.ImageURLDetail(part.ImageURL.Detail),
+				},
+			})
+		default:
+			return nil, fmt.Errorf("unsupported chat message part type: %s", part.Type)
+		}
+	}
+
+	return &model.ChatCompletionMessageContent{
+		ListValue: parts,
+	}, nil
 }
 
 func toMaasToolCalls(toolCalls []schema.ToolCall) []*model.ToolCall {

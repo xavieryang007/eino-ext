@@ -4,6 +4,7 @@ package openai
 import (
 	"context"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"runtime/debug"
@@ -126,6 +127,39 @@ func toOpenAIRole(role schema.RoleType) string {
 	}
 }
 
+func toOpenAIMultiContent(mc []schema.ChatMessagePart) ([]openai.ChatMessagePart, error) {
+	if len(mc) == 0 {
+		return nil, nil
+	}
+
+	ret := make([]openai.ChatMessagePart, 0, len(mc))
+
+	for _, part := range mc {
+		switch part.Type {
+		case schema.ChatMessagePartTypeText:
+			ret = append(ret, openai.ChatMessagePart{
+				Type: openai.ChatMessagePartTypeText,
+				Text: part.Text,
+			})
+		case schema.ChatMessagePartTypeImageURL:
+			if part.ImageURL == nil {
+				return nil, fmt.Errorf("image_url should not be nil")
+			}
+			ret = append(ret, openai.ChatMessagePart{
+				Type: openai.ChatMessagePartTypeImageURL,
+				ImageURL: &openai.ChatMessageImageURL{
+					URL:    part.ImageURL.URL,
+					Detail: openai.ImageURLDetail(part.ImageURL.Detail),
+				},
+			})
+		default:
+			return nil, fmt.Errorf("unsupported chat message part type: %s", part.Type)
+		}
+	}
+
+	return ret, nil
+}
+
 func toMessageRole(role string) schema.RoleType {
 	switch role {
 	case openai.ChatMessageRoleUser:
@@ -184,7 +218,7 @@ func toOpenAIToolCalls(toolCalls []schema.ToolCall) []openai.ToolCall {
 	return ret
 }
 
-func (cm *ChatModel) genRequest(in []*schema.Message) *openai.ChatCompletionRequest {
+func (cm *ChatModel) genRequest(in []*schema.Message) (*openai.ChatCompletionRequest, error) {
 	req := &openai.ChatCompletionRequest{
 		Model:            cm.config.Model,
 		MaxTokens:        cm.config.MaxTokens,
@@ -245,12 +279,17 @@ func (cm *ChatModel) genRequest(in []*schema.Message) *openai.ChatCompletionRequ
 
 	msgs := make([]openai.ChatCompletionMessage, 0, len(in))
 	for _, inMsg := range in {
+		mc, e := toOpenAIMultiContent(inMsg.MultiContent)
+		if e != nil {
+			return nil, e
+		}
 		msg := openai.ChatCompletionMessage{
-			Role:       toOpenAIRole(inMsg.Role),
-			Content:    inMsg.Content,
-			Name:       inMsg.Name,
-			ToolCalls:  toOpenAIToolCalls(inMsg.ToolCalls),
-			ToolCallID: inMsg.ToolCallID,
+			Role:         toOpenAIRole(inMsg.Role),
+			Content:      inMsg.Content,
+			MultiContent: mc,
+			Name:         inMsg.Name,
+			ToolCalls:    toOpenAIToolCalls(inMsg.ToolCalls),
+			ToolCallID:   inMsg.ToolCallID,
 		}
 
 		msgs = append(msgs, msg)
@@ -264,7 +303,7 @@ func (cm *ChatModel) genRequest(in []*schema.Message) *openai.ChatCompletionRequ
 		}
 	}
 
-	return req
+	return req, nil
 }
 
 func (cm *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ...model.Option) (
@@ -280,7 +319,10 @@ func (cm *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ..
 		}
 	}()
 
-	req := cm.genRequest(in)
+	req, err := cm.genRequest(in)
+	if err != nil {
+		return nil, err
+	}
 
 	runtimeModifyReq(req, opts...)
 
@@ -306,7 +348,7 @@ func (cm *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ..
 	msg := resp.Choices[0].Message
 
 	outMsg = &schema.Message{
-		Role:       schema.RoleType(msg.Role),
+		Role:       toMessageRole(msg.Role),
 		Content:    msg.Content,
 		Name:       msg.Name,
 		ToolCallID: msg.ToolCallID,
@@ -343,7 +385,10 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, // nolint
 		}
 	}()
 
-	req := cm.genRequest(in)
+	req, err := cm.genRequest(in)
+	if err != nil {
+		return nil, err
+	}
 
 	runtimeModifyReq(req, opts...)
 
@@ -396,7 +441,7 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, // nolint
 
 			delta := chunk.Choices[0].Delta
 			msg := &schema.Message{
-				Role:      schema.RoleType(delta.Role),
+				Role:      toMessageRole(delta.Role),
 				Content:   delta.Content,
 				ToolCalls: toMessageToolCalls(delta.ToolCalls),
 			}

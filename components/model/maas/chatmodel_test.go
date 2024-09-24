@@ -137,7 +137,42 @@ func Test_Generate(t *testing.T) {
 			convey.So(outMsg.Role, convey.ShouldEqual, schema.Assistant)
 			convey.So(len(outMsg.ToolCalls), convey.ShouldEqual, 1)
 		})
+
+		PatchConvey("generate_with_image_success", func() {
+
+			multiModalMsg := schema.UserMessage("")
+			multiModalMsg.MultiContent = []schema.ChatMessagePart{
+				{
+					Type: schema.ChatMessagePartTypeText,
+					Text: "image_desc",
+				},
+				{
+					Type: schema.ChatMessagePartTypeImageURL,
+					ImageURL: &schema.ChatMessageImageURL{
+						URL:    "https://{RL_ADDRESS}",
+						Detail: schema.ImageURLDetailAuto,
+					},
+				},
+			}
+
+			req, err := toMaasContent(multiModalMsg.Content, multiModalMsg.MultiContent)
+			convey.So(err, convey.ShouldBeNil)
+			convey.So(req.StringValue, convey.ShouldBeNil)
+			convey.So(req.ListValue, convey.ShouldHaveLength, 2)
+			convey.So(req.ListValue[0], convey.ShouldEqual, &model.ChatCompletionMessageContentPart{
+				Type: model.ChatCompletionMessageContentPartTypeText,
+				Text: "image_desc",
+			})
+			convey.So(req.ListValue[1], convey.ShouldEqual, &model.ChatCompletionMessageContentPart{
+				Type: model.ChatCompletionMessageContentPartTypeImageURL,
+				ImageURL: &model.ChatMessageImageURL{
+					URL:    "https://{RL_ADDRESS}",
+					Detail: model.ImageURLDetailAuto,
+				},
+			})
+		})
 	})
+
 }
 
 func Test_Stream(t *testing.T) {
