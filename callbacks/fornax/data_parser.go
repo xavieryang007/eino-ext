@@ -27,6 +27,10 @@ type CallbackDataParser interface {
 	ParseStreamOutput(ctx context.Context, info *callbacks.RunInfo, output *schema.StreamReader[callbacks.CallbackOutput]) map[string]any
 }
 
+func NewDefaultDataParser() CallbackDataParser {
+	return &defaultDataParser{}
+}
+
 type defaultDataParser struct{}
 
 func (d defaultDataParser) ParseInput(ctx context.Context, info *callbacks.RunInfo, input callbacks.CallbackInput) map[string]any {

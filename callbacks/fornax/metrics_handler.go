@@ -98,7 +98,7 @@ func (l *einoMetrics) OnEnd(ctx context.Context, info *callbacks.RunInfo, output
 			Tokens:       int64(tokenInfo.TotalTokens),
 			InputTokens:  int64(tokenInfo.PromptTokens),
 			OutputTokens: int64(tokenInfo.CompletionTokens),
-		}, "0")
+		}, l.getUserID(ctx))
 	default:
 		if isInfraComponent(info.Component) {
 			queryEmitter := l.mtr.GetGraphQueryMetricEmitter(ctx, info.Name, status)
@@ -276,7 +276,15 @@ func (l *einoMetrics) handleChatModelStreamOutput(ctx context.Context, _ *callba
 		Tokens:       int64(tokenInfo.TotalTokens),
 		InputTokens:  int64(tokenInfo.PromptTokens),
 		OutputTokens: int64(tokenInfo.CompletionTokens),
-	}, "0")
+	}, l.getUserID(ctx))
 
 	return nil
+}
+
+func (l *einoMetrics) getUserID(ctx context.Context) string {
+	if uid, ok := getUserID(ctx); ok {
+		return uid
+	}
+
+	return "0"
 }

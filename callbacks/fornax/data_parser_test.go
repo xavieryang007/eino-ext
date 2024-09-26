@@ -317,3 +317,47 @@ func Test_parseAny(t *testing.T) {
 
 	})
 }
+
+func Test_CustomDataParser(t *testing.T) {
+	PatchConvey("test custom data parser", t, func() {
+		ctx := context.Background()
+		cp := customDataParser{NewDefaultDataParser()}
+		tags := cp.ParseInput(ctx, &callbacks.RunInfo{Name: "xxx"}, nil)
+		convey.So(len(tags), convey.ShouldEqual, 1)
+
+		tags = cp.ParseInput(ctx, &callbacks.RunInfo{Component: components.ComponentOfChatModel}, &model.CallbackInput{
+			Messages: []*schema.Message{
+				{
+					Role:    schema.Assistant,
+					Content: "asd",
+					Name:    "name",
+				},
+				{
+					Role:    schema.Assistant,
+					Content: "qwe",
+					Name:    "name",
+				},
+			},
+			Config: &model.Config{
+				Model: "mock_name",
+			},
+		})
+
+		convey.So(tags, convey.ShouldNotBeNil)
+		convey.So(tags[obtag.Input], convey.ShouldNotBeZeroValue)
+		convey.So(tags[obtag.ModelName], convey.ShouldEqual, "mock_name")
+	})
+}
+
+type customDataParser struct {
+	CallbackDataParser
+}
+
+func (c *customDataParser) ParseInput(ctx context.Context, info *callbacks.RunInfo, input callbacks.CallbackInput) map[string]any {
+	switch info.Name {
+	case "xxx":
+		return map[string]any{"custom": 123}
+	default:
+		return c.CallbackDataParser.ParseInput(ctx, info, input)
+	}
+}

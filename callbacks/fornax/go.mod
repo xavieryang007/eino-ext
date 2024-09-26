@@ -6,7 +6,7 @@ require (
 	code.byted.org/data/mario_collector v1.3.0
 	code.byted.org/flow/eino v0.0.0-20240918114741-ad304880d3d5
 	code.byted.org/flow/flow-telemetry-common/go v0.0.0-20240830081243-a15d639a66a0
-	code.byted.org/flowdevops/fornax_sdk v0.0.0-20240909044024-6dfdae20b7e2
+	code.byted.org/flowdevops/fornax_sdk v0.0.0-20240923060838-825174c57aab
 	code.byted.org/gopkg/env v1.6.14
 	code.byted.org/gopkg/logs/v2 v2.2.0-beta.9
 	code.byted.org/lang/gg v0.19.1

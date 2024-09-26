@@ -226,9 +226,22 @@ func (l *einoTracer) setRunInfo(_ context.Context, span *ob.FornaxSpanImpl, info
 }
 
 func (l *einoTracer) setFornaxTags(ctx context.Context, span *ob.FornaxSpanImpl) {
-	span.SetTag(make(spanTags).
+	tags := make(spanTags).
 		set(obtag.SpaceID, itoa(l.identity.GetSpaceID())).
 		set(obtag.FornaxSpaceID, itoa(l.identity.GetSpaceID())).
-		set(obtag.Runtime, toJson(getStaticRuntimeTags())),
-	)
+		set(obtag.Runtime, toJson(getStaticRuntimeTags()))
+
+	if uid, ok := getUserID(ctx); ok {
+		tags.set(obtag.UserID, uid)
+	}
+
+	if did, ok := getDeviceID(ctx); ok {
+		tags.set(obtag.DeviceID, did)
+	}
+
+	if tid, ok := getThreadID(ctx); ok {
+		tags.set(obtag.ThreadID, tid)
+	}
+
+	span.SetTag(tags)
 }

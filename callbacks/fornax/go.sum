@@ -893,8 +893,8 @@ code.byted.org/flow/flow-telemetry-common/go v0.0.0-20240830081243-a15d639a66a0 
 code.byted.org/flow/flow-telemetry-common/go v0.0.0-20240830081243-a15d639a66a0/go.mod h1:s5Xm+wOPHP5/E0W2EtyogaHJmiMC5b/H5ke28u/PkZk=
 code.byted.org/flowdevops/fornax/pkg/auth v0.0.0-20240530115429-4a4ba39f6406 h1:2aMjmLLmdsV8PFJVQFgoNCktKp9xh//Q7MjnKBeA4Fk=
 code.byted.org/flowdevops/fornax/pkg/auth v0.0.0-20240530115429-4a4ba39f6406/go.mod h1:X1SRgLSjUtWNebSjhHIwMfDEAyoVdPREoeOQpCUuRoI=
-code.byted.org/flowdevops/fornax_sdk v0.0.0-20240909044024-6dfdae20b7e2 h1:AQPo7Xkcw+OvuMdS4sw6mUeFGvPqUZqLkIYKRh7cwdI=
-code.byted.org/flowdevops/fornax_sdk v0.0.0-20240909044024-6dfdae20b7e2/go.mod h1:f7MD3wh8hZ8js2sVMrI7PKe1Kri4mkz6ilsbOeOk/rY=
+code.byted.org/flowdevops/fornax_sdk v0.0.0-20240923060838-825174c57aab h1:5HDun9gtuiJwALG5lUf/qWW+oX6Jy+mLzfb2TwSlC5I=
+code.byted.org/flowdevops/fornax_sdk v0.0.0-20240923060838-825174c57aab/go.mod h1:f7MD3wh8hZ8js2sVMrI7PKe1Kri4mkz6ilsbOeOk/rY=
 code.byted.org/flowdevops/mockoai v0.0.10 h1:8Qxgs/5bvO6dDmshQ88MHUKcsDgg9u5MHNNXlCyYd68=
 code.byted.org/golf/buffer_pool v0.1.0 h1:Aj6hHGtwk4Av4gu8wrCqHV7iWo3nMZGp+HZnbKd/wZY=
 code.byted.org/golf/buffer_pool v0.1.0/go.mod h1:W2d2fc0+pnPhsrElW4Mr4aHsEgh/tyytYpzZrSZRHqc=
