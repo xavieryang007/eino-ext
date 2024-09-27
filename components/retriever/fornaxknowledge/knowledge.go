@@ -123,17 +123,15 @@ func (k *Knowledge) Retrieve(ctx context.Context, input string, opts ...retrieve
 		ctx = cbm.OnStart(ctx, &retriever.CallbackInput{Query: input, Extra: extra})
 	}
 
-	topK := k.config.TopK
+	opt := retriever.GetCommonOptions(&retriever.Options{
+		TopK: int(k.config.TopK),
+	}, opts...)
 
-	opt := retriever.GetRetrieverOptions(opts...)
-	if opt.TopK != nil && *opt.TopK > 0 {
-		topK = int32(*opt.TopK)
-	}
-	extra["top_k"] = topK
+	extra["top_k"] = int32(opt.TopK)
 
 	req := &fknowledge.RetrieveKnowledgeParams{
 		Query:         input,
-		TopK:          topK,
+		TopK:          int32(opt.TopK),
 		KnowledgeKeys: k.config.KnowledgeKeys,
 		Channels:      k.config.Channels,
 		Rank:          k.config.ranker,

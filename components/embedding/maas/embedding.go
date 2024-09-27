@@ -138,18 +138,18 @@ func (e *Embedder) IsCallbacksEnabled() bool {
 
 func (e *Embedder) genRequest(texts []string, opts ...embedding.Option) (
 	req model.EmbeddingRequestStrings) {
+	options := &embedding.Options{
+		Model: e.conf.Model,
+	}
+
+	options = embedding.GetCommonOptions(options, opts...)
 
 	req = model.EmbeddingRequestStrings{
 		Input:          texts,
-		Model:          e.conf.Model,
+		Model:          options.Model,
 		User:           e.conf.User,
 		EncodingFormat: model.EmbeddingEncodingFormatFloat,
 		Dimensions:     e.conf.Dimensions,
-	}
-
-	option := embedding.GetEmbeddingOptions(opts...)
-	if option.Model != nil {
-		req.Model = *option.Model
 	}
 
 	return req

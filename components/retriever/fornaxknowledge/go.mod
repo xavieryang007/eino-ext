@@ -7,8 +7,7 @@ toolchain go1.22.0
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
-	code.byted.org/flow/eino v0.0.0-20240920095124-7f4514c9cb97
-	code.byted.org/flow/eino/components/retriever/fornaxknowledge v0.0.0-20240920095124-7f4514c9cb97
+	code.byted.org/flow/eino v0.0.0-20240927085639-f2860a32c6a2
 	code.byted.org/flowdevops/fornax_sdk v0.0.0-20240923060838-825174c57aab
 	code.byted.org/lang/gg v0.19.1
 	code.byted.org/obric/flow_telemetry_go v0.4.1

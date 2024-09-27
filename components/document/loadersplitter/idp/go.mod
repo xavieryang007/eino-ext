@@ -3,7 +3,7 @@ module code.byted.org/flow/eino-ext/components/document/loadersplitter/idp
 go 1.18
 
 require (
-	code.byted.org/flow/eino v0.0.0-20240919091809-034091a4c61d
+	code.byted.org/flow/eino v0.0.0-20240927030830-8116262b5e90
 	code.byted.org/gopkg/lang v0.21.8
 	code.byted.org/lark_ai/idp_sdk v0.0.0-20240703094640-9ac71589a994
 	code.byted.org/overpass/lark_ai_davinci v0.0.0-20240705053244-4917f91e70cc
@@ -55,6 +55,7 @@ require (
 	code.byted.org/kite/kitex v1.16.0 // indirect
 	code.byted.org/kite/kitex-overpass-suite v0.0.26 // indirect
 	code.byted.org/kite/rpal v0.1.16 // indirect
+	code.byted.org/lang/gg v0.18.0 // indirect
 	code.byted.org/lang/trace v0.0.3 // indirect
 	code.byted.org/lark_ai/idp_common v0.0.0-20240701122047-54360ca8048f // indirect
 	code.byted.org/lidar/profiler v0.3.9 // indirect
@@ -83,7 +84,7 @@ require (
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/bufbuild/protocompile v0.8.0 // indirect
 	github.com/bytedance/gopkg v0.0.0-20240514070511-01b2cbcf35e1 // indirect
-	github.com/bytedance/sonic v1.12.1 // indirect
+	github.com/bytedance/sonic v1.12.2 // indirect
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
 	github.com/caarlos0/env/v6 v6.10.1 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
@@ -119,7 +120,6 @@ require (
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.17.7 // indirect
 	github.com/klauspost/cpuid/v2 v2.2.7 // indirect
-	github.com/kr/pretty v0.3.1 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/gls v0.0.0-20220109145502-612d0167dce5 // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
@@ -146,7 +146,7 @@ require (
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20231121144256-b99613f794b6 // indirect
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
-	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1 // indirect
+	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect

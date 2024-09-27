@@ -87,7 +87,13 @@ func (r *Retriever) Retrieve(ctx context.Context, query string, opts ...retrieve
 		ctx = cbm.OnStart(ctx, &retriever.CallbackInput{Query: query})
 	}
 
-	options := retriever.GetRetrieverOptions(opts...)
+	options := retriever.GetCommonOptions(&retriever.Options{
+		Index:          r.config.Index,
+		SubIndex:       r.config.SubIndex,
+		TopK:           r.config.TopK,
+		ScoreThreshold: r.config.ScoreThreshold,
+		DSLInfo:        r.config.FilterDSL,
+	}, opts...)
 
 	useBuiltinEmbedding := r.config.EmbeddingConfig.UseBuiltin && options.Embedding == nil
 
@@ -192,32 +198,16 @@ func (r *Retriever) embeddingQuery(ctx context.Context, query string, options *r
 
 func (r *Retriever) retrieverWithVector(ctx context.Context, dense []float64, sparse [][]interface{}, options *retriever.Options) (docs []*schema.Document, err error) {
 	req := &viking.RecallRequest{
-		Index:            r.config.Index,
-		SubIndex:         r.config.SubIndex,
+		Index:            options.Index,
+		SubIndex:         options.SubIndex,
 		Embedding:        f64To32(dense),
 		SparseEmbedding:  sparse,
 		SparseLogitAlpha: r.config.EmbeddingConfig.SparseLogitAlpha,
-		TopK:             int32(r.config.TopK),
-		DslInfo:          r.config.FilterDSL,
+		TopK:             int32(options.TopK),
+		DslInfo:          options.DSLInfo,
 	}
 
-	if options.Index != nil {
-		req.Index = *options.Index
-	}
-
-	if options.SubIndex != nil {
-		req.SubIndex = *options.SubIndex
-	}
-
-	if options.TopK != nil {
-		req.TopK = int32(*options.TopK)
-	}
-
-	if options.DSLInfo != nil {
-		req.DslInfo = options.DSLInfo
-	}
-
-	if req.SubIndex == "" {
+	if len(req.SubIndex) == 0 {
 		req.SubIndex = defaultSubIndex
 	}
 
@@ -232,14 +222,9 @@ func (r *Retriever) retrieverWithVector(ctx context.Context, dense []float64, sp
 		return []*schema.Document{}, nil
 	}
 
-	scoreThreshold := r.config.ScoreThreshold
-	if options.ScoreThreshold != nil {
-		scoreThreshold = options.ScoreThreshold
-	}
-
 	docs = make([]*schema.Document, 0, len(resp.Result))
 	for _, result := range resp.Result {
-		if scoreThreshold != nil && result.Scores < *scoreThreshold {
+		if options.ScoreThreshold != nil && result.Scores < *options.ScoreThreshold {
 			continue
 		}
 

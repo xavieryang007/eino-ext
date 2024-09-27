@@ -58,7 +58,7 @@ func TestLarkDocInGraph(t *testing.T) {
 		err = graph.AddEdge("larkDoc", compose.END)
 		assert.Nil(t, err)
 
-		_, err = graph.Compile()
+		_, err = graph.Compile(context.Background())
 		assert.Nil(t, err)
 	})
 
@@ -66,7 +66,7 @@ func TestLarkDocInGraph(t *testing.T) {
 		chain := compose.NewChain[document.Source, []*schema.Document]()
 		chain.AppendLoaderSplitter(l)
 
-		_, err := chain.Compile()
+		_, err := chain.Compile(context.Background())
 		assert.Nil(t, err)
 	})
 
@@ -74,9 +74,10 @@ func TestLarkDocInGraph(t *testing.T) {
 		chain := compose.NewChain[document.Source, map[string]any]()
 		parallel := compose.NewParallel()
 		parallel.AddLoaderSplitter("k1", l)
+		parallel.AddLoaderSplitter("k2", l)
 
 		chain.AppendParallel(parallel)
-		_, err := chain.Compile()
+		_, err := chain.Compile(context.Background())
 		assert.Nil(t, err)
 	})
 }

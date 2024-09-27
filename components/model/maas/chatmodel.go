@@ -258,10 +258,18 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...f
 }
 
 func (cm *ChatModel) genRequest(in []*schema.Message, opts ...fmodel.Option) (req model.ChatCompletionRequest, err error) {
+	options := fmodel.GetCommonOptions(&fmodel.Options{
+		Temperature: cm.config.Temperature,
+		MaxTokens:   cm.config.MaxTokens,
+		Model:       cm.config.Model,
+		TopP:        cm.config.TopP,
+	}, opts...)
+
 	req = model.ChatCompletionRequest{
-		MaxTokens:         cm.config.MaxTokens,
-		Temperature:       cm.config.Temperature,
-		TopP:              cm.config.TopP,
+		MaxTokens:         options.MaxTokens,
+		Temperature:       options.Temperature,
+		TopP:              options.TopP,
+		Model:             options.Model,
 		Stream:            cm.config.Stream,
 		Stop:              cm.config.Stop,
 		FrequencyPenalty:  cm.config.FrequencyPenalty,
@@ -301,25 +309,6 @@ func (cm *ChatModel) genRequest(in []*schema.Message, opts ...fmodel.Option) (re
 		}
 
 		req.Tools = append(req.Tools, maasTool)
-	}
-
-	o := fmodel.GetModelOptions(opts...)
-
-	if o.Temperature != nil {
-		req.Temperature = *o.Temperature
-	}
-	if o.MaxTokens != nil {
-		req.MaxTokens = *o.MaxTokens
-	}
-	if o.Model != nil {
-		req.Model = *o.Model
-	}
-	if o.TopP != nil {
-		req.TopP = *o.TopP
-	}
-
-	if len(req.Model) == 0 {
-		req.Model = cm.config.Model
 	}
 
 	return req, nil

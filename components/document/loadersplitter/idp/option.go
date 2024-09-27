@@ -9,11 +9,7 @@ type option struct {
 }
 
 func WithLarkDocAccessKey(accessKey string) document.LoaderSplitterOption {
-	return func(opts *document.LoaderSplitterOptions) {
-		if o, ok := opts.ImplSpecificOption.(*option); ok {
-			o.LarkDocAccessKey = accessKey
-		}
-
-		return
-	}
+	return document.WrapImplSpecificOptFn(func(o *option) {
+		o.LarkDocAccessKey = accessKey
+	})
 }

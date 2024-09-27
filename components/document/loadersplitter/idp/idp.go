@@ -107,12 +107,7 @@ func (s *LoaderSplitter) LoadAndSplit(ctx context.Context, src document.Source, 
 		LarkDocAccessKey: larkDocUserAccessKey,
 	}
 
-	opt := &document.LoaderSplitterOptions{
-		ImplSpecificOption: idpOption,
-	}
-	for _, optFn := range opts {
-		optFn(opt)
-	}
+	idpOption = document.GetImplSpecificOptions(idpOption, opts...)
 
 	if s.config.FileType == FileTypeOfLarkDoc {
 		if s.larkDocLoader == nil {

@@ -5,7 +5,7 @@ go 1.20
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
-	code.byted.org/flow/eino v0.0.0-20240918030911-b0143ea12a6f
+	code.byted.org/flow/eino v0.0.0-20240927030830-8116262b5e90
 	code.byted.org/kite/kitex v1.17.0
 	code.byted.org/kite/kitutil v3.8.8+incompatible
 	code.byted.org/middleware/eino v1.0.0-rc.2
@@ -54,6 +54,7 @@ require (
 	code.byted.org/kite/endpoint v3.7.5+incompatible // indirect
 	code.byted.org/kite/kitc v3.10.26+incompatible // indirect
 	code.byted.org/kite/rpal v0.1.19 // indirect
+	code.byted.org/lang/gg v0.18.0 // indirect
 	code.byted.org/lang/trace v0.0.3 // indirect
 	code.byted.org/lidar/profiler v0.3.9 // indirect
 	code.byted.org/lidar/profiler/kitex v0.0.0-20240515095433-9c7e047c4f64 // indirect

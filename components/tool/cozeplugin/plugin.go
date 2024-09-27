@@ -158,8 +158,7 @@ func (c *cozePlugin) Info(ctx context.Context) (*schema.ToolInfo, error) {
 }
 
 func (c *cozePlugin) InvokableRun(ctx context.Context, argumentsInJSON string, opts ...tool.Option) (string, error) {
-	opt := getPluginOption(opts...)
-	plgOpt := opt.ImplSpecificOption.(*pluginOption)
+	plgOpt := tool.GetImplSpecificOptions(&pluginOptions{}, opts...)
 
 	var err error
 	if plgOpt.InputModifier != nil {
@@ -223,8 +222,7 @@ func (s *streamCozePlugin) Info(ctx context.Context) (*schema.ToolInfo, error) {
 }
 
 func (s *streamCozePlugin) StreamableRun(ctx context.Context, argumentsInJSON string, opts ...tool.Option) (*schema.StreamReader[string], error) {
-	opt := getPluginOption(opts...)
-	plgOpt := opt.ImplSpecificOption.(*pluginOption)
+	plgOpt := tool.GetImplSpecificOptions(&pluginOptions{}, opts...)
 
 	var err error
 	if plgOpt.InputModifier != nil {

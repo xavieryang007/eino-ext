@@ -5,8 +5,7 @@ go 1.20
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
-	code.byted.org/flow/eino v0.0.0-20240909085143-b409c4094153
-	code.byted.org/flow/eino/components/tool/fornaxplugin v0.0.0-20240919091809-034091a4c61d
+	code.byted.org/flow/eino v0.0.0-20240927030830-8116262b5e90
 	code.byted.org/gopkg/asynccache v0.0.0-20210422090342-26f94f7676b8
 	code.byted.org/gopkg/logs/v2 v2.2.0-beta.9
 	code.byted.org/kite/kitex v1.16.0
@@ -14,7 +13,6 @@ require (
 	code.byted.org/lang/gg v0.18.0
 	code.byted.org/overpass/flow_devops_plugin v0.0.0-20240821000551-3a50ed64f224
 	github.com/bytedance/mockey v1.2.10
-	github.com/bytedance/sonic v1.12.1
 	github.com/cloudwego/kitex v0.10.0
 	github.com/stretchr/testify v1.9.0
 )
@@ -81,6 +79,7 @@ require (
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/bufbuild/protocompile v0.8.0 // indirect
 	github.com/bytedance/gopkg v0.0.0-20240514070511-01b2cbcf35e1 // indirect
+	github.com/bytedance/sonic v1.12.2 // indirect
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
 	github.com/caarlos0/env/v6 v6.10.1 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
@@ -95,6 +94,9 @@ require (
 	github.com/cloudwego/thriftgo v0.3.6 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/facebookgo/ensure v0.0.0-20200202191622-63f1cf65ac4c // indirect
+	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
+	github.com/facebookgo/subset v0.0.0-20200203212716-c811ad88dec4 // indirect
 	github.com/fatih/structtag v1.2.0 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.3 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
@@ -126,7 +128,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
-	github.com/sashabaranov/go-openai v1.26.3 // indirect
 	github.com/shirou/gopsutil/v3 v3.24.2 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/slongfield/pyfmt v0.0.0-20220222012616-ea85ff4c361f // indirect
@@ -144,7 +145,7 @@ require (
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20231121144256-b99613f794b6 // indirect
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
-	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1 // indirect
+	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect

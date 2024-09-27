@@ -86,7 +86,7 @@ func (i *Indexer) Store(ctx context.Context, docs []*schema.Document, opts ...in
 		ctx = cbm.OnStart(ctx, &indexer.CallbackInput{Docs: docs})
 	}
 
-	options := indexer.GetIndexerOption(opts...)
+	options := indexer.GetCommonOptions(&indexer.Options{}, opts...)
 
 	useBuiltinEmbedding := i.config.EmbeddingConfig.UseBuiltin && options.Embedding == nil
 

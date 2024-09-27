@@ -218,12 +218,12 @@ func toOpenAIToolCalls(toolCalls []schema.ToolCall) []openai.ToolCall {
 	return ret
 }
 
-func (cm *ChatModel) genRequest(in []*schema.Message) (*openai.ChatCompletionRequest, error) {
+func (cm *ChatModel) genRequest(in []*schema.Message, options *model.Options) (*openai.ChatCompletionRequest, error) {
 	req := &openai.ChatCompletionRequest{
-		Model:            cm.config.Model,
-		MaxTokens:        cm.config.MaxTokens,
-		Temperature:      cm.config.Temperature,
-		TopP:             cm.config.TopP,
+		Model:            options.Model,
+		MaxTokens:        options.MaxTokens,
+		Temperature:      options.Temperature,
+		TopP:             options.TopP,
 		Stop:             cm.config.Stop,
 		PresencePenalty:  cm.config.PresencePenalty,
 		Seed:             cm.config.Seed,
@@ -319,12 +319,17 @@ func (cm *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ..
 		}
 	}()
 
-	req, err := cm.genRequest(in)
+	options := model.GetCommonOptions(&model.Options{
+		Temperature: cm.config.Temperature,
+		MaxTokens:   cm.config.MaxTokens,
+		Model:       cm.config.Model,
+		TopP:        cm.config.TopP,
+	}, opts...)
+
+	req, err := cm.genRequest(in, options)
 	if err != nil {
 		return nil, err
 	}
-
-	runtimeModifyReq(req, opts...)
 
 	reqConf := &model.Config{
 		Model:       req.Model,
@@ -385,12 +390,17 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, // nolint
 		}
 	}()
 
-	req, err := cm.genRequest(in)
+	options := model.GetCommonOptions(&model.Options{
+		Temperature: cm.config.Temperature,
+		MaxTokens:   cm.config.MaxTokens,
+		Model:       cm.config.Model,
+		TopP:        cm.config.TopP,
+	}, opts...)
+
+	req, err := cm.genRequest(in, options)
 	if err != nil {
 		return nil, err
 	}
-
-	runtimeModifyReq(req, opts...)
 
 	req.Stream = true
 
@@ -531,29 +541,6 @@ func toTools(tis []*schema.ToolInfo) ([]tool, error) {
 	}
 
 	return tools, nil
-}
-
-func runtimeModifyReq(req *openai.ChatCompletionRequest, opts ...model.Option) {
-	if req == nil {
-		return
-	}
-	if len(opts) == 0 {
-		return
-	}
-	o := model.GetModelOptions(opts...)
-
-	if o.Temperature != nil {
-		req.Temperature = *o.Temperature
-	}
-	if o.MaxTokens != nil {
-		req.MaxTokens = *o.MaxTokens
-	}
-	if o.Model != nil {
-		req.Model = *o.Model
-	}
-	if o.TopP != nil {
-		req.TopP = *o.TopP
-	}
 }
 
 func (cm *ChatModel) BindTools(tools []*schema.ToolInfo) error {

@@ -3,7 +3,7 @@ module code.byted.org/flow/eino-ext/components/embedding/openai
 go 1.18
 
 require (
-	code.byted.org/flow/eino v0.0.0-20240918114741-ad304880d3d5
+	code.byted.org/flow/eino v0.0.0-20240927030830-8116262b5e90
 	code.byted.org/gopkg/ctxvalues v0.6.0
 	code.byted.org/gopkg/logs/v2 v2.2.0-beta.9
 	github.com/sashabaranov/go-openai v1.30.0
@@ -44,7 +44,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/slongfield/pyfmt v0.0.0-20220222012616-ea85ff4c361f // indirect
 	github.com/yargevad/filepathx v1.0.0 // indirect
-	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1 // indirect
+	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 // indirect
 	golang.org/x/sys v0.20.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

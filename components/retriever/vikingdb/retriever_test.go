@@ -11,7 +11,6 @@ import (
 
 	"code.byted.org/flow/eino/components/retriever"
 	viking "code.byted.org/lagrange/viking_go_client"
-	"code.byted.org/lang/gg/gptr"
 
 	"code.byted.org/flow/eino-ext/components/retriever/vikingdb/internal/mock/embedding"
 )
@@ -74,7 +73,10 @@ func TestRetrieverWithVector(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		emb := embedding.NewMockEmbedder(ctrl)
 		vector := []float64{1.1, 1.2, 3.5}
-		r, err := NewRetriever(ctx, &RetrieverConfig{EmbeddingConfig: EmbeddingConfig{Embedding: emb}, ScoreThreshold: gptr.Of(20.24)})
+		scoreThresholdConf := 10.00
+		scoreThresholdOpt := 20.24
+
+		r, err := NewRetriever(ctx, &RetrieverConfig{EmbeddingConfig: EmbeddingConfig{Embedding: emb}, ScoreThreshold: &scoreThresholdConf})
 		convey.So(err, convey.ShouldBeNil)
 		convey.So(r, convey.ShouldNotBeNil)
 
@@ -113,7 +115,9 @@ func TestRetrieverWithVector(t *testing.T) {
 				},
 			}, "", nil).Build()
 
-			resp, err := r.retrieverWithVector(ctx, vector, nil, &retriever.Options{})
+			resp, err := r.retrieverWithVector(ctx, vector, nil, &retriever.Options{
+				ScoreThreshold: &scoreThresholdOpt,
+			})
 			convey.So(err, convey.ShouldBeNil)
 			convey.So(resp, convey.ShouldNotBeNil)
 			convey.So(len(resp), convey.ShouldEqual, 1)

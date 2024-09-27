@@ -5,7 +5,10 @@ go 1.18
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
-	code.byted.org/flow/eino v0.0.0-20240920095124-7f4514c9cb97
+	code.byted.org/flow/eino v0.0.0-20240927085639-f2860a32c6a2
+	code.byted.org/gopkg/ctxvalues v0.6.0
+	code.byted.org/gopkg/logid v0.0.0-20211104042040-f78600e482f2
+	code.byted.org/gopkg/logs/v2 v2.2.0-beta.9
 	code.byted.org/lagrange/viking_go_client v0.0.44
 	code.byted.org/lang/gg v0.19.1
 	github.com/bytedance/mockey v1.2.12
@@ -37,14 +40,11 @@ require (
 	code.byted.org/gopkg/asynccache v0.0.0-20210422090342-26f94f7676b8 // indirect
 	code.byted.org/gopkg/consul v1.2.6 // indirect
 	code.byted.org/gopkg/context v0.0.1 // indirect
-	code.byted.org/gopkg/ctxvalues v0.6.0 // indirect
 	code.byted.org/gopkg/debug v0.10.1 // indirect
 	code.byted.org/gopkg/env v1.6.13 // indirect
 	code.byted.org/gopkg/etcd_util v2.3.3+incompatible // indirect
 	code.byted.org/gopkg/etcdproxy v0.1.1 // indirect
-	code.byted.org/gopkg/logid v0.0.0-20211104042040-f78600e482f2 // indirect
 	code.byted.org/gopkg/logs v1.2.23 // indirect
-	code.byted.org/gopkg/logs/v2 v2.2.0-beta.9 // indirect
 	code.byted.org/gopkg/metainfo v0.1.4 // indirect
 	code.byted.org/gopkg/metrics v1.4.25 // indirect
 	code.byted.org/gopkg/metrics/v3 v3.1.31 // indirect
@@ -88,7 +88,7 @@ require (
 	github.com/bufbuild/protocompile v0.8.0 // indirect
 	github.com/bytedance/go-tagexpr/v2 v2.9.2 // indirect
 	github.com/bytedance/gopkg v0.0.0-20240514070511-01b2cbcf35e1 // indirect
-	github.com/bytedance/sonic v1.12.1 // indirect
+	github.com/bytedance/sonic v1.12.2 // indirect
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
 	github.com/caarlos0/env/v6 v6.10.1 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
@@ -177,7 +177,7 @@ require (
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20231121144256-b99613f794b6 // indirect
 	golang.org/x/arch v0.8.0 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
-	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1 // indirect
+	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.24.0 // indirect

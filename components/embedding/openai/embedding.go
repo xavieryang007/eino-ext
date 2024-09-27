@@ -7,9 +7,10 @@ import (
 
 	"github.com/sashabaranov/go-openai"
 
-	"code.byted.org/flow/eino-ext/components/embedding/openai/internal/transport"
 	"code.byted.org/flow/eino/callbacks"
 	"code.byted.org/flow/eino/components/embedding"
+
+	"code.byted.org/flow/eino-ext/components/embedding/openai/internal/transport"
 )
 
 type EmbeddingEncodingFormat string
@@ -81,15 +82,18 @@ func (e *Embedder) EmbedStrings(ctx context.Context, texts []string, opts ...emb
 		}
 	}()
 
+	options := &embedding.Options{
+		Model: e.config.Model,
+	}
+	options = embedding.GetCommonOptions(options, opts...)
+
 	req := &openai.EmbeddingRequest{
 		Input:          texts,
-		Model:          openai.EmbeddingModel(e.config.Model),
+		Model:          openai.EmbeddingModel(options.Model),
 		User:           e.config.User,
 		EncodingFormat: openai.EmbeddingEncodingFormat(e.config.EncodingFormat),
 		Dimensions:     e.config.Dimensions,
 	}
-
-	runtimeModifyReq(req, opts...)
 
 	conf := &embedding.Config{
 		Model:          string(req.Model),
@@ -138,18 +142,4 @@ func (e *Embedder) GetType() string {
 
 func (e *Embedder) IsCallbacksEnabled() bool {
 	return true
-}
-
-func runtimeModifyReq(req *openai.EmbeddingRequest, opts ...embedding.Option) {
-	if req == nil {
-		return
-	}
-	if len(opts) == 0 {
-		return
-	}
-	o := embedding.GetEmbeddingOptions(opts...)
-
-	if o.Model != nil {
-		req.Model = openai.EmbeddingModel(*o.Model)
-	}
 }

@@ -90,7 +90,7 @@ func TestKnowledgeStream(t *testing.T) {
 			c := compose.NewChain[string, []*schema.Document]()
 			c.AppendRetriever(r)
 
-			run, err := c.Compile()
+			run, err := c.Compile(ctx)
 			convey.So(err, convey.ShouldBeNil)
 
 			docsReader, err := run.Stream(ctx, "test")

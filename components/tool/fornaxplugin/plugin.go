@@ -59,8 +59,7 @@ func (i *invokablePlugin) Info(ctx context.Context) (*schema.ToolInfo, error) {
 }
 
 func (i *invokablePlugin) InvokableRun(ctx context.Context, argumentsInJSON string, opts ...tool.Option) (string, error) {
-	opt := getPluginOption(opts...)
-	plgOpt := opt.ImplSpecificOption.(*pluginOption)
+	plgOpt := tool.GetImplSpecificOptions(&pluginOptions{}, opts...)
 
 	content, def, err := executeTool(ctx, i.toolID, argumentsInJSON, plgOpt.callOpts...)
 	if err != nil {

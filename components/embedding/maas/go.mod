@@ -3,7 +3,7 @@ module code.byted.org/flow/eino-ext/components/embedding/maas
 go 1.18
 
 require (
-	code.byted.org/flow/eino v0.0.0-20240918114741-ad304880d3d5
+	code.byted.org/flow/eino v0.0.0-20240927030830-8116262b5e90
 	github.com/bytedance/mockey v1.2.12
 	github.com/smartystreets/goconvey v1.8.1
 	github.com/volcengine/volcengine-go-sdk v1.0.157
@@ -29,7 +29,7 @@ require (
 	github.com/volcengine/volc-sdk-golang v1.0.172 // indirect
 	github.com/yargevad/filepathx v1.0.0 // indirect
 	golang.org/x/arch v0.8.0 // indirect
-	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1 // indirect
+	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 // indirect
 	golang.org/x/net v0.25.0 // indirect
 	golang.org/x/sys v0.24.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
