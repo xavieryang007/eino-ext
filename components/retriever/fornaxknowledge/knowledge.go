@@ -153,7 +153,7 @@ func (k *Knowledge) Retrieve(ctx context.Context, input string, opts ...retrieve
 	}
 
 	if cbmOK {
-		_ = cbm.OnEnd(ctx, &retriever.CallbackOutput{Docs: docs, Extra: extra})
+		_ = cbm.OnEnd(ctx, &retriever.CallbackOutput{Docs: retrieveDocs, Extra: extra})
 	}
 
 	return retrieveDocs, nil
