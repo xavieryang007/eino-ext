@@ -8,7 +8,6 @@ require (
 	code.byted.org/flow/eino v0.0.0-20240927030830-8116262b5e90
 	code.byted.org/kite/kitex v1.17.0
 	code.byted.org/kite/kitutil v3.8.8+incompatible
-	code.byted.org/middleware/eino v1.0.0-rc.2
 	code.byted.org/overpass/ocean_cloud_plugin v0.0.0-20240910083709-0d31634cb8c4
 	github.com/bytedance/mockey v1.2.10
 	github.com/cloudwego/kitex v0.11.0

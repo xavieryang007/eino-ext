@@ -10,7 +10,6 @@ import (
 
 	"code.byted.org/kite/kitex/client/callopt"
 	"code.byted.org/kite/kitutil"
-	"code.byted.org/middleware/eino/pkg/common/errors"
 	"code.byted.org/overpass/ocean_cloud_plugin/kitex_gen/ocean/cloud/plugin"
 	"code.byted.org/overpass/ocean_cloud_plugin/kitex_gen/ocean/cloud/plugin/pluginservice"
 
@@ -247,7 +246,7 @@ func (s *streamCozePlugin) StreamableRun(ctx context.Context, argumentsInJSON st
 	}
 	resp, err := streamClient.StreamDoAction(ctx, req, append(defaultStreamCallOpts, plgOpt.streamCallOpts...)...)
 	if err != nil {
-		return nil, errors.Wrapf(err, errors.ErrCodeSystemFailure, "request to stream execute coze plugin fail")
+		return nil, fmt.Errorf("request to stream execute coze plugin fail: %w", err)
 	}
 
 	result := schema.NewStream[string](1)
