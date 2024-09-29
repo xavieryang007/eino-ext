@@ -150,9 +150,9 @@ func (c *cozePlugin) Info(ctx context.Context) (*schema.ToolInfo, error) {
 	param := constructParams(api.Parameters)
 
 	return &schema.ToolInfo{
-		Name:   api.Name,
-		Desc:   api.Desc,
-		Params: param,
+		Name:        api.Name,
+		Desc:        api.Desc,
+		ParamsOneOf: schema.NewParamsOneOfByParams(param),
 	}, nil
 }
 
@@ -214,9 +214,9 @@ func (s *streamCozePlugin) Info(ctx context.Context) (*schema.ToolInfo, error) {
 	param := constructParams(api.Parameters)
 
 	return &schema.ToolInfo{
-		Name:   api.Name,
-		Desc:   api.Desc,
-		Params: param,
+		Name:        api.Name,
+		Desc:        api.Desc,
+		ParamsOneOf: schema.NewParamsOneOfByParams(param),
 	}, nil
 }
 

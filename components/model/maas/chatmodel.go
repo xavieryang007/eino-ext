@@ -16,7 +16,6 @@ import (
 	"code.byted.org/flow/eino/callbacks"
 	fmodel "code.byted.org/flow/eino/components/model"
 	"code.byted.org/flow/eino/schema"
-	sutils "code.byted.org/flow/eino/schema/utils"
 	"code.byted.org/flow/eino/utils/safe"
 	"code.byted.org/lang/gg/gptr"
 )
@@ -481,7 +480,10 @@ func toTools(tls []*schema.ToolInfo) ([]tool, error) {
 			return nil, errors.New("unexpected nil tool")
 		}
 
-		paramsJSONSchema := sutils.ParamInfosToJSONSchema(ti.Params)
+		paramsJSONSchema, err := ti.ParamsOneOf.ToOpenAPIV3()
+		if err != nil {
+			return nil, fmt.Errorf("convert toolInfo ParamsOneOf to JSONSchema failed: %w", err)
+		}
 
 		tools[i] = tool{
 			Function: &functionDefinition{

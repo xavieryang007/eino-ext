@@ -155,19 +155,20 @@ func TestNewPluginTool(t *testing.T) {
 	assert.Equal(t, &schema.ToolInfo{
 		Name: "search",
 		Desc: "头条搜索",
-		Params: map[string]*schema.ParameterInfo{
-			"body": {
-				Type:     schema.Object,
-				Required: true,
-				SubParams: map[string]*schema.ParameterInfo{
-					"input_query": {
-						Type:     schema.String,
-						Desc:     "用户输入的查询的关键字内容",
-						Required: true,
+		ParamsOneOf: schema.NewParamsOneOfByParams(
+			map[string]*schema.ParameterInfo{
+				"body": {
+					Type:     schema.Object,
+					Required: true,
+					SubParams: map[string]*schema.ParameterInfo{
+						"input_query": {
+							Type:     schema.String,
+							Desc:     "用户输入的查询的关键字内容",
+							Required: true,
+						},
 					},
 				},
-			},
-		},
+			}),
 	}, toolInfo)
 
 	content, err := plg.InvokableRun(ctx, "{\"body\":{ \"input_query\": \"巴黎奥运会中国队获取了多少金牌\" }}",
