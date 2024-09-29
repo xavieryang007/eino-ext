@@ -3,7 +3,7 @@ module code.byted.org/flow/eino-ext/components/embedding/maas
 go 1.18
 
 require (
-	code.byted.org/flow/eino v0.0.0-20240927030830-8116262b5e90
+	code.byted.org/flow/eino v0.0.0-20240929111219-f2bee28ecbcb
 	github.com/bytedance/mockey v1.2.12
 	github.com/smartystreets/goconvey v1.8.1
 	github.com/volcengine/volcengine-go-sdk v1.0.157

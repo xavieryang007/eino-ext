@@ -43,19 +43,20 @@ type ChatModelConfig struct {
 	ByAzure    bool   `json:"by_azure"`
 	APIVersion string `json:"api_version"`
 
-	Model           string   `json:"model"`
-	MaxTokens       int      `json:"max_tokens,omitempty"`
-	Temperature     float32  `json:"temperature,omitempty"`
-	TopP            float32  `json:"top_p,omitempty"`
+	Model string `json:"model"`
+
+	MaxTokens       *int     `json:"max_tokens,omitempty"`
+	Temperature     *float32 `json:"temperature,omitempty"`
+	TopP            *float32 `json:"top_p,omitempty"`
 	Stop            []string `json:"stop,omitempty"`
-	PresencePenalty float32  `json:"presence_penalty,omitempty"`
+	PresencePenalty *float32 `json:"presence_penalty,omitempty"`
 	// ResponseFormat is the format of the response.
 	// can be "json_object" or "text".
 	// tips: if you use "json_object", the prompt must contains a `JSON` string.
 	// refs: https://platform.openai.com/docs/guides/structured-outputs/json-mode.
 	ResponseFormat   *ChatCompletionResponseFormat `json:"response_format,omitempty"`
 	Seed             *int                          `json:"seed,omitempty"`
-	FrequencyPenalty float32                       `json:"frequency_penalty,omitempty"`
+	FrequencyPenalty *float32                      `json:"frequency_penalty,omitempty"`
 	// LogitBias is must be a token id string (specified by their token ID in the tokenizer), not a word string.
 	// incorrect: `"logit_bias":{"You": 6}`, correct: `"logit_bias":{"1639": 6}`
 	// refs: https://platform.openai.com/docs/api-reference/chat/create#chat/create-logit_bias
@@ -63,12 +64,12 @@ type ChatModelConfig struct {
 	// LogProbs indicates whether to return log probabilities of the output tokens or not.
 	// If true, returns the log probabilities of each output token returned in the content of message.
 	// This option is currently not available on the gpt-4-vision-preview model.
-	LogProbs bool `json:"logprobs,omitempty"`
+	LogProbs *bool `json:"logprobs,omitempty"`
 	// TopLogProbs is an integer between 0 and 5 specifying the number of most likely tokens to return at each
 	// token position, each with an associated log probability.
 	// logprobs must be set to true if this parameter is used.
-	TopLogProbs int           `json:"top_logprobs,omitempty"`
-	User        string        `json:"user,omitempty"`
+	TopLogProbs *int          `json:"top_logprobs,omitempty"`
+	User        *string       `json:"user,omitempty"`
 	Timeout     time.Duration `json:"timeout"`
 }
 
@@ -219,19 +220,23 @@ func toOpenAIToolCalls(toolCalls []schema.ToolCall) []openai.ToolCall {
 }
 
 func (cm *ChatModel) genRequest(in []*schema.Message, options *model.Options) (*openai.ChatCompletionRequest, error) {
+	if options.Model == nil || len(*options.Model) == 0 {
+		return nil, fmt.Errorf("open chat model gen request with empty model")
+	}
+
 	req := &openai.ChatCompletionRequest{
-		Model:            options.Model,
-		MaxTokens:        options.MaxTokens,
-		Temperature:      options.Temperature,
-		TopP:             options.TopP,
+		Model:            *options.Model,
+		MaxTokens:        dereferenceOrZero(options.MaxTokens),
+		Temperature:      dereferenceOrZero(options.Temperature),
+		TopP:             dereferenceOrZero(options.TopP),
 		Stop:             cm.config.Stop,
-		PresencePenalty:  cm.config.PresencePenalty,
+		PresencePenalty:  dereferenceOrZero(cm.config.PresencePenalty),
 		Seed:             cm.config.Seed,
-		FrequencyPenalty: cm.config.FrequencyPenalty,
+		FrequencyPenalty: dereferenceOrZero(cm.config.FrequencyPenalty),
 		LogitBias:        cm.config.LogitBias,
-		LogProbs:         cm.config.LogProbs,
-		TopLogProbs:      cm.config.TopLogProbs,
-		User:             cm.config.User,
+		LogProbs:         dereferenceOrZero(cm.config.LogProbs),
+		TopLogProbs:      dereferenceOrZero(cm.config.TopLogProbs),
+		User:             dereferenceOrZero(cm.config.User),
 	}
 
 	if len(cm.tools) > 0 {
@@ -322,7 +327,7 @@ func (cm *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ..
 	options := model.GetCommonOptions(&model.Options{
 		Temperature: cm.config.Temperature,
 		MaxTokens:   cm.config.MaxTokens,
-		Model:       cm.config.Model,
+		Model:       &cm.config.Model,
 		TopP:        cm.config.TopP,
 	}, opts...)
 
@@ -393,7 +398,7 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, // nolint
 	options := model.GetCommonOptions(&model.Options{
 		Temperature: cm.config.Temperature,
 		MaxTokens:   cm.config.MaxTokens,
-		Model:       cm.config.Model,
+		Model:       &cm.config.Model,
 		TopP:        cm.config.TopP,
 	}, opts...)
 

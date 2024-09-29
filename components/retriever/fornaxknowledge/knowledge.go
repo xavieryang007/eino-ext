@@ -57,16 +57,16 @@ type Config struct {
 
 	Filter *string `json:"filter"`
 
-	TopK      int32     `json:"top_k"` // default 3
-	Converter Converter `json:"-"`     // default defaultConverter
+	TopK      *int32    `json:"top_k,omitempty"` // default 3
+	Converter Converter `json:"-"`               // default defaultConverter
 }
 
 // NewKnowledgeRetriever creates a knowledge retriever.
 func NewKnowledgeRetriever(ctx context.Context, config *Config) (*Knowledge, error) {
 	const defaultTopK = int32(3)
 
-	if config.TopK <= 0 {
-		config.TopK = defaultTopK
+	if config.TopK == nil {
+		config.TopK = ptrOf(defaultTopK)
 	}
 	if config.Converter == nil {
 		config.Converter = defaultConverter
@@ -123,15 +123,17 @@ func (k *Knowledge) Retrieve(ctx context.Context, input string, opts ...retrieve
 		ctx = cbm.OnStart(ctx, &retriever.CallbackInput{Query: input, Extra: extra})
 	}
 
+	baseTopK := int(dereferenceOrZero(k.config.TopK))
+
 	opt := retriever.GetCommonOptions(&retriever.Options{
-		TopK: int(k.config.TopK),
+		TopK: &baseTopK,
 	}, opts...)
 
-	extra["top_k"] = int32(opt.TopK)
+	extra["top_k"] = dereferenceOrZero(opt.TopK)
 
 	req := &fknowledge.RetrieveKnowledgeParams{
 		Query:         input,
-		TopK:          int32(opt.TopK),
+		TopK:          int32(dereferenceOrZero(opt.TopK)),
 		KnowledgeKeys: k.config.KnowledgeKeys,
 		Channels:      k.config.Channels,
 		Rank:          k.config.ranker,

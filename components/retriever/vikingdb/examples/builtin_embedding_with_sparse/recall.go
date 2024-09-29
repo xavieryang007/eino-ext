@@ -4,11 +4,12 @@ import (
 	"context"
 	"os"
 
-	"code.byted.org/flow/eino-ext/components/retriever/vikingdb"
 	"code.byted.org/gopkg/ctxvalues"
 	"code.byted.org/gopkg/logid"
 	"code.byted.org/gopkg/logs/v2"
 	viking "code.byted.org/lagrange/viking_go_client"
+
+	"code.byted.org/flow/eino-ext/components/retriever/vikingdb"
 )
 
 func main() {
@@ -16,6 +17,8 @@ func main() {
 	vikingDBToken := os.Getenv("VIKING_DB_TOKEN")
 
 	ctx := ctxvalues.SetLogID(context.Background(), logid.GenLogID())
+
+	baseTopK := 5
 
 	// 混合向量检索: https://bytedance.larkoffice.com/wiki/F3iJwhUa9i3WYFkdOOUcEddFnAh
 	// 1. 向量库打开 has_sparse 开关
@@ -32,7 +35,7 @@ func main() {
 		},
 		Index:    "3", // index version, replace if needed
 		SubIndex: "",
-		TopK:     5,
+		TopK:     &baseTopK,
 	})
 	if err != nil {
 		logs.CtxError(ctx, "NewRetriever failed, err=%v", err)

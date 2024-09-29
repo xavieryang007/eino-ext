@@ -1,10 +1,4 @@
-package maas
-
-const typ = "MaaS"
-
-func getType() string {
-	return typ
-}
+package fornaxknowledge
 
 func dereferenceOrZero[T any](v *T) T {
 	if v == nil {
@@ -13,4 +7,8 @@ func dereferenceOrZero[T any](v *T) T {
 	}
 
 	return *v
+}
+
+func ptrOf[T any](v T) *T {
+	return &v
 }

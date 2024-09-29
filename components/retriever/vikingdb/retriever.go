@@ -29,11 +29,11 @@ type RetrieverConfig struct {
 	Index string `json:"index"`
 	// SubIndex will be set with "default" if len is zero
 	SubIndex       string   `json:"sub_index"`
-	TopK           int      `json:"top_k"`
-	ScoreThreshold *float64 `json:"score_threshold"`
+	TopK           *int     `json:"top_k,omitempty"` // default to 10
+	ScoreThreshold *float64 `json:"score_threshold,omitempty"`
 
 	// option
-	FilterDSL map[string]any `json:"filter_dsl"`
+	FilterDSL map[string]any `json:"filter_dsl,omitempty"`
 }
 
 type EmbeddingConfig struct {
@@ -68,6 +68,14 @@ func NewRetriever(ctx context.Context, conf *RetrieverConfig) (*Retriever, error
 		return nil, fmt.Errorf("[NewRetriever] embedding not provided")
 	}
 
+	if len(conf.SubIndex) == 0 {
+		conf.SubIndex = defaultSubIndex
+	}
+
+	if conf.TopK == nil {
+		conf.TopK = ptrOf(defaultTopK)
+	}
+
 	return &Retriever{
 		client: viking.NewVikingDbClient(conf.Name, conf.Token, conf.Region),
 		config: conf,
@@ -88,8 +96,8 @@ func (r *Retriever) Retrieve(ctx context.Context, query string, opts ...retrieve
 	}
 
 	options := retriever.GetCommonOptions(&retriever.Options{
-		Index:          r.config.Index,
-		SubIndex:       r.config.SubIndex,
+		Index:          &r.config.Index,
+		SubIndex:       &r.config.SubIndex,
 		TopK:           r.config.TopK,
 		ScoreThreshold: r.config.ScoreThreshold,
 		DSLInfo:        r.config.FilterDSL,
@@ -197,22 +205,18 @@ func (r *Retriever) embeddingQuery(ctx context.Context, query string, options *r
 }
 
 func (r *Retriever) retrieverWithVector(ctx context.Context, dense []float64, sparse [][]interface{}, options *retriever.Options) (docs []*schema.Document, err error) {
+	if options.Index == nil || len(*options.Index) == 0 {
+		return nil, fmt.Errorf("vikingdb retrieve with vector, index is empty")
+	}
+
 	req := &viking.RecallRequest{
-		Index:            options.Index,
-		SubIndex:         options.SubIndex,
+		Index:            dereferenceOrZero(options.Index),
+		SubIndex:         dereferenceOrZero(options.SubIndex),
 		Embedding:        f64To32(dense),
 		SparseEmbedding:  sparse,
 		SparseLogitAlpha: r.config.EmbeddingConfig.SparseLogitAlpha,
-		TopK:             int32(options.TopK),
+		TopK:             int32(dereferenceOrZero(options.TopK)),
 		DslInfo:          options.DSLInfo,
-	}
-
-	if len(req.SubIndex) == 0 {
-		req.SubIndex = defaultSubIndex
-	}
-
-	if req.TopK == 0 {
-		req.TopK = defaultTopK
 	}
 
 	resp, _, err := r.client.Recall(req)

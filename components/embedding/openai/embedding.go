@@ -2,6 +2,7 @@ package openai
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -25,15 +26,15 @@ type EmbeddingConfig struct {
 	APIKey  string `json:"api_key"`
 	ByAzure bool   `json:"by_azure"`
 
-	Model string `json:"model"`
-	User  string `json:"user"`
+	Model string  `json:"model"`
+	User  *string `json:"user,omitempty"`
 	// EmbeddingEncodingFormat is the format of the embedding data.
 	// Currently, only "float" and "base64" are supported, however, "base64" is not officially documented.
 	// If not specified OpenAI will use "float".
-	EncodingFormat EmbeddingEncodingFormat `json:"encoding_format,omitempty"`
+	EncodingFormat *EmbeddingEncodingFormat `json:"encoding_format,omitempty"`
 	// Dimensions The number of dimensions the resulting output embeddings should have.
 	// Only supported in text-embedding-3 and later models.
-	Dimensions int `json:"dimensions,omitempty"`
+	Dimensions *int `json:"dimensions,omitempty"`
 
 	Timeout time.Duration `json:"timeout"`
 }
@@ -83,16 +84,20 @@ func (e *Embedder) EmbedStrings(ctx context.Context, texts []string, opts ...emb
 	}()
 
 	options := &embedding.Options{
-		Model: e.config.Model,
+		Model: &e.config.Model,
 	}
 	options = embedding.GetCommonOptions(options, opts...)
 
+	if options.Model == nil || len(*options.Model) == 0 {
+		return nil, fmt.Errorf("open embedder uses empty model")
+	}
+
 	req := &openai.EmbeddingRequest{
 		Input:          texts,
-		Model:          openai.EmbeddingModel(options.Model),
-		User:           e.config.User,
-		EncodingFormat: openai.EmbeddingEncodingFormat(e.config.EncodingFormat),
-		Dimensions:     e.config.Dimensions,
+		Model:          openai.EmbeddingModel(*options.Model),
+		User:           dereferenceOrZero(e.config.User),
+		EncodingFormat: openai.EmbeddingEncodingFormat(dereferenceOrDefault(e.config.EncodingFormat, EmbeddingEncodingFormatFloat)),
+		Dimensions:     dereferenceOrZero(e.config.Dimensions),
 	}
 
 	conf := &embedding.Config{

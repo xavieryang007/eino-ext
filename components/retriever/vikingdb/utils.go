@@ -19,3 +19,16 @@ func f32To64(f32 []float32) []float64 {
 
 	return f64
 }
+
+func dereferenceOrZero[T any](v *T) T {
+	if v == nil {
+		var t T
+		return t
+	}
+
+	return *v
+}
+
+func ptrOf[T any](v T) *T {
+	return &v
+}

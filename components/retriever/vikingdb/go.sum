@@ -868,10 +868,8 @@ code.byted.org/data-arch/gotbase v1.0.8-0.20220905113555-b9d46a7dc975/go.mod h1:
 code.byted.org/duanyi.aster/gopkg v0.0.1/go.mod h1:gxOcKCeV3yQ+J37/A3h5kQqxu/On27n+zdkZuzCbPac=
 code.byted.org/duanyi.aster/gopkg v0.0.3 h1:vQve62C3QiafPw2w8kAK/P+VVwW5Bi+p6foeVxlFydo=
 code.byted.org/duanyi.aster/gopkg v0.0.3/go.mod h1:gxOcKCeV3yQ+J37/A3h5kQqxu/On27n+zdkZuzCbPac=
-code.byted.org/flow/eino v0.0.0-20240927030830-8116262b5e90 h1:JihyNuzLL2mz/CxQeL1Dq6XXBCXpldZmWvYBfsQgp7c=
-code.byted.org/flow/eino v0.0.0-20240927030830-8116262b5e90/go.mod h1:IKHqDjPTRk6X91IuuefWi/n7RLUZSzWv5I8Fszssf9A=
-code.byted.org/flow/eino v0.0.0-20240927085639-f2860a32c6a2 h1:vJlZAx8Zr4Z4qV+Xz/LWdxDHeBwiR7545G29x5Wt1c4=
-code.byted.org/flow/eino v0.0.0-20240927085639-f2860a32c6a2/go.mod h1:IKHqDjPTRk6X91IuuefWi/n7RLUZSzWv5I8Fszssf9A=
+code.byted.org/flow/eino v0.0.0-20240929111219-f2bee28ecbcb h1:Ikrtj9NhwNnOHHrmUH+PvI0VjrejaA0VX5E3d20PvjA=
+code.byted.org/flow/eino v0.0.0-20240929111219-f2bee28ecbcb/go.mod h1:IKHqDjPTRk6X91IuuefWi/n7RLUZSzWv5I8Fszssf9A=
 code.byted.org/golf/buffer_pool v0.1.0 h1:Aj6hHGtwk4Av4gu8wrCqHV7iWo3nMZGp+HZnbKd/wZY=
 code.byted.org/golf/buffer_pool v0.1.0/go.mod h1:W2d2fc0+pnPhsrElW4Mr4aHsEgh/tyytYpzZrSZRHqc=
 code.byted.org/golf/consul v2.1.13+incompatible h1:XiBd9JzwnfgeMMqJ3imoJiV15ppOicdq/qBNW5iEj8A=
@@ -1086,8 +1084,6 @@ code.byted.org/kitex/updater v0.0.0-20200921102538-dbe78eb45dfa/go.mod h1:T0pxyt
 code.byted.org/kitex/updater v0.0.0-20210718093053-3e86736fc333/go.mod h1:T0pxytxkkDMVDTpyql8XcQOTq2qumS5Ry1dI16TuDrE=
 code.byted.org/lagrange/viking_go_client v0.0.44 h1:RTUJjVjmXdAHfQkpYGBv3ZeLqoWqpyb7TZHXk/lCHAo=
 code.byted.org/lagrange/viking_go_client v0.0.44/go.mod h1:H4JKtLaNcnv6SGplLM0q+LxOmzWprCbH8txsTmnoXGs=
-code.byted.org/lang/gg v0.19.1 h1:vDjcpK56TGcfiDiIuNON2IJ7HaH8vEjTdIx6OWLJXoM=
-code.byted.org/lang/gg v0.19.1/go.mod h1:0PJ3ycctxq5JSI8WdvYHUz/NdWR7WsrR9n8hli8MgRg=
 code.byted.org/lang/trace v0.0.2/go.mod h1:2XuTiJT13K4Y1j+QMvYx0EQ5G9BZaC5LxwoK63/Si/o=
 code.byted.org/lang/trace v0.0.3 h1:eoAYuzN2xh8Go0dgX03pbPsHcmHHcTcdVeChpMsFZ7A=
 code.byted.org/lang/trace v0.0.3/go.mod h1:2XuTiJT13K4Y1j+QMvYx0EQ5G9BZaC5LxwoK63/Si/o=

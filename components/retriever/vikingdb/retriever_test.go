@@ -91,7 +91,7 @@ func TestRetrieverWithVector(t *testing.T) {
 		PatchConvey("test Recalled nothing", func() {
 			Mock(GetMethod(r.client, "Recall")).Return(nil, "", nil).Build()
 
-			resp, err := r.retrieverWithVector(ctx, vector, nil, &retriever.Options{})
+			resp, err := r.retrieverWithVector(ctx, vector, nil, &retriever.Options{Index: ptrOf("index")})
 			convey.So(err, convey.ShouldBeNil)
 			convey.So(resp, convey.ShouldNotBeNil)
 			convey.So(len(resp), convey.ShouldEqual, 0)
@@ -117,6 +117,7 @@ func TestRetrieverWithVector(t *testing.T) {
 
 			resp, err := r.retrieverWithVector(ctx, vector, nil, &retriever.Options{
 				ScoreThreshold: &scoreThresholdOpt,
+				Index:          ptrOf("index"),
 			})
 			convey.So(err, convey.ShouldBeNil)
 			convey.So(resp, convey.ShouldNotBeNil)

@@ -4,8 +4,9 @@ import (
 	"context"
 	"os"
 
-	"code.byted.org/flow/eino-ext/components/embedding/openai"
 	"code.byted.org/gopkg/logs/v2"
+
+	"code.byted.org/flow/eino-ext/components/embedding/openai"
 )
 
 func main() {
@@ -13,14 +14,17 @@ func main() {
 
 	ctx := context.Background()
 
+	var (
+		defaultDim = 1024
+	)
+
 	embedding, err := openai.NewEmbedder(ctx, &openai.EmbeddingConfig{
-		BaseURL:        "https://search.bytedance.net/gpt/openapi/online/multimodal/crawl",
-		APIKey:         accessKey,
-		ByAzure:        true,
-		Model:          "text-embedding-3-large",
-		EncodingFormat: openai.EmbeddingEncodingFormatFloat,
-		Dimensions:     1024,
-		Timeout:        0,
+		BaseURL:    "https://search.bytedance.net/gpt/openapi/online/multimodal/crawl",
+		APIKey:     accessKey,
+		ByAzure:    true,
+		Model:      "text-embedding-3-large",
+		Dimensions: &defaultDim,
+		Timeout:    0,
 	})
 	if err != nil {
 		logs.Errorf("new embedder error: %v\n", err)

@@ -29,9 +29,9 @@ type EmbeddingConfig struct {
 	// endpoint_id of the model you use in ark platform, mostly like `ep-20xxxxxxx-xxxxx`.
 	Model string
 	// A unique identifier representing your end-user, which will help to monitor and detect abuse. see more at https://github.com/volcengine/volcengine-go-sdk/blob/master/service/arkruntime/model/embeddings.go
-	User string
+	User *string
 	// Dimensions The number of dimensions the resulting output embeddings should have, different between models.
-	Dimensions int
+	Dimensions *int
 }
 
 type Embedder struct {
@@ -139,17 +139,17 @@ func (e *Embedder) IsCallbacksEnabled() bool {
 func (e *Embedder) genRequest(texts []string, opts ...embedding.Option) (
 	req model.EmbeddingRequestStrings) {
 	options := &embedding.Options{
-		Model: e.conf.Model,
+		Model: &e.conf.Model,
 	}
 
 	options = embedding.GetCommonOptions(options, opts...)
 
 	req = model.EmbeddingRequestStrings{
 		Input:          texts,
-		Model:          options.Model,
-		User:           e.conf.User,
-		EncodingFormat: model.EmbeddingEncodingFormatFloat,
-		Dimensions:     e.conf.Dimensions,
+		Model:          dereferenceOrZero(options.Model),
+		User:           dereferenceOrZero(e.conf.User),
+		EncodingFormat: model.EmbeddingEncodingFormatFloat, // only support Float for now?
+		Dimensions:     dereferenceOrZero(e.conf.Dimensions),
 	}
 
 	return req

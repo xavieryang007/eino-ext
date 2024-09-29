@@ -30,8 +30,8 @@ cloud.google.com/go/storage v1.5.0/go.mod h1:tpKbwo567HUNpVclU5sGELwQWBDZ8gh0Zeo
 cloud.google.com/go/storage v1.6.0/go.mod h1:N7U0C8pVQ/+NIKOBQyamJIeKQKkZ+mxpohlUTyfDhBk=
 cloud.google.com/go/storage v1.8.0/go.mod h1:Wv1Oy7z6Yz3DshWRJFhqM/UCfaWIRTdp0RXyy7KQOVs=
 cloud.google.com/go/storage v1.10.0/go.mod h1:FLPqc6j+Ki4BU591ie1oL6qBQGu2Bl/tZ9ullr3+Kg0=
-code.byted.org/flow/eino v0.0.0-20240927030830-8116262b5e90 h1:JihyNuzLL2mz/CxQeL1Dq6XXBCXpldZmWvYBfsQgp7c=
-code.byted.org/flow/eino v0.0.0-20240927030830-8116262b5e90/go.mod h1:IKHqDjPTRk6X91IuuefWi/n7RLUZSzWv5I8Fszssf9A=
+code.byted.org/flow/eino v0.0.0-20240929111219-f2bee28ecbcb h1:Ikrtj9NhwNnOHHrmUH+PvI0VjrejaA0VX5E3d20PvjA=
+code.byted.org/flow/eino v0.0.0-20240929111219-f2bee28ecbcb/go.mod h1:IKHqDjPTRk6X91IuuefWi/n7RLUZSzWv5I8Fszssf9A=
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/toml v1.1.0/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=

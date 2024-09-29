@@ -4,12 +4,13 @@ import (
 	"context"
 	"os"
 
-	"code.byted.org/flow/eino-ext/components/retriever/vikingdb"
 	"code.byted.org/flow/eino/components/embedding"
 	"code.byted.org/gopkg/ctxvalues"
 	"code.byted.org/gopkg/logid"
 	"code.byted.org/gopkg/logs/v2"
 	viking "code.byted.org/lagrange/viking_go_client"
+
+	"code.byted.org/flow/eino-ext/components/retriever/vikingdb"
 )
 
 func main() {
@@ -20,6 +21,8 @@ func main() {
 
 	emb := &mockEmbedding{} // replace with your embedding
 
+	baseTopK := 5
+
 	retriever, err := vikingdb.NewRetriever(ctx, &vikingdb.RetrieverConfig{
 		Name:            vikingDBName,
 		Token:           vikingDBToken,
@@ -27,7 +30,7 @@ func main() {
 		EmbeddingConfig: vikingdb.EmbeddingConfig{Embedding: emb},
 		Index:           "3", // index version, replace if needed
 		SubIndex:        "",
-		TopK:            5,
+		TopK:            &baseTopK,
 	})
 	if err != nil {
 		logs.CtxError(ctx, "NewRetriever failed, err=%v", err)

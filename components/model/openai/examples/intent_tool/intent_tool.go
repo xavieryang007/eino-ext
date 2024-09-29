@@ -13,6 +13,7 @@ import (
 
 func main() {
 	accessKey := os.Getenv("OPENAI_API_KEY")
+	defaultTemperature := float32(0.7)
 
 	ctx := context.Background()
 	chatModel, err := openai.NewChatModel(ctx, &openai.ChatModelConfig{
@@ -20,7 +21,7 @@ func main() {
 		APIKey:      accessKey,
 		ByAzure:     true,
 		Model:       "gpt-35-turbo-1106",
-		Temperature: 0.7,
+		Temperature: &defaultTemperature,
 		// API Specs: https://github.com/Azure/azure-rest-api-specs/blob/4b847aabd57c3477f6018bcce7d5156006dd214d/specification/cognitiveservices/data-plane/AzureOpenAI/inference/stable/2024-06-01/inference.json
 		APIVersion: "2024-06-01",
 	})

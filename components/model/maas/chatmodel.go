@@ -45,19 +45,19 @@ type ChatModelConfig struct {
 	Model string `json:"model"`
 
 	/* -- Parameters in request -- */
-	MaxTokens         int                   `json:"max_tokens,omitempty"`
-	Temperature       float32               `json:"temperature,omitempty"`
-	TopP              float32               `json:"top_p,omitempty"`
-	Stream            bool                  `json:"stream,omitempty"`
+	MaxTokens         *int                  `json:"max_tokens,omitempty"`
+	Temperature       *float32              `json:"temperature,omitempty"`
+	TopP              *float32              `json:"top_p,omitempty"`
+	Stream            *bool                 `json:"stream,omitempty"`
 	Stop              []string              `json:"stop,omitempty"`
-	FrequencyPenalty  float32               `json:"frequency_penalty,omitempty"`
+	FrequencyPenalty  *float32              `json:"frequency_penalty,omitempty"`
 	LogitBias         map[string]int        `json:"logit_bias,omitempty"`
-	LogProbs          bool                  `json:"log_probs,omitempty"`
-	TopLogProbs       int                   `json:"top_log_probs,omitempty"`
-	User              string                `json:"user,omitempty"`
-	PresencePenalty   float32               `json:"presence_penalty,omitempty"`
-	RepetitionPenalty float32               `json:"repetition_penalty,omitempty"`
-	N                 int                   `json:"n,omitempty"`
+	LogProbs          *bool                 `json:"log_probs,omitempty"`
+	TopLogProbs       *int                  `json:"top_log_probs,omitempty"`
+	User              *string               `json:"user,omitempty"`
+	PresencePenalty   *float32              `json:"presence_penalty,omitempty"`
+	RepetitionPenalty *float32              `json:"repetition_penalty,omitempty"`
+	N                 *int                  `json:"n,omitempty"`
 	ResponseFormat    *model.ResponseFormat `json:"response_format,omitempty"`
 	Timeout           time.Duration         `json:"timeout"`
 }
@@ -132,7 +132,7 @@ func (cm *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ..
 		})
 	}
 
-	resp, err := cm.client.CreateChatCompletion(ctx, req)
+	resp, err := cm.client.CreateChatCompletion(ctx, *req)
 	if err != nil {
 		return nil, fmt.Errorf("[MaasV3] CreateChatCompletion error, %v", err)
 	}
@@ -185,7 +185,7 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...f
 		})
 	}
 
-	stream, err := cm.client.CreateChatCompletionStream(ctx, req)
+	stream, err := cm.client.CreateChatCompletionStream(ctx, *req)
 	if err != nil {
 		return nil, err
 	}
@@ -257,29 +257,33 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...f
 	return outStream, nil
 }
 
-func (cm *ChatModel) genRequest(in []*schema.Message, opts ...fmodel.Option) (req model.ChatCompletionRequest, err error) {
+func (cm *ChatModel) genRequest(in []*schema.Message, opts ...fmodel.Option) (req *model.ChatCompletionRequest, err error) {
 	options := fmodel.GetCommonOptions(&fmodel.Options{
 		Temperature: cm.config.Temperature,
 		MaxTokens:   cm.config.MaxTokens,
-		Model:       cm.config.Model,
+		Model:       &cm.config.Model,
 		TopP:        cm.config.TopP,
 	}, opts...)
 
-	req = model.ChatCompletionRequest{
-		MaxTokens:         options.MaxTokens,
-		Temperature:       options.Temperature,
-		TopP:              options.TopP,
-		Model:             options.Model,
-		Stream:            cm.config.Stream,
+	if options.Model == nil || len(*options.Model) == 0 {
+		return nil, fmt.Errorf("maas chat model gen request with empty model")
+	}
+
+	req = &model.ChatCompletionRequest{
+		MaxTokens:         dereferenceOrZero(options.MaxTokens),
+		Temperature:       dereferenceOrZero(options.Temperature),
+		TopP:              dereferenceOrZero(options.TopP),
+		Model:             dereferenceOrZero(options.Model),
+		Stream:            dereferenceOrZero(cm.config.Stream),
 		Stop:              cm.config.Stop,
-		FrequencyPenalty:  cm.config.FrequencyPenalty,
+		FrequencyPenalty:  dereferenceOrZero(cm.config.FrequencyPenalty),
 		LogitBias:         cm.config.LogitBias,
-		LogProbs:          cm.config.LogProbs,
-		TopLogProbs:       cm.config.TopLogProbs,
-		User:              cm.config.User,
-		PresencePenalty:   cm.config.PresencePenalty,
-		RepetitionPenalty: cm.config.RepetitionPenalty,
-		N:                 cm.config.N,
+		LogProbs:          dereferenceOrZero(cm.config.LogProbs),
+		TopLogProbs:       dereferenceOrZero(cm.config.TopLogProbs),
+		User:              dereferenceOrZero(cm.config.User),
+		PresencePenalty:   dereferenceOrZero(cm.config.PresencePenalty),
+		RepetitionPenalty: dereferenceOrZero(cm.config.RepetitionPenalty),
+		N:                 dereferenceOrZero(cm.config.N),
 		ResponseFormat:    cm.config.ResponseFormat,
 	}
 	for _, msg := range in {
