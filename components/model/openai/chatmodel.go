@@ -48,6 +48,7 @@ type ChatModelConfig struct {
 	MaxTokens       *int     `json:"max_tokens,omitempty"`
 	Temperature     *float32 `json:"temperature,omitempty"`
 	TopP            *float32 `json:"top_p,omitempty"`
+	N               *int     `json:"n,omitempty"`
 	Stop            []string `json:"stop,omitempty"`
 	PresencePenalty *float32 `json:"presence_penalty,omitempty"`
 	// ResponseFormat is the format of the response.
@@ -229,6 +230,7 @@ func (cm *ChatModel) genRequest(in []*schema.Message, options *model.Options) (*
 		MaxTokens:        dereferenceOrZero(options.MaxTokens),
 		Temperature:      dereferenceOrZero(options.Temperature),
 		TopP:             dereferenceOrZero(options.TopP),
+		N:                dereferenceOrZero(cm.config.N),
 		Stop:             cm.config.Stop,
 		PresencePenalty:  dereferenceOrZero(cm.config.PresencePenalty),
 		Seed:             cm.config.Seed,
@@ -355,14 +357,25 @@ func (cm *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ..
 		return nil, err
 	}
 
-	msg := resp.Choices[0].Message
+	for _, choice := range resp.Choices {
+		if choice.Index != 0 {
+			continue
+		}
 
-	outMsg = &schema.Message{
-		Role:       toMessageRole(msg.Role),
-		Content:    msg.Content,
-		Name:       msg.Name,
-		ToolCallID: msg.ToolCallID,
-		ToolCalls:  toMessageToolCalls(msg.ToolCalls),
+		msg := choice.Message
+		outMsg = &schema.Message{
+			Role:       toMessageRole(msg.Role),
+			Content:    msg.Content,
+			Name:       msg.Name,
+			ToolCallID: msg.ToolCallID,
+			ToolCalls:  toMessageToolCalls(msg.ToolCalls),
+		}
+
+		break
+	}
+
+	if outMsg == nil { // unexpected
+		return nil, fmt.Errorf("unexpected completion choices without index=0")
 	}
 
 	usage := &model.TokenUsage{
@@ -454,11 +467,9 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, // nolint
 				return
 			}
 
-			delta := chunk.Choices[0].Delta
-			msg := &schema.Message{
-				Role:      toMessageRole(delta.Role),
-				Content:   delta.Content,
-				ToolCalls: toMessageToolCalls(delta.ToolCalls),
+			msg, usage, found := cm.resolveStreamResponse(chunk)
+			if !found {
+				continue
 			}
 
 			// skip empty message
@@ -481,19 +492,10 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, // nolint
 
 			lastEmptyMsg = nil
 
-			var tokenUsage *model.TokenUsage
-			if chunk.Usage != nil {
-				tokenUsage = &model.TokenUsage{
-					PromptTokens:     chunk.Usage.PromptTokens,
-					CompletionTokens: chunk.Usage.CompletionTokens,
-					TotalTokens:      chunk.Usage.TotalTokens,
-				}
-			}
-
 			closed := rawStream.Send(&model.CallbackOutput{
 				Message:    msg,
 				Config:     reqConf,
-				TokenUsage: tokenUsage,
+				TokenUsage: usage,
 			}, nil)
 
 			if closed {
@@ -526,6 +528,33 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, // nolint
 	return outStream, nil
 }
 
+func (cm *ChatModel) resolveStreamResponse(resp openai.ChatCompletionStreamResponse) (msg *schema.Message, usage *model.TokenUsage, found bool) {
+	for _, choice := range resp.Choices {
+		// take 0 index as response, rewrite if needed
+		if choice.Index != 0 {
+			continue
+		}
+
+		found = true
+		msg = &schema.Message{
+			Role:      toMessageRole(choice.Delta.Role),
+			Content:   choice.Delta.Content,
+			ToolCalls: toMessageToolCalls(choice.Delta.ToolCalls),
+		}
+
+		break
+	}
+
+	if resp.Usage != nil {
+		usage = &model.TokenUsage{
+			PromptTokens:     resp.Usage.PromptTokens,
+			CompletionTokens: resp.Usage.CompletionTokens,
+			TotalTokens:      resp.Usage.TotalTokens,
+		}
+	}
+
+	return msg, usage, found
+}
 func toTools(tis []*schema.ToolInfo) ([]tool, error) {
 	tools := make([]tool, len(tis))
 	for i := range tis {

@@ -221,6 +221,10 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...f
 				return
 			}
 
+			if msg == nil {
+				continue
+			}
+
 			closed := rawStream.Send(&fmodel.CallbackOutput{
 				Message:    msg,
 				Config:     reqConf,
@@ -323,7 +327,18 @@ func (cm *ChatModel) resolveChatResponse(resp model.ChatCompletionResponse) (msg
 		return nil, nil, ErrEmptyResponse
 	}
 
-	choice := resp.Choices[0]
+	var choice *model.ChatCompletionChoice
+
+	for _, c := range resp.Choices {
+		if c.Index == 0 {
+			choice = c
+			break
+		}
+	}
+
+	if choice == nil { // unexpected
+		return nil, nil, fmt.Errorf("unexpected completion choices without index=0")
+	}
 
 	content := choice.Message.Content
 	if content == nil && len(choice.Message.ToolCalls) == 0 {
@@ -355,6 +370,10 @@ func (cm *ChatModel) resolveStreamResponse(resp model.ChatCompletionStreamRespon
 	}
 
 	choice := resp.Choices[0]
+	// take 0 index as response, rewrite if needed
+	if choice.Index != 0 {
+		return nil, nil, nil
+	}
 
 	err = getUnexpectedFinishReason(choice.FinishReason)
 	if err != nil {
