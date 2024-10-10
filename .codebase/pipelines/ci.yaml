@@ -32,7 +32,7 @@ jobs:
                     - "!*/mock/**"
                 eino-changed:
                   base: "change"
-                  threshold: 0.6%
+                  threshold: 1%
                   paths:
                     - "!tests"
                     - "!examples/**"
