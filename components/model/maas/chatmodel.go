@@ -231,14 +231,28 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...f
 				return
 			}
 
+			if usage != nil {
+				// stream usage return in last chunk without message content, then
+				// last message received from callback output stream: Message == nil and TokenUsage != nil
+				// last message received from outStream: Message != nil
+				if closed := rawStream.Send(&fmodel.CallbackOutput{
+					Message:    msg,
+					Config:     reqConf,
+					TokenUsage: usage,
+				}, nil); closed {
+					return
+				}
+
+				continue
+			}
+
 			if msg == nil {
 				continue
 			}
 
 			closed := rawStream.Send(&fmodel.CallbackOutput{
-				Message:    msg,
-				Config:     reqConf,
-				TokenUsage: usage,
+				Message: msg,
+				Config:  reqConf,
 			}, nil)
 			if closed {
 				return
@@ -255,6 +269,10 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...f
 
 	outStream = schema.StreamReaderWithConvert(rawStreamArr[0],
 		func(src *fmodel.CallbackOutput) (*schema.Message, error) {
+			if src.Message == nil {
+				return nil, schema.ErrNoValue
+			}
+
 			return src.Message, nil
 		},
 	)
