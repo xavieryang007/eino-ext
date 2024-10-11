@@ -7,7 +7,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"code.byted.org/flow/eino/schema/utils"
+	"github.com/getkin/kin-openapi/openapi3"
 
 	goopenai "github.com/sashabaranov/go-openai"
 	"github.com/stretchr/testify/assert"
@@ -227,14 +227,14 @@ func TestChatModelToolCall(t *testing.T) {
 
 	tools := []*schema.ToolInfo{
 		{
-			Name:   weatherToolName,
-			Desc:   weatherToolDesc,
-			Params: weatherParams,
+			Name:        weatherToolName,
+			Desc:        weatherToolDesc,
+			ParamsOneOf: schema.NewParamsOneOfByParams(weatherParams),
 		},
 		{
-			Name:   "get_current_stock_price",
-			Desc:   "Get the current stock price given the name of the stock",
-			Params: stockParams,
+			Name:        "get_current_stock_price",
+			Desc:        "Get the current stock price given the name of the stock",
+			ParamsOneOf: schema.NewParamsOneOfByParams(stockParams),
 		},
 	}
 
@@ -246,39 +246,53 @@ func TestChatModelToolCall(t *testing.T) {
 	tool1 := chatModel.tools[0]
 	assert.Equal(t, weatherToolName, tool1.Function.Name)
 	assert.Equal(t, weatherToolDesc, tool1.Function.Description)
-	expectedDefinition := &utils.JSONSchema{
-		Type: schema.Object,
-		Properties: map[string]*utils.JSONSchema{
+	expectedDefinition := &openapi3.Schema{
+		Type: &openapi3.Types{openapi3.TypeObject},
+		Properties: map[string]*openapi3.SchemaRef{
 			"location": {
-				Type:        schema.String,
-				Description: "The city and state, e.g. San Francisco, CA",
+				Value: &openapi3.Schema{
+					Type:        &openapi3.Types{openapi3.TypeString},
+					Description: "The city and state, e.g. San Francisco, CA",
+				},
 			},
 			"unit": {
-				Type: schema.String,
-				Enum: []string{"celsius", "fahrenheit"},
+				Value: &openapi3.Schema{
+					Type: &openapi3.Types{openapi3.TypeString},
+					Enum: []any{"celsius", "fahrenheit"},
+				},
 			},
 			"days": {
-				Type:        schema.Array,
-				Description: "The number of days to forecast",
-				Items: &utils.JSONSchema{
-					Type:        schema.Integer,
+				Value: &openapi3.Schema{
+					Type:        &openapi3.Types{openapi3.TypeArray},
 					Description: "The number of days to forecast",
-					Enum:        []string{"1", "2", "3", "4", "5", "6", "7"},
+					Items: &openapi3.SchemaRef{
+						Value: &openapi3.Schema{
+							Type:        &openapi3.Types{openapi3.TypeInteger},
+							Description: "The number of days to forecast",
+							Enum:        []any{"1", "2", "3", "4", "5", "6", "7"},
+						},
+					},
 				},
 			},
 			"infos": {
-				Type: schema.Object,
-				Properties: map[string]*utils.JSONSchema{
-					"type_windy": {
-						Type:        schema.Boolean,
-						Description: "The types of windy weather",
+				Value: &openapi3.Schema{
+					Type: &openapi3.Types{openapi3.TypeObject},
+					Properties: map[string]*openapi3.SchemaRef{
+						"type_windy": {
+							Value: &openapi3.Schema{
+								Type:        &openapi3.Types{openapi3.TypeBoolean},
+								Description: "The types of windy weather",
+							},
+						},
+						"type_rainy": {
+							Value: &openapi3.Schema{
+								Type:        &openapi3.Types{openapi3.TypeBoolean},
+								Description: "The types of rainy weather",
+							},
+						},
 					},
-					"type_rainy": {
-						Type:        schema.Boolean,
-						Description: "The types of rainy weather",
-					},
+					Required: []string{},
 				},
-				Required: []string{},
 			},
 		},
 		Required: []string{"location"},
@@ -349,14 +363,14 @@ func TestChatModelForceToolCall(t *testing.T) {
 
 		tools := []*schema.ToolInfo{
 			{
-				Name:   "do_nothing",
-				Desc:   "do nothing",
-				Params: doNothingParams,
+				Name:        "do_nothing",
+				Desc:        "do nothing",
+				ParamsOneOf: schema.NewParamsOneOfByParams(doNothingParams),
 			},
 			{
-				Name:   "get_current_stock_price",
-				Desc:   "Get the current stock price given the name of the stock",
-				Params: stockParams,
+				Name:        "get_current_stock_price",
+				Desc:        "Get the current stock price given the name of the stock",
+				ParamsOneOf: schema.NewParamsOneOfByParams(stockParams),
 			},
 		}
 

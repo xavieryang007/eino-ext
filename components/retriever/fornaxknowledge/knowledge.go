@@ -119,10 +119,6 @@ func (k *Knowledge) Retrieve(ctx context.Context, input string, opts ...retrieve
 		}
 	}()
 
-	if cbmOK {
-		ctx = cbm.OnStart(ctx, &retriever.CallbackInput{Query: input, Extra: extra})
-	}
-
 	baseTopK := int(dereferenceOrZero(k.config.TopK))
 
 	opt := retriever.GetCommonOptions(&retriever.Options{
@@ -138,6 +134,16 @@ func (k *Knowledge) Retrieve(ctx context.Context, input string, opts ...retrieve
 		Channels:      k.config.Channels,
 		Rank:          k.config.ranker,
 		Filter:        k.config.Filter,
+	}
+
+	if cbmOK {
+		ctx = cbm.OnStart(ctx, &retriever.CallbackInput{
+			Query:          input,
+			TopK:           int(req.TopK),
+			Filter:         dereferenceOrZero(req.Filter),
+			ScoreThreshold: nil, // not support multiple channels threshold
+			Extra:          extra,
+		})
 	}
 
 	result, err := k.client.RetrieveKnowledge(ctx, req)

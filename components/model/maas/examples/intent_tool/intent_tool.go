@@ -27,30 +27,32 @@ func main() {
 		{
 			Name: "user_company",
 			Desc: "根据用户的姓名和邮箱，查询用户的公司和职位信息",
-			Params: map[string]*schema.ParameterInfo{
-				"name": {
-					Type: "string",
-					Desc: "用户的姓名",
-				},
-				"email": {
-					Type: "string",
-					Desc: "用户的邮箱",
-				},
-			},
+			ParamsOneOf: schema.NewParamsOneOfByParams(
+				map[string]*schema.ParameterInfo{
+					"name": {
+						Type: "string",
+						Desc: "用户的姓名",
+					},
+					"email": {
+						Type: "string",
+						Desc: "用户的邮箱",
+					},
+				}),
 		},
 		{
 			Name: "user_salary",
 			Desc: "根据用户的姓名和邮箱，查询用户的薪酬信息",
-			Params: map[string]*schema.ParameterInfo{
-				"name": {
-					Type: "string",
-					Desc: "用户的姓名",
-				},
-				"email": {
-					Type: "string",
-					Desc: "用户的邮箱",
-				},
-			},
+			ParamsOneOf: schema.NewParamsOneOfByParams(
+				map[string]*schema.ParameterInfo{
+					"name": {
+						Type: "string",
+						Desc: "用户的姓名",
+					},
+					"email": {
+						Type: "string",
+						Desc: "用户的邮箱",
+					},
+				}),
 		},
 	})
 	if err != nil {

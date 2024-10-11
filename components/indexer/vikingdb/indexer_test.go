@@ -72,9 +72,13 @@ func TestStoreWithVector(t *testing.T) {
 		ctx := context.Background()
 		ctrl := gomock.NewController(t)
 		emb := embedding.NewMockEmbedder(ctrl)
-		dvs := []*schema.DocumentWithVector{
-			{Document: &schema.Document{ID: "123", Content: "asd"}, Vector: []float64{1.1, 1.2}},
-			{Document: &schema.Document{ID: "124", Content: "qwe"}, Vector: []float64{2.1, 2.2}},
+
+		d1 := &schema.Document{ID: "123", Content: "asd"}
+		d2 := &schema.Document{ID: "124", Content: "qwe"}
+
+		dvs := []*schema.Document{
+			d1.WithVector([]float64{1.1, 1.2}),
+			d2.WithVector([]float64{2.1, 2.2}),
 		}
 
 		idx, err := NewIndexer(ctx, &IndexerConfig{AddBatchSize: 1, EmbeddingConfig: EmbeddingConfig{Embedding: emb}})

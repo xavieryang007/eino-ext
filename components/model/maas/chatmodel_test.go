@@ -50,29 +50,31 @@ func Test_Generate(t *testing.T) {
 			{
 				Name: "get_current_weather",
 				Desc: "Get the current weather in a given location",
-				Params: map[string]*schema.ParameterInfo{
-					"location": {
-						Type:     schema.String,
-						Desc:     "The city and state, e.g. San Francisco, CA",
-						Required: true,
-					},
-					"unit": {
-						Type:     schema.String,
-						Enum:     []string{"celsius", "fahrenheit"},
-						Required: true,
-					},
-				},
+				ParamsOneOf: schema.NewParamsOneOfByParams(
+					map[string]*schema.ParameterInfo{
+						"location": {
+							Type:     schema.String,
+							Desc:     "The city and state, e.g. San Francisco, CA",
+							Required: true,
+						},
+						"unit": {
+							Type:     schema.String,
+							Enum:     []string{"celsius", "fahrenheit"},
+							Required: true,
+						},
+					}),
 			},
 			{
 				Name: "get_current_stock_price",
 				Desc: "Get the current stock price given the name of the stock",
-				Params: map[string]*schema.ParameterInfo{
-					"name": {
-						Type:     schema.String,
-						Desc:     "The name of the stock",
-						Required: true,
-					},
-				},
+				ParamsOneOf: schema.NewParamsOneOfByParams(
+					map[string]*schema.ParameterInfo{
+						"name": {
+							Type:     schema.String,
+							Desc:     "The name of the stock",
+							Required: true,
+						},
+					}),
 			},
 		}), convey.ShouldBeNil)
 
@@ -323,14 +325,14 @@ func TestBindTools(t *testing.T) {
 
 		tools := []*schema.ToolInfo{
 			{
-				Name:   "do_nothing",
-				Desc:   "do nothing",
-				Params: doNothingParams,
+				Name:        "do_nothing",
+				Desc:        "do nothing",
+				ParamsOneOf: schema.NewParamsOneOfByParams(doNothingParams),
 			},
 			{
-				Name:   "get_current_stock_price",
-				Desc:   "Get the current stock price given the name of the stock",
-				Params: stockParams,
+				Name:        "get_current_stock_price",
+				Desc:        "Get the current stock price given the name of the stock",
+				ParamsOneOf: schema.NewParamsOneOfByParams(stockParams),
 			},
 		}
 

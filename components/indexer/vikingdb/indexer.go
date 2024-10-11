@@ -99,16 +99,16 @@ func (i *Indexer) Store(ctx context.Context, docs []*schema.Document, opts ...in
 				return nil, err
 			}
 		} else {
-			var dvs []*schema.DocumentWithVector
+			var docsWithEmbedding []*schema.Document
 
 			// embedding
-			dvs, err = i.embeddingDocs(ctx, chunks, options)
+			docsWithEmbedding, err = i.embeddingDocs(ctx, chunks, options)
 			if err != nil {
 				return nil, err
 			}
 
 			// store
-			chunkIds, err = i.storeWithVector(ctx, dvs, options)
+			chunkIds, err = i.storeWithVector(ctx, docsWithEmbedding, options)
 			if err != nil {
 				return nil, err
 			}
@@ -164,7 +164,7 @@ func (i *Indexer) storeRaw(_ context.Context, docs []*schema.Document, options *
 	return ids, nil
 }
 
-func (i *Indexer) embeddingDocs(ctx context.Context, docs []*schema.Document, options *indexer.Options) (dvs []*schema.DocumentWithVector, err error) {
+func (i *Indexer) embeddingDocs(ctx context.Context, docs []*schema.Document, options *indexer.Options) ([]*schema.Document, error) {
 	emb := i.config.EmbeddingConfig.Embedding
 	if options.Embedding != nil {
 		emb = options.Embedding
@@ -184,18 +184,14 @@ func (i *Indexer) embeddingDocs(ctx context.Context, docs []*schema.Document, op
 		return nil, fmt.Errorf("[embeddingDocs] invalid return length of vector, got=%d, expected=%d", len(vectors), len(docs))
 	}
 
-	dvs = make([]*schema.DocumentWithVector, len(docs))
 	for j := range docs {
-		dvs[j] = &schema.DocumentWithVector{
-			Document: docs[j],
-			Vector:   vectors[j],
-		}
+		docs[j].WithVector(vectors[j])
 	}
 
-	return dvs, nil
+	return docs, nil
 }
 
-func (i *Indexer) storeWithVector(_ context.Context, dvs []*schema.DocumentWithVector, options *indexer.Options) (ids []string, err error) {
+func (i *Indexer) storeWithVector(_ context.Context, dvs []*schema.Document, options *indexer.Options) (ids []string, err error) {
 	subIndexes := i.config.SubIndexes
 	if len(options.SubIndexes) > 0 {
 		subIndexes = options.SubIndexes
@@ -204,21 +200,21 @@ func (i *Indexer) storeWithVector(_ context.Context, dvs []*schema.DocumentWithV
 	dataList := make([]*viking.VikingDbData, len(dvs))
 	for j := range dvs {
 		dv := dvs[j]
-		subIndexes = gslice.Uniq(append(subIndexes, dv.Document.SubIndexes()...))
+		subIndexes = gslice.Uniq(append(subIndexes, dv.SubIndexes()...))
 		if len(subIndexes) == 0 {
 			subIndexes = []string{defaultSubIndex}
 		}
 
-		id, err := parseUint64(dv.Document.ID)
+		id, err := parseUint64(dv.ID)
 		if err != nil {
 			return nil, err
 		}
 		dataList[j] = viking.NewVikingDbDataF32(
 			id,
 			subIndexes,
-			f64To32(dv.Vector),
-			viking.WithAttrs(dv.Document.Content),
-			viking.WithDslInfo(dv.Document.VikingDSLInfo()))
+			f64To32(dv.Vector()),
+			viking.WithAttrs(dv.Content),
+			viking.WithDslInfo(dv.VikingDSLInfo()))
 	}
 
 	ids, _, err = i.client.AddData(dataList)

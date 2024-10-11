@@ -65,52 +65,53 @@ func TestConvertToolInfo(t *testing.T) {
 		expect := &schema.ToolInfo{
 			Name: "update_user_info",
 			Desc: "full update user info",
-			Params: map[string]*schema.ParameterInfo{
-				"email": {
-					Type:     "string",
-					Desc:     "user's email",
-					Required: true,
-				},
-				"job": {
-					Type:     "object",
-					Desc:     "user's job",
-					Required: true,
-					SubParams: map[string]*schema.ParameterInfo{
-						"company": {
-							Type:     "string",
-							Desc:     "the company of user's job",
-							Required: false,
-						},
-						"employee_no": {
-							Type:     "integer",
-							Desc:     "the number of employee",
-							Required: false,
-						},
+			ParamsOneOf: schema.NewParamsOneOfByParams(
+				map[string]*schema.ParameterInfo{
+					"email": {
+						Type:     "string",
+						Desc:     "user's email",
+						Required: true,
 					},
-				},
-				"incomes": {
-					Type:     "array",
-					Desc:     "user's incomes info",
-					Required: true,
-					ElemInfo: &schema.ParameterInfo{
+					"job": {
 						Type:     "object",
-						Desc:     "ignored desc",
-						Required: false,
+						Desc:     "user's job",
+						Required: true,
 						SubParams: map[string]*schema.ParameterInfo{
-							"source": {
+							"company": {
 								Type:     "string",
-								Desc:     "the source of income",
+								Desc:     "the company of user's job",
 								Required: false,
 							},
-							"amount": {
-								Type:     "number",
-								Desc:     "the amount of income",
+							"employee_no": {
+								Type:     "integer",
+								Desc:     "the number of employee",
 								Required: false,
 							},
 						},
 					},
-				},
-			},
+					"incomes": {
+						Type:     "array",
+						Desc:     "user's incomes info",
+						Required: true,
+						ElemInfo: &schema.ParameterInfo{
+							Type:     "object",
+							Desc:     "ignored desc",
+							Required: false,
+							SubParams: map[string]*schema.ParameterInfo{
+								"source": {
+									Type:     "string",
+									Desc:     "the source of income",
+									Required: false,
+								},
+								"amount": {
+									Type:     "number",
+									Desc:     "the amount of income",
+									Required: false,
+								},
+							},
+						},
+					},
+				}),
 		}
 
 		dst, err := convertToolInfo(context.Background(), src)

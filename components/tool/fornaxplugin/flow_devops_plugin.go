@@ -90,9 +90,9 @@ func convertToolInfo(_ context.Context, tl *tool.Tool) (*schema.ToolInfo, error)
 	}
 
 	return &schema.ToolInfo{
-		Name:   tl.GetName(),
-		Desc:   tl.GetDesc(),
-		Params: topParamInfo.SubParams,
+		Name:        tl.GetName(),
+		Desc:        tl.GetDesc(),
+		ParamsOneOf: schema.NewParamsOneOfByParams(topParamInfo.SubParams),
 	}, nil
 }
 

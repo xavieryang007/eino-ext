@@ -16,7 +16,6 @@ import (
 	"code.byted.org/flow/eino/callbacks"
 	fmodel "code.byted.org/flow/eino/components/model"
 	"code.byted.org/flow/eino/schema"
-	sutils "code.byted.org/flow/eino/schema/utils"
 	"code.byted.org/flow/eino/utils/safe"
 	"code.byted.org/lang/gg/gptr"
 )
@@ -97,7 +96,9 @@ func NewChatModel(_ context.Context, config *ChatModelConfig) (*ChatModel, error
 type ChatModel struct {
 	config *ChatModelConfig
 	client *arkruntime.Client
-	tools  []tool
+
+	tools    []tool
+	rawTools []*schema.ToolInfo
 }
 
 func (cm *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ...fmodel.Option) (
@@ -123,12 +124,15 @@ func (cm *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ..
 		MaxTokens:   req.MaxTokens,
 		Temperature: req.Temperature,
 		TopP:        req.TopP,
+		Stop:        req.Stop,
 	}
 
 	if cbmOK {
 		ctx = cbm.OnStart(ctx, &fmodel.CallbackInput{
-			Messages: in,
-			Config:   reqConf,
+			Messages:   in,
+			Tools:      append(cm.rawTools), // join tool info from call options
+			ToolChoice: nil,                 // not support in api
+			Config:     reqConf,
 		})
 	}
 
@@ -176,12 +180,15 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...f
 		MaxTokens:   req.MaxTokens,
 		Temperature: req.Temperature,
 		TopP:        req.TopP,
+		Stop:        req.Stop,
 	}
 
 	if cbmOK {
 		ctx = cbm.OnStart(ctx, &fmodel.CallbackInput{
-			Messages: in,
-			Config:   reqConf,
+			Messages:   in,
+			Tools:      append(cm.rawTools), // join tool info from call options
+			ToolChoice: nil,                 // not support in api
+			Config:     reqConf,
 		})
 	}
 
@@ -267,6 +274,7 @@ func (cm *ChatModel) genRequest(in []*schema.Message, opts ...fmodel.Option) (re
 		MaxTokens:   cm.config.MaxTokens,
 		Model:       &cm.config.Model,
 		TopP:        cm.config.TopP,
+		Stop:        cm.config.Stop,
 	}, opts...)
 
 	if options.Model == nil || len(*options.Model) == 0 {
@@ -279,7 +287,7 @@ func (cm *ChatModel) genRequest(in []*schema.Message, opts ...fmodel.Option) (re
 		TopP:              dereferenceOrZero(options.TopP),
 		Model:             dereferenceOrZero(options.Model),
 		Stream:            dereferenceOrZero(cm.config.Stream),
-		Stop:              cm.config.Stop,
+		Stop:              options.Stop,
 		FrequencyPenalty:  dereferenceOrZero(cm.config.FrequencyPenalty),
 		LogitBias:         cm.config.LogitBias,
 		LogProbs:          dereferenceOrZero(cm.config.LogProbs),
@@ -290,6 +298,7 @@ func (cm *ChatModel) genRequest(in []*schema.Message, opts ...fmodel.Option) (re
 		N:                 dereferenceOrZero(cm.config.N),
 		ResponseFormat:    cm.config.ResponseFormat,
 	}
+
 	for _, msg := range in {
 		content, e := toMaasContent(msg.Content, msg.MultiContent)
 		if e != nil {
@@ -414,6 +423,8 @@ func (cm *ChatModel) BindTools(tools []*schema.ToolInfo) error {
 		return err
 	}
 
+	cm.rawTools = tools
+
 	return nil
 }
 
@@ -500,7 +511,10 @@ func toTools(tls []*schema.ToolInfo) ([]tool, error) {
 			return nil, errors.New("unexpected nil tool")
 		}
 
-		paramsJSONSchema := sutils.ParamInfosToJSONSchema(ti.Params)
+		paramsJSONSchema, err := ti.ParamsOneOf.ToOpenAPIV3()
+		if err != nil {
+			return nil, fmt.Errorf("convert toolInfo ParamsOneOf to JSONSchema failed: %w", err)
+		}
 
 		tools[i] = tool{
 			Function: &functionDefinition{
