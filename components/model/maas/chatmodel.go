@@ -396,6 +396,14 @@ func (cm *ChatModel) resolveChatResponse(resp model.ChatCompletionResponse) (msg
 
 func (cm *ChatModel) resolveStreamResponse(resp model.ChatCompletionStreamResponse) (msg *schema.Message, usage *fmodel.TokenUsage, err error) {
 	if len(resp.Choices) == 0 {
+		if resp.Usage != nil { // stream last chunk return usage
+			return nil, &fmodel.TokenUsage{
+				PromptTokens:     resp.Usage.PromptTokens,
+				CompletionTokens: resp.Usage.CompletionTokens,
+				TotalTokens:      resp.Usage.TotalTokens,
+			}, nil
+		}
+
 		return nil, nil, ErrEmptyResponse
 	}
 
@@ -416,14 +424,6 @@ func (cm *ChatModel) resolveStreamResponse(resp model.ChatCompletionStreamRespon
 		Role:      schema.RoleType(choice.Delta.Role),
 		ToolCalls: toMessageToolCalls(choice.Delta.ToolCalls),
 		Content:   content,
-	}
-
-	if resp.Usage != nil {
-		usage = &fmodel.TokenUsage{
-			PromptTokens:     resp.Usage.PromptTokens,
-			CompletionTokens: resp.Usage.CompletionTokens,
-			TotalTokens:      resp.Usage.TotalTokens,
-		}
 	}
 
 	return msg, usage, nil
