@@ -6,11 +6,15 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/bytedance/sonic"
+
 	"code.byted.org/flow/eino/callbacks"
 	"code.byted.org/flow/eino/components"
 	"code.byted.org/flow/eino/components/embedding"
 	"code.byted.org/flow/eino/components/retriever"
 	"code.byted.org/flow/eino/schema"
+	"code.byted.org/flow/flow-telemetry-common/go/obtag"
+	"code.byted.org/gopkg/logs/v2"
 	viking "code.byted.org/lagrange/viking_go_client"
 )
 
@@ -91,10 +95,6 @@ func (r *Retriever) Retrieve(ctx context.Context, query string, opts ...retrieve
 		}
 	}()
 
-	if cbmOK {
-		ctx = cbm.OnStart(ctx, &retriever.CallbackInput{Query: query})
-	}
-
 	options := retriever.GetCommonOptions(&retriever.Options{
 		Index:          &r.config.Index,
 		SubIndex:       &r.config.SubIndex,
@@ -102,6 +102,26 @@ func (r *Retriever) Retrieve(ctx context.Context, query string, opts ...retrieve
 		ScoreThreshold: r.config.ScoreThreshold,
 		DSLInfo:        r.config.FilterDSL,
 	}, opts...)
+
+	cbExtra := map[string]any{
+		obtag.VikingDBName:   r.config.Name,
+		obtag.VikingDBRegion: r.config.Region,
+	}
+
+	if cbmOK {
+		dslFilter, marshalErr := sonic.Marshal(options.DSLInfo)
+		if marshalErr != nil {
+			logs.CtxWarn(ctx, "viking db retriever: marshal dsl info failed, err=%v", err)
+		}
+
+		ctx = cbm.OnStart(ctx, &retriever.CallbackInput{
+			Query:          query,
+			TopK:           dereferenceOrZero(options.TopK),
+			Filter:         string(dslFilter),
+			ScoreThreshold: options.ScoreThreshold,
+			Extra:          cbExtra,
+		})
+	}
 
 	useBuiltinEmbedding := r.config.EmbeddingConfig.UseBuiltin && options.Embedding == nil
 
@@ -126,7 +146,10 @@ func (r *Retriever) Retrieve(ctx context.Context, query string, opts ...retrieve
 	}
 
 	if cbmOK {
-		cbm.OnEnd(ctx, &retriever.CallbackOutput{Docs: docs})
+		cbm.OnEnd(ctx, &retriever.CallbackOutput{
+			Docs:  docs,
+			Extra: cbExtra,
+		})
 	}
 
 	return docs, nil
@@ -240,7 +263,8 @@ func (r *Retriever) retrieverWithVector(ctx context.Context, dense []float64, sp
 		docs = append(docs,
 			doc.WithScore(result.Scores).
 				WithVikingExtraInfo(result.ExtraInfos).
-				WithVikingDSLInfo(req.DslInfo))
+				WithVikingDSLInfo(req.DslInfo),
+		)
 	}
 
 	return docs, nil

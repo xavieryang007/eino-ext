@@ -9,6 +9,7 @@ import (
 	"github.com/smartystreets/goconvey/convey"
 	"go.uber.org/mock/gomock"
 
+	"code.byted.org/flow/eino/callbacks"
 	"code.byted.org/flow/eino/components/retriever"
 	viking "code.byted.org/lagrange/viking_go_client"
 
@@ -64,6 +65,51 @@ func TestEmbeddingQuery(t *testing.T) {
 			convey.So(err, convey.ShouldBeNil)
 			convey.So(vector, convey.ShouldNotBeNil)
 		})
+	})
+}
+
+func TestRetriever(t *testing.T) {
+	PatchConvey("test Retriever", t, func() {
+		ctx := context.Background()
+		ctrl := gomock.NewController(t)
+		emb := embedding.NewMockEmbedder(ctrl)
+
+		cbm, _ := callbacks.NewManager(&callbacks.RunInfo{
+			Name:      "mo",
+			Type:      "ck",
+			Component: "mock",
+		}, &callbacks.HandlerBuilder{})
+
+		scoreThresholdConf := 10.00
+		ctx = callbacks.CtxWithManager(ctx, cbm)
+
+		r, err := NewRetriever(ctx, &RetrieverConfig{Index: "asd", EmbeddingConfig: EmbeddingConfig{Embedding: emb}, ScoreThreshold: &scoreThresholdConf})
+		convey.So(err, convey.ShouldBeNil)
+		convey.So(r, convey.ShouldNotBeNil)
+
+		Mock(GetMethod(r.client, "Recall")).Return(&viking.RecallResp{
+			Code:    0,
+			Message: "",
+			Result: []*viking.SimpleRecallRpcResult{
+				{
+					Scores:       30.30,
+					LabelLower64: 12345,
+					Attrs:        "mock1",
+				},
+				{
+					Scores:       10.30,
+					LabelLower64: 12346,
+					Attrs:        "mock2",
+				},
+			},
+		}, "", nil).Build()
+
+		emb.EXPECT().EmbedStrings(gomock.Any(), gomock.Any()).Return([][]float64{{1.1, 1.2, 3.5}}, nil).Times(1)
+
+		docs, err := r.Retrieve(ctx, "asd")
+		convey.So(err, convey.ShouldBeNil)
+		convey.So(len(docs), convey.ShouldEqual, 2)
+
 	})
 }
 

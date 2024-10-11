@@ -79,6 +79,7 @@ type ChatModel struct {
 	config *ChatModelConfig
 
 	tools         []tool
+	rawTools      []*schema.ToolInfo
 	forceToolCall bool
 }
 
@@ -328,6 +329,7 @@ func (cm *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ..
 		MaxTokens:   cm.config.MaxTokens,
 		Model:       &cm.config.Model,
 		TopP:        cm.config.TopP,
+		Stop:        cm.config.Stop,
 	}, opts...)
 
 	req, err := cm.genRequest(in, options)
@@ -340,12 +342,15 @@ func (cm *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ..
 		MaxTokens:   req.MaxTokens,
 		Temperature: req.Temperature,
 		TopP:        req.TopP,
+		Stop:        req.Stop,
 	}
 
 	if cbmOK {
 		ctx = cbm.OnStart(ctx, &model.CallbackInput{
-			Messages: in,
-			Config:   reqConf,
+			Messages:   in,
+			Tools:      append(cm.rawTools), // join tool info from call options
+			ToolChoice: getToolChoice(req.ToolChoice),
+			Config:     reqConf,
 		})
 	}
 
@@ -367,7 +372,7 @@ func (cm *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ..
 	usage := &model.TokenUsage{
 		PromptTokens:     resp.Usage.PromptTokens,
 		CompletionTokens: resp.Usage.CompletionTokens,
-		TotalTokens:      resp.Usage.CompletionTokens,
+		TotalTokens:      resp.Usage.TotalTokens,
 	}
 
 	if cbmOK {
@@ -399,6 +404,7 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, // nolint
 		MaxTokens:   cm.config.MaxTokens,
 		Model:       &cm.config.Model,
 		TopP:        cm.config.TopP,
+		Stop:        cm.config.Stop,
 	}, opts...)
 
 	req, err := cm.genRequest(in, options)
@@ -413,12 +419,15 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, // nolint
 		MaxTokens:   req.MaxTokens,
 		Temperature: req.Temperature,
 		TopP:        req.TopP,
+		Stop:        req.Stop,
 	}
 
 	if cbmOK {
 		ctx = cbm.OnStart(ctx, &model.CallbackInput{
-			Messages: in,
-			Config:   reqConf,
+			Messages:   in,
+			Tools:      append(cm.rawTools), // join tool info from call options
+			ToolChoice: getToolChoice(req.ToolChoice),
+			Config:     reqConf,
 		})
 	}
 
@@ -558,6 +567,7 @@ func (cm *ChatModel) BindTools(tools []*schema.ToolInfo) error {
 	}
 
 	cm.forceToolCall = false
+	cm.rawTools = tools
 
 	return nil
 }
@@ -570,6 +580,7 @@ func (cm *ChatModel) BindForcedTools(tools []*schema.ToolInfo) error {
 	}
 
 	cm.forceToolCall = true
+	cm.rawTools = tools
 
 	return nil
 }
@@ -580,4 +591,17 @@ func (cm *ChatModel) GetType() string {
 
 func (cm *ChatModel) IsCallbacksEnabled() bool {
 	return true
+}
+
+func getToolChoice(choice any) any {
+	switch t := choice.(type) {
+	case string:
+		return t
+	case openai.ToolChoice:
+		return &schema.ToolInfo{
+			Name: t.Function.Name,
+		}
+	default:
+		return nil
+	}
 }

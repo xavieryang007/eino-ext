@@ -893,6 +893,8 @@ code.byted.org/flow/eino v0.0.0-20240927085639-f2860a32c6a2 h1:vJlZAx8Zr4Z4qV+Xz
 code.byted.org/flow/eino v0.0.0-20240927085639-f2860a32c6a2/go.mod h1:IKHqDjPTRk6X91IuuefWi/n7RLUZSzWv5I8Fszssf9A=
 code.byted.org/flow/eino v0.0.0-20240929111219-f2bee28ecbcb h1:Ikrtj9NhwNnOHHrmUH+PvI0VjrejaA0VX5E3d20PvjA=
 code.byted.org/flow/eino v0.0.0-20240929111219-f2bee28ecbcb/go.mod h1:IKHqDjPTRk6X91IuuefWi/n7RLUZSzWv5I8Fszssf9A=
+code.byted.org/flow/eino v0.0.0-20241010131430-d4fdc2c37179 h1:TU6G296IfSaXxG+BylRVQE4cdOeAEH7ScGvxyjGW1lk=
+code.byted.org/flow/eino v0.0.0-20241010131430-d4fdc2c37179/go.mod h1:wbnFryA+NZ7Nxn6zaYu0vgt+K51AXSG9tpSYshD7oiM=
 code.byted.org/flow/flow-telemetry-common/go v0.0.0-20240830081243-a15d639a66a0 h1:+lLbSuKW0q0ljZ/iWUxlpekVW0Qab89hVlNvDMAiRtU=
 code.byted.org/flow/flow-telemetry-common/go v0.0.0-20240830081243-a15d639a66a0/go.mod h1:s5Xm+wOPHP5/E0W2EtyogaHJmiMC5b/H5ke28u/PkZk=
 code.byted.org/flowdevops/fornax/pkg/auth v0.0.0-20240530115429-4a4ba39f6406 h1:2aMjmLLmdsV8PFJVQFgoNCktKp9xh//Q7MjnKBeA4Fk=
