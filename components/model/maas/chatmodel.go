@@ -174,7 +174,10 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...f
 	if err != nil {
 		return nil, err
 	}
+
 	req.Stream = true
+	req.StreamOptions = &model.StreamOptions{IncludeUsage: true}
+
 	reqConf := &fmodel.Config{
 		Model:       req.Model,
 		MaxTokens:   req.MaxTokens,

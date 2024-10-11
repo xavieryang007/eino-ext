@@ -426,6 +426,7 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, // nolint
 	}
 
 	req.Stream = true
+	req.StreamOptions = &openai.StreamOptions{IncludeUsage: true}
 
 	reqConf := &model.Config{
 		Model:       req.Model,
