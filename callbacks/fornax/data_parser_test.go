@@ -78,24 +78,24 @@ func Test_ParseStreamInput(t *testing.T) {
 		ctx := context.Background()
 		parser := defaultDataParser{}
 		makeStream := func(outputs []*model.CallbackInput, err error) *schema.StreamReader[callbacks.CallbackInput] {
-			st := schema.NewStream[callbacks.CallbackInput](1)
+			sr, sw := schema.Pipe[callbacks.CallbackInput](1)
 			go func() {
 				defer func() {
-					st.Finish()
+					sw.Close()
 				}()
 
 				for i := range outputs {
-					if closed := st.Send(outputs[i], nil); closed {
+					if closed := sw.Send(outputs[i], nil); closed {
 						break
 					}
 				}
 
 				if err != nil {
-					st.Send(nil, err)
+					sw.Send(nil, err)
 				}
 			}()
 
-			return st.AsReader()
+			return sr
 		}
 
 		PatchConvey("test error", func() {
@@ -164,24 +164,24 @@ func Test_ParseStreamOutput(t *testing.T) {
 		ctx := context.Background()
 		parser := defaultDataParser{}
 		makeStream := func(outputs []*model.CallbackOutput, err error) *schema.StreamReader[callbacks.CallbackOutput] {
-			st := schema.NewStream[callbacks.CallbackOutput](1)
+			sr, sw := schema.Pipe[callbacks.CallbackOutput](1)
 			go func() {
 				defer func() {
-					st.Finish()
+					sw.Close()
 				}()
 
 				for i := range outputs {
-					if closed := st.Send(outputs[i], nil); closed {
+					if closed := sw.Send(outputs[i], nil); closed {
 						break
 					}
 				}
 
 				if err != nil {
-					st.Send(nil, err)
+					sw.Send(nil, err)
 				}
 			}()
 
-			return st.AsReader()
+			return sr
 		}
 
 		PatchConvey("test error", func() {

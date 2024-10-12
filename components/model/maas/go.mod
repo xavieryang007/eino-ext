@@ -3,10 +3,11 @@ module code.byted.org/flow/eino-ext/components/model/maas
 go 1.18
 
 require (
-	code.byted.org/flow/eino v0.0.0-20241010131430-d4fdc2c37179
+	code.byted.org/flow/eino v0.1.0
 	code.byted.org/gopkg/logs/v2 v2.2.0-beta.9
 	code.byted.org/lang/gg v0.18.0
 	github.com/bytedance/mockey v1.2.10
+	github.com/getkin/kin-openapi v0.128.0
 	github.com/smartystreets/goconvey v1.8.1
 	github.com/stretchr/testify v1.9.0
 	github.com/volcengine/volcengine-go-sdk v1.0.154
@@ -33,7 +34,6 @@ require (
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
-	github.com/getkin/kin-openapi v0.128.0 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect

@@ -145,12 +145,12 @@ func TestTraceIntegration(t *testing.T) {
 
 			Mock(GetMethod(span, "Finish")).Return().Build()
 
-			output := schema.NewStream[callbacks.CallbackOutput](1)
+			sr, sw := schema.Pipe[callbacks.CallbackOutput](1)
 			go func() {
-				defer output.Finish()
+				defer sw.Close()
 
 				for i := 0; i < 10; i++ {
-					closed := output.Send(&model.CallbackOutput{
+					closed := sw.Send(&model.CallbackOutput{
 						Message: &schema.Message{Role: schema.Assistant, Content: fmt.Sprint(i)},
 						Config:  cfg,
 						TokenUsage: &model.TokenUsage{
@@ -166,7 +166,7 @@ func TestTraceIntegration(t *testing.T) {
 				}
 			}()
 
-			ctx = tracer.OnEndWithStreamOutput(ctx, info, output.AsReader())
+			ctx = tracer.OnEndWithStreamOutput(ctx, info, sr)
 
 			time.Sleep(time.Second * 1)
 		})
@@ -198,32 +198,32 @@ func TestTraceIntegration(t *testing.T) {
 
 			Mock(GetMethod(span, "Finish")).Return().Build()
 
-			output := schema.NewStream[callbacks.CallbackOutput](1)
+			sr, sw := schema.Pipe[callbacks.CallbackOutput](1)
 
 			go func() {
-				_ = output.Send(nil, fmt.Errorf("mock err"))
-				output.Finish()
+				_ = sw.Send(nil, fmt.Errorf("mock err"))
+				sw.Close()
 			}()
 
-			ctx = tracer.OnEndWithStreamOutput(ctx, info, output.AsReader())
+			ctx = tracer.OnEndWithStreamOutput(ctx, info, sr)
 
 			time.Sleep(time.Second * 1)
 		})
 
 		PatchConvey("test collect success", func() {
-			ci := schema.NewStream[callbacks.CallbackInput](1)
+			sr, sw := schema.Pipe[callbacks.CallbackInput](1)
 			go func() {
-				defer ci.Finish()
+				defer sw.Close()
 
 				str := "hello"
 				for i := 0; i < len(str); i++ {
-					if closed := ci.Send(&schema.Message{Role: schema.User, Content: str[i : i+1]}, nil); closed {
+					if closed := sw.Send(&schema.Message{Role: schema.User, Content: str[i : i+1]}, nil); closed {
 						break
 					}
 				}
 			}()
 
-			ctx := tracer.OnStartWithStreamInput(context.Background(), info, ci.AsReader())
+			ctx := tracer.OnStartWithStreamInput(context.Background(), info, sr)
 			convey.So(ctx.Value(traceStreamInputAsyncKey{}), convey.ShouldNotBeNil)
 
 			span := tracer.tracer.GetSpanFromContext(ctx)

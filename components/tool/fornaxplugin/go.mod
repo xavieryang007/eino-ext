@@ -5,7 +5,7 @@ go 1.20
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
-	code.byted.org/flow/eino v0.0.0-20241010073522-6d80a0de0542
+	code.byted.org/flow/eino v0.1.0
 	code.byted.org/gopkg/asynccache v0.0.0-20210422090342-26f94f7676b8
 	code.byted.org/gopkg/logs/v2 v2.2.0-beta.9
 	code.byted.org/kite/kitex v1.16.0

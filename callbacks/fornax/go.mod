@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	code.byted.org/data/mario_collector v1.3.0
-	code.byted.org/flow/eino v0.0.0-20240918114741-ad304880d3d5
+	code.byted.org/flow/eino v0.1.0
 	code.byted.org/flow/flow-telemetry-common/go v0.0.0-20240830081243-a15d639a66a0
 	code.byted.org/flowdevops/fornax_sdk v0.0.0-20240923060838-825174c57aab
 	code.byted.org/gopkg/env v1.6.14
@@ -12,7 +12,7 @@ require (
 	code.byted.org/lang/gg v0.19.1
 	code.byted.org/obric/flow_telemetry_go v0.4.1
 	github.com/bytedance/mockey v1.2.12
-	github.com/bytedance/sonic v1.12.1
+	github.com/bytedance/sonic v1.12.2
 	github.com/smartystreets/goconvey v1.8.1
 	github.com/stretchr/testify v1.9.0
 )
@@ -154,10 +154,13 @@ require (
 	github.com/facebookgo/clock v0.0.0-20150410010913-600d898af40a // indirect
 	github.com/fatih/structtag v1.2.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
+	github.com/getkin/kin-openapi v0.128.0 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.3 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
+	github.com/go-openapi/jsonpointer v0.21.0 // indirect
+	github.com/go-openapi/swag v0.23.0 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
@@ -177,6 +180,7 @@ require (
 	github.com/hertz-contrib/http2 v0.1.1 // indirect
 	github.com/hertz-contrib/localsession v0.1.0 // indirect
 	github.com/iancoleman/strcase v0.3.0 // indirect
+	github.com/invopop/yaml v0.3.1 // indirect
 	github.com/jhump/protoreflect v1.15.6 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
@@ -197,6 +201,7 @@ require (
 	github.com/olivere/elastic/v7 v7.0.32 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20210726034734-bdbb7cc3a1c0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.9 // indirect
+	github.com/perimeterx/marshmallow v1.1.5 // indirect
 	github.com/philhofer/fwd v1.1.1 // indirect
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
 	github.com/pkg/errors v0.9.1 // indirect

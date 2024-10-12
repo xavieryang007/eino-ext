@@ -200,17 +200,17 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...f
 		return nil, err
 	}
 
-	rawStream := schema.NewStream[*fmodel.CallbackOutput](1)
+	sr, sw := schema.Pipe[*fmodel.CallbackOutput](1)
 	go func() {
 		defer func() {
 			panicErr := recover()
 
 			if panicErr != nil {
-				_ = rawStream.Send(nil, safe.NewPanicErr(panicErr, debug.Stack()))
+				_ = sw.Send(nil, safe.NewPanicErr(panicErr, debug.Stack()))
 			}
 
-			rawStream.Finish()
-			closeMaaSStreamReader(stream)
+			sw.Close()
+			_ = closeMaaSStreamReader(stream) // nolint: byted_returned_err_should_do_check
 
 		}()
 
@@ -221,13 +221,13 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...f
 			}
 
 			if err != nil {
-				_ = rawStream.Send(nil, err)
+				_ = sw.Send(nil, err)
 				return
 			}
 
 			msg, usage, e := cm.resolveStreamResponse(resp)
 			if e != nil {
-				_ = rawStream.Send(nil, e)
+				_ = sw.Send(nil, e)
 				return
 			}
 
@@ -235,7 +235,7 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...f
 				// stream usage return in last chunk without message content, then
 				// last message received from callback output stream: Message == nil and TokenUsage != nil
 				// last message received from outStream: Message != nil
-				if closed := rawStream.Send(&fmodel.CallbackOutput{
+				if closed := sw.Send(&fmodel.CallbackOutput{
 					Message:    msg,
 					Config:     reqConf,
 					TokenUsage: usage,
@@ -250,7 +250,7 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...f
 				continue
 			}
 
-			closed := rawStream.Send(&fmodel.CallbackOutput{
+			closed := sw.Send(&fmodel.CallbackOutput{
 				Message: msg,
 				Config:  reqConf,
 			}, nil)
@@ -262,9 +262,9 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...f
 
 	rawStreamArr := make([]*schema.StreamReader[*fmodel.CallbackOutput], 2)
 	if cbmOK {
-		rawStreamArr = rawStream.AsReader().Copy(2)
+		rawStreamArr = sr.Copy(2)
 	} else {
-		rawStreamArr[0] = rawStream.AsReader()
+		rawStreamArr[0] = sr
 	}
 
 	outStream = schema.StreamReaderWithConvert(rawStreamArr[0],

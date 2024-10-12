@@ -868,10 +868,8 @@ code.byted.org/data-arch/gotbase v1.0.8-0.20220905113555-b9d46a7dc975/go.mod h1:
 code.byted.org/duanyi.aster/gopkg v0.0.1/go.mod h1:gxOcKCeV3yQ+J37/A3h5kQqxu/On27n+zdkZuzCbPac=
 code.byted.org/duanyi.aster/gopkg v0.0.3 h1:vQve62C3QiafPw2w8kAK/P+VVwW5Bi+p6foeVxlFydo=
 code.byted.org/duanyi.aster/gopkg v0.0.3/go.mod h1:gxOcKCeV3yQ+J37/A3h5kQqxu/On27n+zdkZuzCbPac=
-code.byted.org/flow/eino v0.0.0-20241010131430-d4fdc2c37179 h1:TU6G296IfSaXxG+BylRVQE4cdOeAEH7ScGvxyjGW1lk=
-code.byted.org/flow/eino v0.0.0-20241010131430-d4fdc2c37179/go.mod h1:wbnFryA+NZ7Nxn6zaYu0vgt+K51AXSG9tpSYshD7oiM=
-code.byted.org/flow/eino v0.0.0-20241011031855-07158bcf8140 h1:e217SYcOPdQlIHXwB5pCOYffWPa6psS3OpFuXruDrbE=
-code.byted.org/flow/eino v0.0.0-20241011031855-07158bcf8140/go.mod h1:wbnFryA+NZ7Nxn6zaYu0vgt+K51AXSG9tpSYshD7oiM=
+code.byted.org/flow/eino v0.1.0 h1:Cuwz8Io8nGyBdLDs5d/Grj41ZDNntjMWTVmdmiZtL+w=
+code.byted.org/flow/eino v0.1.0/go.mod h1:wbnFryA+NZ7Nxn6zaYu0vgt+K51AXSG9tpSYshD7oiM=
 code.byted.org/golf/buffer_pool v0.1.0 h1:Aj6hHGtwk4Av4gu8wrCqHV7iWo3nMZGp+HZnbKd/wZY=
 code.byted.org/golf/buffer_pool v0.1.0/go.mod h1:W2d2fc0+pnPhsrElW4Mr4aHsEgh/tyytYpzZrSZRHqc=
 code.byted.org/golf/consul v2.1.13+incompatible h1:XiBd9JzwnfgeMMqJ3imoJiV15ppOicdq/qBNW5iEj8A=

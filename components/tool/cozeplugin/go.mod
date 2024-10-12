@@ -5,7 +5,7 @@ go 1.20
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
-	code.byted.org/flow/eino v0.0.0-20241010073522-6d80a0de0542
+	code.byted.org/flow/eino v0.1.0
 	code.byted.org/kite/kitex v1.17.0
 	code.byted.org/kite/kitutil v3.8.8+incompatible
 	code.byted.org/overpass/ocean_cloud_plugin v0.0.0-20240910083709-0d31634cb8c4

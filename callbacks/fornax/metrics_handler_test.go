@@ -82,7 +82,8 @@ func Test_FornaxMetrics_ChatModel(t *testing.T) {
 		})
 
 		PatchConvey("test stream", func() {
-			c1 := handler.OnStartWithStreamInput(ctx, nil, schema.NewStream[callbacks.CallbackInput](1).AsReader())
+			sri, _ := schema.Pipe[callbacks.CallbackInput](1)
+			c1 := handler.OnStartWithStreamInput(ctx, nil, sri)
 			convey.So(c1.Value(metricsVariablesKey{}).(*metricsVariablesValue), convey.ShouldNotBeNil)
 
 			info := &callbacks.RunInfo{
@@ -91,10 +92,10 @@ func Test_FornaxMetrics_ChatModel(t *testing.T) {
 				Component: components.ComponentOfChatModel,
 			}
 
-			output := schema.NewStream[callbacks.CallbackOutput](1)
+			sro, sw := schema.Pipe[callbacks.CallbackOutput](1)
 			go func() {
 				for i := 0; i < 2; i++ {
-					output.Send(&model.CallbackOutput{
+					sw.Send(&model.CallbackOutput{
 						TokenUsage: &model.TokenUsage{
 							PromptTokens:     0,
 							CompletionTokens: 0,
@@ -103,10 +104,10 @@ func Test_FornaxMetrics_ChatModel(t *testing.T) {
 					}, nil)
 				}
 
-				output.Finish()
+				sw.Close()
 			}()
 
-			handler.OnEndWithStreamOutput(c1, info, output.AsReader())
+			handler.OnEndWithStreamOutput(c1, info, sro)
 		})
 	})
 

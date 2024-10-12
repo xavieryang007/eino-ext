@@ -450,17 +450,17 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, // nolint
 		return nil, err
 	}
 
-	rawStream := schema.NewStream[*model.CallbackOutput](1)
+	sr, sw := schema.Pipe[*model.CallbackOutput](1)
 	go func() {
 		defer func() {
 			panicErr := recover()
 			_ = stream.Close()
 
 			if panicErr != nil {
-				_ = rawStream.Send(nil, safe.NewPanicErr(panicErr, debug.Stack()))
+				_ = sw.Send(nil, safe.NewPanicErr(panicErr, debug.Stack()))
 			}
 
-			rawStream.Finish()
+			sw.Close()
 		}()
 
 		var lastEmptyMsg *schema.Message
@@ -472,7 +472,7 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, // nolint
 			}
 
 			if chunkErr != nil {
-				_ = rawStream.Send(nil, chunkErr)
+				_ = sw.Send(nil, chunkErr)
 				return
 			}
 
@@ -481,7 +481,7 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, // nolint
 				// stream usage return in last chunk without message content, then
 				// last message received from callback output stream: Message == nil and TokenUsage != nil
 				// last message received from outStream: Message != nil
-				if closed := rawStream.Send(&model.CallbackOutput{
+				if closed := sw.Send(&model.CallbackOutput{
 					Message:    msg,
 					Config:     reqConf,
 					TokenUsage: usage,
@@ -502,7 +502,7 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, // nolint
 			if lastEmptyMsg != nil {
 				cMsg, cErr := schema.ConcatMessages([]*schema.Message{lastEmptyMsg, msg})
 				if cErr != nil { // nolint: byted_s_too_many_nests_in_func
-					_ = rawStream.Send(nil, cErr)
+					_ = sw.Send(nil, cErr)
 					return
 				}
 
@@ -516,7 +516,7 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, // nolint
 
 			lastEmptyMsg = nil
 
-			closed := rawStream.Send(&model.CallbackOutput{
+			closed := sw.Send(&model.CallbackOutput{
 				Message: msg,
 				Config:  reqConf,
 			}, nil)
@@ -529,9 +529,9 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, // nolint
 
 	rawStreamArr := make([]*schema.StreamReader[*model.CallbackOutput], 2)
 	if cbmOK {
-		rawStreamArr = rawStream.AsReader().Copy(2) // nolint: byted_s_magic_number
+		rawStreamArr = sr.Copy(2) // nolint: byted_s_magic_number
 	} else {
-		rawStreamArr[0] = rawStream.AsReader()
+		rawStreamArr[0] = sr
 	}
 
 	outStream = schema.StreamReaderWithConvert(rawStreamArr[0],

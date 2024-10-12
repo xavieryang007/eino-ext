@@ -249,14 +249,14 @@ func (s *streamCozePlugin) StreamableRun(ctx context.Context, argumentsInJSON st
 		return nil, fmt.Errorf("request to stream execute coze plugin fail: %w", err)
 	}
 
-	result := schema.NewStream[string](1)
+	sr, sw := schema.Pipe[string](1)
 	go func() {
 		defer func() {
 			panicErr := recover()
 			if panicErr != nil {
-				result.Send("", safe.NewPanicErr(panicErr, debug.Stack()))
+				sw.Send("", safe.NewPanicErr(panicErr, debug.Stack()))
 			}
-			result.Finish()
+			sw.Close()
 			_ = resp.Close()
 		}()
 
@@ -266,17 +266,17 @@ func (s *streamCozePlugin) StreamableRun(ctx context.Context, argumentsInJSON st
 				break
 			}
 			if err != nil {
-				result.Send("", fmt.Errorf("execute coze plugin stream response error: %w", err))
+				sw.Send("", fmt.Errorf("execute coze plugin stream response error: %w", err))
 				break
 			}
 			if !chunk.Success {
-				result.Send("", fmt.Errorf("stream execute coze plugin fail"))
+				sw.Send("", fmt.Errorf("stream execute coze plugin fail"))
 				break
 			}
 			if chunk.Resp.SSEData != nil {
-				result.Send(*chunk.Resp.SSEData, nil)
+				sw.Send(*chunk.Resp.SSEData, nil)
 			} else {
-				result.Send("", fmt.Errorf("stream execute coze plugin success, but SSEData is empty"))
+				sw.Send("", fmt.Errorf("stream execute coze plugin success, but SSEData is empty"))
 				break
 			}
 			if chunk.IsFinish {
@@ -285,5 +285,5 @@ func (s *streamCozePlugin) StreamableRun(ctx context.Context, argumentsInJSON st
 		}
 	}()
 
-	return result.AsReader(), nil
+	return sr, nil
 }

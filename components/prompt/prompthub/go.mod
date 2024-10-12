@@ -3,7 +3,7 @@ module code.byted.org/flow/eino-ext/components/prompt/prompthub
 go 1.22
 
 require (
-	code.byted.org/flow/eino v0.0.0-20241010100649-fa5e736184ab
+	code.byted.org/flow/eino v0.1.0
 	code.byted.org/flowdevops/fornax_sdk v0.0.0-20240923060838-825174c57aab
 	code.byted.org/lang/gg v0.18.0
 )
