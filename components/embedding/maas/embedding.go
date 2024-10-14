@@ -3,6 +3,8 @@ package maas
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"time"
 
 	"github.com/volcengine/volcengine-go-sdk/service/arkruntime"
 	"github.com/volcengine/volcengine-go-sdk/service/arkruntime/model"
@@ -12,8 +14,12 @@ import (
 )
 
 var (
-	defaultBaseURL = "https://ark.cn-beijing.volces.com/api/v3"
-	defaultRegion  = "cn-beijing"
+	// all default values are from github.com/volcengine/volcengine-go-sdk/service/arkruntime/config.go
+	defaultBaseURL        = "https://ark.cn-beijing.volces.com/api/v3"
+	defaultRegion         = "cn-beijing"
+	defaultRetryTimes int = 2
+	defaultTimeout        = 10 * time.Minute
+	defalutClient         = http.Client{Timeout: defaultTimeout}
 )
 
 type EmbeddingConfig struct {
@@ -21,6 +27,10 @@ type EmbeddingConfig struct {
 	BaseURL string
 	// Region of maas endpoint, default "cn-beijing", see more
 	Region string
+
+	HTTPClient *http.Client   `json:"-"`
+	Timeout    *time.Duration `json:"timeout"`
+	RetryTimes *int           `json:"retry_times"`
 
 	// one of APIKey or ak/sk must be set for authorization.
 	APIKey               string
@@ -40,27 +50,37 @@ type Embedder struct {
 }
 
 func buildClient(config *EmbeddingConfig) *arkruntime.Client {
-	if config.BaseURL == "" {
+	if len(config.BaseURL) == 0 {
 		config.BaseURL = defaultBaseURL
 	}
-	if config.Region == "" {
+	if len(config.Region) == 0 {
 		config.Region = defaultRegion
 	}
-
-	if config.APIKey != "" {
-		return arkruntime.NewClientWithApiKey(
-			config.APIKey,
-			arkruntime.WithBaseUrl(config.BaseURL),
-			arkruntime.WithRegion(config.Region),
-		)
+	if config.Timeout == nil {
+		config.Timeout = &defaultTimeout
+	}
+	if config.HTTPClient == nil {
+		config.HTTPClient = &defalutClient
+	}
+	if config.RetryTimes == nil {
+		config.RetryTimes = &defaultRetryTimes
 	}
 
-	return arkruntime.NewClientWithAkSk(
-		config.AccessKey,
-		config.SecretKey,
+	if len(config.APIKey) > 0 {
+		return arkruntime.NewClientWithApiKey(config.APIKey,
+			arkruntime.WithHTTPClient(config.HTTPClient),
+			arkruntime.WithRetryTimes(*config.RetryTimes),
+			arkruntime.WithBaseUrl(config.BaseURL),
+			arkruntime.WithRegion(config.Region),
+			arkruntime.WithTimeout(*config.Timeout))
+	}
+
+	return arkruntime.NewClientWithAkSk(config.AccessKey, config.SecretKey,
+		arkruntime.WithHTTPClient(config.HTTPClient),
+		arkruntime.WithRetryTimes(*config.RetryTimes),
 		arkruntime.WithBaseUrl(config.BaseURL),
 		arkruntime.WithRegion(config.Region),
-	)
+		arkruntime.WithTimeout(*config.Timeout))
 }
 
 func NewEmbedder(ctx context.Context, config *EmbeddingConfig) (*Embedder, error) {

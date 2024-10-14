@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	code.byted.org/data/mario_collector v1.3.0
-	code.byted.org/flow/eino v0.1.0
+	code.byted.org/flow/eino v0.1.1
 	code.byted.org/flow/flow-telemetry-common/go v0.0.0-20240830081243-a15d639a66a0
 	code.byted.org/flowdevops/fornax_sdk v0.0.0-20240923060838-825174c57aab
 	code.byted.org/gopkg/env v1.6.14

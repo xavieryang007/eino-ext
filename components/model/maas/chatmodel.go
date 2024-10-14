@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
 	"runtime/debug"
 	"time"
 
@@ -21,8 +22,12 @@ import (
 )
 
 var (
-	defaultBaseURL = "https://ark.cn-beijing.volces.com/api/v3"
-	defaultRegion  = "cn-beijing"
+	// all default values are from github.com/volcengine/volcengine-go-sdk/service/arkruntime/config.go
+	defaultBaseURL        = "https://ark.cn-beijing.volces.com/api/v3"
+	defaultRegion         = "cn-beijing"
+	defaultRetryTimes int = 2
+	defaultTimeout        = 10 * time.Minute
+	defalutClient         = http.Client{Timeout: defaultTimeout}
 )
 
 var (
@@ -34,6 +39,10 @@ type ChatModelConfig struct {
 	BaseURL string `json:"base_url"`
 	// default: "cn-beijing"
 	Region string `json:"region"`
+
+	HTTPClient *http.Client   `json:"-"`
+	Timeout    *time.Duration `json:"timeout"`
+	RetryTimes *int           `json:"retry_times"`
 
 	// one of APIKey or AccessKey/SecretKey is required.
 	APIKey    string `json:"api_key"`
@@ -58,7 +67,6 @@ type ChatModelConfig struct {
 	RepetitionPenalty *float32              `json:"repetition_penalty,omitempty"`
 	N                 *int                  `json:"n,omitempty"`
 	ResponseFormat    *model.ResponseFormat `json:"response_format,omitempty"`
-	Timeout           time.Duration         `json:"timeout"`
 }
 
 func buildClient(config *ChatModelConfig) *arkruntime.Client {
@@ -68,18 +76,31 @@ func buildClient(config *ChatModelConfig) *arkruntime.Client {
 	if len(config.Region) == 0 {
 		config.Region = defaultRegion
 	}
+	if config.Timeout == nil {
+		config.Timeout = &defaultTimeout
+	}
+	if config.HTTPClient == nil {
+		config.HTTPClient = &defalutClient
+	}
+	if config.RetryTimes == nil {
+		config.RetryTimes = &defaultRetryTimes
+	}
 
 	if len(config.APIKey) > 0 {
 		return arkruntime.NewClientWithApiKey(config.APIKey,
+			arkruntime.WithHTTPClient(config.HTTPClient),
+			arkruntime.WithRetryTimes(*config.RetryTimes),
 			arkruntime.WithBaseUrl(config.BaseURL),
 			arkruntime.WithRegion(config.Region),
-			arkruntime.WithTimeout(config.Timeout))
+			arkruntime.WithTimeout(*config.Timeout))
 	}
 
 	return arkruntime.NewClientWithAkSk(config.AccessKey, config.SecretKey,
+		arkruntime.WithHTTPClient(config.HTTPClient),
+		arkruntime.WithRetryTimes(*config.RetryTimes),
 		arkruntime.WithBaseUrl(config.BaseURL),
 		arkruntime.WithRegion(config.Region),
-		arkruntime.WithTimeout(config.Timeout))
+		arkruntime.WithTimeout(*config.Timeout))
 }
 
 func NewChatModel(_ context.Context, config *ChatModelConfig) (*ChatModel, error) {

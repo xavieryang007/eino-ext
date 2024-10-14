@@ -882,8 +882,8 @@ code.byted.org/dp/mario_common v1.0.4/go.mod h1:PSclcIF4eX+TH0CY9y2OCfGxSsq9qmk6
 code.byted.org/duanyi.aster/gopkg v0.0.1/go.mod h1:gxOcKCeV3yQ+J37/A3h5kQqxu/On27n+zdkZuzCbPac=
 code.byted.org/duanyi.aster/gopkg v0.0.3 h1:vQve62C3QiafPw2w8kAK/P+VVwW5Bi+p6foeVxlFydo=
 code.byted.org/duanyi.aster/gopkg v0.0.3/go.mod h1:gxOcKCeV3yQ+J37/A3h5kQqxu/On27n+zdkZuzCbPac=
-code.byted.org/flow/eino v0.1.0 h1:Cuwz8Io8nGyBdLDs5d/Grj41ZDNntjMWTVmdmiZtL+w=
-code.byted.org/flow/eino v0.1.0/go.mod h1:wbnFryA+NZ7Nxn6zaYu0vgt+K51AXSG9tpSYshD7oiM=
+code.byted.org/flow/eino v0.1.1 h1:e/6U+V/q2tzLn5neYk6GgLXZqQ+SjZDbcfXsbWHA0dQ=
+code.byted.org/flow/eino v0.1.1/go.mod h1:wbnFryA+NZ7Nxn6zaYu0vgt+K51AXSG9tpSYshD7oiM=
 code.byted.org/flow/flow-telemetry-common/go v0.0.0-20240730122926-a412175fd637 h1:4t6DTnRsLpnxDm8j0RegHfVJkmxDUTzvvSazhuI8TIw=
 code.byted.org/flow/flow-telemetry-common/go v0.0.0-20240730122926-a412175fd637/go.mod h1:s5Xm+wOPHP5/E0W2EtyogaHJmiMC5b/H5ke28u/PkZk=
 code.byted.org/flowdevops/fornax/pkg/auth v0.0.0-20240530115429-4a4ba39f6406 h1:2aMjmLLmdsV8PFJVQFgoNCktKp9xh//Q7MjnKBeA4Fk=

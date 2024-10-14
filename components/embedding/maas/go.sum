@@ -30,8 +30,8 @@ cloud.google.com/go/storage v1.5.0/go.mod h1:tpKbwo567HUNpVclU5sGELwQWBDZ8gh0Zeo
 cloud.google.com/go/storage v1.6.0/go.mod h1:N7U0C8pVQ/+NIKOBQyamJIeKQKkZ+mxpohlUTyfDhBk=
 cloud.google.com/go/storage v1.8.0/go.mod h1:Wv1Oy7z6Yz3DshWRJFhqM/UCfaWIRTdp0RXyy7KQOVs=
 cloud.google.com/go/storage v1.10.0/go.mod h1:FLPqc6j+Ki4BU591ie1oL6qBQGu2Bl/tZ9ullr3+Kg0=
-code.byted.org/flow/eino v0.1.0 h1:Cuwz8Io8nGyBdLDs5d/Grj41ZDNntjMWTVmdmiZtL+w=
-code.byted.org/flow/eino v0.1.0/go.mod h1:wbnFryA+NZ7Nxn6zaYu0vgt+K51AXSG9tpSYshD7oiM=
+code.byted.org/flow/eino v0.1.1 h1:e/6U+V/q2tzLn5neYk6GgLXZqQ+SjZDbcfXsbWHA0dQ=
+code.byted.org/flow/eino v0.1.1/go.mod h1:wbnFryA+NZ7Nxn6zaYu0vgt+K51AXSG9tpSYshD7oiM=
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/BurntSushi/toml v1.1.0/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
@@ -461,8 +461,8 @@ github.com/urfave/cli/v2 v2.3.0/go.mod h1:LJmUH05zAU44vOAcrfzZQKsZbVcdbOG8rtL3/X
 github.com/volcengine/volc-sdk-golang v1.0.23/go.mod h1:AfG/PZRUkHJ9inETvbjNifTDgut25Wbkm2QoYBTbvyU=
 github.com/volcengine/volc-sdk-golang v1.0.172 h1:475eZM4pLPNtN2FIypdJ6lSj0lQsk1wfDwxUBqpNFY4=
 github.com/volcengine/volc-sdk-golang v1.0.172/go.mod h1:PA2CrkTf08dsmb1fLQbkF00/804nCPcPeMLqa7+FdTk=
-github.com/volcengine/volcengine-go-sdk v1.0.157 h1:jhXTxioT0m11KILZZHm9XRAgTYDBFUY3U/dQYDnoR+E=
-github.com/volcengine/volcengine-go-sdk v1.0.157/go.mod h1:oht5AKDJsk0fY6tV2ViqaVlOO14KSRmXZlI8ikK60Tg=
+github.com/volcengine/volcengine-go-sdk v1.0.160 h1:Jpa8MJ/V9Dh5zCbIKgF8AOKhfigVIJqYpSV4pW1tjy0=
+github.com/volcengine/volcengine-go-sdk v1.0.160/go.mod h1:oht5AKDJsk0fY6tV2ViqaVlOO14KSRmXZlI8ikK60Tg=
 github.com/x-cray/logrus-prefixed-formatter v0.5.2 h1:00txxvfBM9muc0jiLIEAkAcIMJzfthRT6usrui8uGmg=
 github.com/xdg-go/pbkdf2 v1.0.0/go.mod h1:jrpuAogTd400dnrH08LKmI/xc1MbPOebTwRqcT5RDeI=
 github.com/xdg-go/scram v1.0.2/go.mod h1:1WAq6h33pAW+iRreB34OORO2Nf7qel3VV3fjBj+hCSs=
