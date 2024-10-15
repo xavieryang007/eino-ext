@@ -247,27 +247,27 @@ func TestChatModelToolCall(t *testing.T) {
 	assert.Equal(t, weatherToolName, tool1.Function.Name)
 	assert.Equal(t, weatherToolDesc, tool1.Function.Description)
 	expectedDefinition := &openapi3.Schema{
-		Type: &openapi3.Types{openapi3.TypeObject},
+		Type: openapi3.TypeObject,
 		Properties: map[string]*openapi3.SchemaRef{
 			"location": {
 				Value: &openapi3.Schema{
-					Type:        &openapi3.Types{openapi3.TypeString},
+					Type:        openapi3.TypeString,
 					Description: "The city and state, e.g. San Francisco, CA",
 				},
 			},
 			"unit": {
 				Value: &openapi3.Schema{
-					Type: &openapi3.Types{openapi3.TypeString},
+					Type: openapi3.TypeString,
 					Enum: []any{"celsius", "fahrenheit"},
 				},
 			},
 			"days": {
 				Value: &openapi3.Schema{
-					Type:        &openapi3.Types{openapi3.TypeArray},
+					Type:        openapi3.TypeArray,
 					Description: "The number of days to forecast",
 					Items: &openapi3.SchemaRef{
 						Value: &openapi3.Schema{
-							Type:        &openapi3.Types{openapi3.TypeInteger},
+							Type:        openapi3.TypeInteger,
 							Description: "The number of days to forecast",
 							Enum:        []any{"1", "2", "3", "4", "5", "6", "7"},
 						},
@@ -276,17 +276,17 @@ func TestChatModelToolCall(t *testing.T) {
 			},
 			"infos": {
 				Value: &openapi3.Schema{
-					Type: &openapi3.Types{openapi3.TypeObject},
+					Type: openapi3.TypeObject,
 					Properties: map[string]*openapi3.SchemaRef{
 						"type_windy": {
 							Value: &openapi3.Schema{
-								Type:        &openapi3.Types{openapi3.TypeBoolean},
+								Type:        openapi3.TypeBoolean,
 								Description: "The types of windy weather",
 							},
 						},
 						"type_rainy": {
 							Value: &openapi3.Schema{
-								Type:        &openapi3.Types{openapi3.TypeBoolean},
+								Type:        openapi3.TypeBoolean,
 								Description: "The types of rainy weather",
 							},
 						},
