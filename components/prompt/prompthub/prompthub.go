@@ -59,7 +59,7 @@ func (p *promptHub) Format(ctx context.Context, vs map[string]any, opts ...promp
 	}
 	messages := make([]schema.MessagesTemplate, 0)
 	// prompt may be not nil but a zero value if prompt doesn't exist.
-	if template.GetPrompt().GetPromptText().GetSystemPrompt() != nil && !reflect.ValueOf(template.GetPrompt().GetPromptText().GetSystemPrompt()).Elem().IsZero() {
+	if template != nil && template.GetPrompt().GetPromptText().GetSystemPrompt() != nil && !reflect.ValueOf(template.GetPrompt().GetPromptText().GetSystemPrompt()).Elem().IsZero() {
 		m, err := messageConv(template.GetPrompt().GetPromptText().GetSystemPrompt())
 		if err != nil {
 			return nil, err
@@ -67,7 +67,7 @@ func (p *promptHub) Format(ctx context.Context, vs map[string]any, opts ...promp
 		messages = append(messages, m)
 	}
 	// prompt may be not nil but a zero value if prompt doesn't exist.
-	if template.GetPrompt().GetPromptText().GetUserPrompt() != nil && !reflect.ValueOf(template.GetPrompt().GetPromptText().GetUserPrompt()).Elem().IsZero() {
+	if template != nil && template.GetPrompt().GetPromptText().GetUserPrompt() != nil && !reflect.ValueOf(template.GetPrompt().GetPromptText().GetUserPrompt()).Elem().IsZero() {
 		m, err := messageConv(template.GetPrompt().GetPromptText().GetUserPrompt())
 		if err != nil {
 			return nil, err
