@@ -56,7 +56,7 @@ func main() {
 		"name":            "Alice",
 		"tool_name":       "google_search",
 		"message_history": []*schema.Message{},
-		"user_query":      []*schema.Message{schema.UserMessage("地球有多种")},
+		"user_query":      "地球有多重？",
 	})
 	if err != nil {
 		logs.Errorf("chatTpl.Format failed, err=%w", err)
@@ -94,22 +94,16 @@ func (e *extendPromptHub) Format(ctx context.Context, vs map[string]any, opts ..
 		return nil, err
 	}
 
-	const (
-		placeholderOfSystemTemplate = "system_template"
-		placeholderOfMessageHistory = "message_history"
-		placeholderOfUserQuery      = "user_query"
-	)
-
 	tpl := prompt.FromMessages(schema.Jinja2,
-		schema.MessagesPlaceholder(placeholderOfSystemTemplate, false),
-		schema.MessagesPlaceholder(placeholderOfMessageHistory, false),
-		schema.MessagesPlaceholder(placeholderOfUserQuery, false),
+		schema.MessagesPlaceholder("system_template", false),
+		schema.MessagesPlaceholder("message_history", false),
+		schema.UserMessage("{{user_query}}"),
 	)
 
 	return tpl.Format(ctx, map[string]any{
-		placeholderOfSystemTemplate: spMsgs,
-		placeholderOfMessageHistory: vs[placeholderOfMessageHistory],
-		placeholderOfUserQuery:      vs[placeholderOfUserQuery],
+		"system_template": spMsgs,
+		"message_history": vs["message_history"],
+		"user_query":      vs["user_query"],
 	}, opts...)
 }
 
