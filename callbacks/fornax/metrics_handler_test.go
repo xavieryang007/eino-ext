@@ -32,7 +32,7 @@ func Test_FornaxMetrics_ChatModel(t *testing.T) {
 		}
 	}()
 
-	if err := ob.MustInit(); err != nil {
+	if err := ob.MustInit(nil); err != nil {
 		t.Fatal(err)
 	}
 

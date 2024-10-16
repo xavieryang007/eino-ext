@@ -4,15 +4,17 @@ go 1.18
 
 require (
 	code.byted.org/data/mario_collector v1.3.0
-	code.byted.org/flow/eino v0.1.2-0.20241015121515-8df91602a235
-	code.byted.org/flow/flow-telemetry-common/go v0.0.0-20240830081243-a15d639a66a0
-	code.byted.org/flowdevops/fornax_sdk v0.0.0-20240923060838-825174c57aab
+	code.byted.org/flow/eino v0.1.2
+	code.byted.org/flow/flow-telemetry-common/go v0.0.0-20241011125720-ebc2858921ed
+	code.byted.org/flowdevops/fornax_sdk v1.0.0
 	code.byted.org/gopkg/env v1.6.14
 	code.byted.org/gopkg/logs/v2 v2.2.0-beta.9
 	code.byted.org/lang/gg v0.19.1
-	code.byted.org/obric/flow_telemetry_go v0.4.1
+	code.byted.org/obric/flow_telemetry_go v0.4.4
+	code.byted.org/tiktok/buildinfo v0.0.2
 	github.com/bytedance/mockey v1.2.12
 	github.com/bytedance/sonic v1.12.2
+	github.com/getkin/kin-openapi v0.118.0
 	github.com/smartystreets/goconvey v1.8.1
 	github.com/stretchr/testify v1.9.0
 )
@@ -29,7 +31,7 @@ require (
 	code.byted.org/bytedtrace/bytedtrace-client-go v1.2.2 // indirect
 	code.byted.org/bytedtrace/bytedtrace-common/go v0.0.13 // indirect
 	code.byted.org/bytedtrace/bytedtrace-compatible-lightweight-go v1.0.1 // indirect
-	code.byted.org/bytedtrace/bytedtrace-conf-provider-client-go v0.0.26 // indirect
+	code.byted.org/bytedtrace/bytedtrace-conf-provider-client-go v0.0.27 // indirect
 	code.byted.org/bytedtrace/bytedtrace-reporter-factory v1.0.0 // indirect
 	code.byted.org/bytedtrace/bytedtrace-utils-go v1.0.3 // indirect
 	code.byted.org/bytedtrace/interface-go v1.0.20 // indirect
@@ -101,7 +103,6 @@ require (
 	code.byted.org/security/sensitive_finder_engine v0.3.18 // indirect
 	code.byted.org/security/zti-jwt-helper-golang v1.0.17 // indirect
 	code.byted.org/service_mesh/shmipc v0.2.16 // indirect
-	code.byted.org/tiktok/buildinfo v0.0.2 // indirect
 	code.byted.org/toutiao/elastic/v7 v7.0.42 // indirect
 	code.byted.org/trace/trace-client-go v1.3.7 // indirect
 	code.byted.org/ttarch/byteconf-cel-go v0.0.3 // indirect
@@ -153,7 +154,6 @@ require (
 	github.com/facebookgo/clock v0.0.0-20150410010913-600d898af40a // indirect
 	github.com/fatih/structtag v1.2.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
-	github.com/getkin/kin-openapi v0.118.0 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.3 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect

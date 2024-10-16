@@ -7,10 +7,10 @@ toolchain go1.22.0
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
-	code.byted.org/flow/eino v0.1.2-0.20241015121515-8df91602a235
+	code.byted.org/flow/eino v0.1.2
 	code.byted.org/flowdevops/fornax_sdk v0.0.0-20240923060838-825174c57aab
 	code.byted.org/lang/gg v0.19.1
-	code.byted.org/obric/flow_telemetry_go v0.4.1
+	code.byted.org/obric/flow_telemetry_go v0.4.3-0.20240930033149-64fccee39cf9
 	github.com/bytedance/mockey v1.2.12
 	github.com/bytedance/sonic v1.12.2
 	github.com/smartystreets/goconvey v1.8.1
@@ -40,7 +40,7 @@ require (
 	code.byted.org/data/mario_collector v1.2.27 // indirect
 	code.byted.org/dp/mario_common v1.0.4 // indirect
 	code.byted.org/duanyi.aster/gopkg v0.0.3 // indirect
-	code.byted.org/flow/flow-telemetry-common/go v0.0.0-20240830081243-a15d639a66a0 // indirect
+	code.byted.org/flow/flow-telemetry-common/go v0.0.0-20240919074455-8e57761161a1 // indirect
 	code.byted.org/flowdevops/fornax/pkg/auth v0.0.0-20240530115429-4a4ba39f6406 // indirect
 	code.byted.org/golf/buffer_pool v0.1.0 // indirect
 	code.byted.org/golf/consul v2.1.13+incompatible // indirect

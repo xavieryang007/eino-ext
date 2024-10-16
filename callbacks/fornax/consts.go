@@ -20,12 +20,18 @@ type metricsVariablesValue struct {
 	callbackInput callbacks.CallbackInput
 }
 
+type traceVariablesKey struct{}
+
+type traceVariablesValue struct {
+	startTime time.Time
+}
+
 type metricsGraphNameKey struct{}
 
 const (
-	customSpanTagKeyName      = "eino_name"
-	customSpanTagKeyType      = "eino_type"
-	customSpanTagKeyComponent = "eino_component"
+	customSpanTagKeyName      = "eino_run_info_name"
+	customSpanTagKeyType      = "eino_run_info_type"
+	customSpanTagKeyComponent = "eino_run_info_component"
 )
 
 var infraComponents = map[components.Component]struct{}{

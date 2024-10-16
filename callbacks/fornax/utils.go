@@ -55,6 +55,27 @@ func (t spanTags) set(key string, value any) spanTags {
 	return t
 }
 
+func (t spanTags) setIfNotZero(key string, val any) {
+	if val == nil {
+		return
+	}
+
+	rv := reflect.ValueOf(val)
+	if rv.IsValid() && rv.IsZero() {
+		return
+	}
+
+	t.set(key, val)
+}
+
+func (t spanTags) setFromExtraIfNotZero(key string, extra map[string]any) {
+	if extra == nil {
+		return
+	}
+
+	t.setIfNotZero(key, extra[key])
+}
+
 func setMetricsVariablesValue(ctx context.Context, val *metricsVariablesValue) context.Context {
 	if val == nil {
 		return ctx
@@ -65,6 +86,19 @@ func setMetricsVariablesValue(ctx context.Context, val *metricsVariablesValue) c
 
 func getMetricsVariablesValue(ctx context.Context) (*metricsVariablesValue, bool) {
 	val, ok := ctx.Value(metricsVariablesKey{}).(*metricsVariablesValue)
+	return val, ok
+}
+
+func setTraceVariablesValue(ctx context.Context, val *traceVariablesValue) context.Context {
+	if val == nil {
+		return ctx
+	}
+
+	return context.WithValue(ctx, traceVariablesKey{}, val)
+}
+
+func getTraceVariablesValue(ctx context.Context) (*traceVariablesValue, bool) {
+	val, ok := ctx.Value(traceVariablesKey{}).(*traceVariablesValue)
 	return val, ok
 }
 

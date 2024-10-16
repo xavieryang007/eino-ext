@@ -18,7 +18,7 @@ import (
 	node "code.byted.org/flowdevops/fornax_sdk/domain/node"
 	prompt "code.byted.org/flowdevops/fornax_sdk/domain/prompt"
 	ob "code.byted.org/flowdevops/fornax_sdk/infra/ob"
-	trace "code.byted.org/obric/flow_telemetry_go/trace"
+	flow_interface "code.byted.org/obric/flow_telemetry_go/v2/flow_interface"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -130,10 +130,10 @@ func (mr *MockIClientMockRecorder) RetrieveKnowledge(arg0, arg1 any) *gomock.Cal
 }
 
 // StartSpan mocks base method.
-func (m *MockIClient) StartSpan(arg0 context.Context, arg1 string, arg2 ...trace.FlowStartSpanOption) (ob.FornaxSpan, context.Context, error) {
+func (m *MockIClient) StartSpan(arg0 context.Context, arg1, arg2 string, arg3 ...flow_interface.FlowStartSpanOption) (ob.FornaxSpan, context.Context, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1}
-	for _, a := range arg2 {
+	varargs := []any{arg0, arg1, arg2}
+	for _, a := range arg3 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "StartSpan", varargs...)
@@ -144,9 +144,9 @@ func (m *MockIClient) StartSpan(arg0 context.Context, arg1 string, arg2 ...trace
 }
 
 // StartSpan indicates an expected call of StartSpan.
-func (mr *MockIClientMockRecorder) StartSpan(arg0, arg1 any, arg2 ...any) *gomock.Call {
+func (mr *MockIClientMockRecorder) StartSpan(arg0, arg1, arg2 any, arg3 ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1}, arg2...)
+	varargs := append([]any{arg0, arg1, arg2}, arg3...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartSpan", reflect.TypeOf((*MockIClient)(nil).StartSpan), varargs...)
 }
 

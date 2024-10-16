@@ -10,8 +10,8 @@ import (
 	"code.byted.org/flowdevops/fornax_sdk"
 	"code.byted.org/flowdevops/fornax_sdk/domain"
 	"code.byted.org/flowdevops/fornax_sdk/infra/ob"
+	"code.byted.org/gopkg/env"
 	"code.byted.org/gopkg/logs/v2"
-	flowtrace "code.byted.org/obric/flow_telemetry_go/trace"
 )
 
 func newTraceCallbackHandler(client *fornax_sdk.Client, o *options) callbacks.Handler {
@@ -44,9 +44,11 @@ func (l *einoTracer) OnStart(ctx context.Context, info *callbacks.RunInfo, input
 		spanName = string(info.Component)
 	}
 
-	span, ctx, err := l.tracer.StartSpan(ctx, spanName,
-		flowtrace.SetStartTime(time.Now()),
-		flowtrace.AsyncChildSpan())
+	span, ctx, err := l.tracer.StartSpan(
+		ctx,
+		spanName,
+		parseSpanTypeFromComponent(info.Component),
+		ob.AsyncChildSpan())
 	if err != nil {
 		logs.Warnf("[einoTracer][OnStart] start span failed: %s", err.Error())
 		return ctx
@@ -63,10 +65,12 @@ func (l *einoTracer) OnStart(ctx context.Context, info *callbacks.RunInfo, input
 	l.setRunInfo(ctx, si, info)
 
 	if l.parser != nil {
-		si.SetTag(l.parser.ParseInput(ctx, info, input))
+		si.SetTag(ctx, l.parser.ParseInput(ctx, info, input))
 	}
 
-	return ctx
+	return setTraceVariablesValue(ctx, &traceVariablesValue{
+		startTime: time.Now(),
+	})
 }
 
 func (l *einoTracer) OnEnd(ctx context.Context, info *callbacks.RunInfo, output callbacks.CallbackOutput) context.Context {
@@ -87,14 +91,14 @@ func (l *einoTracer) OnEnd(ctx context.Context, info *callbacks.RunInfo, output 
 	}
 
 	if l.parser != nil {
-		si.SetTag(l.parser.ParseOutput(ctx, info, output))
+		si.SetTag(ctx, l.parser.ParseOutput(ctx, info, output))
 	}
 
 	if stopCh, ok := ctx.Value(traceStreamInputAsyncKey{}).(streamInputAsyncVal); ok {
 		<-stopCh
 	}
 
-	span.Finish()
+	span.Finish(ctx)
 
 	return ctx
 }
@@ -116,13 +120,13 @@ func (l *einoTracer) OnError(ctx context.Context, info *callbacks.RunInfo, err e
 		return ctx
 	}
 
-	si.SetTag(getErrorTags(ctx, err))
+	si.SetTag(ctx, getErrorTags(ctx, err))
 
 	if stopCh, ok := ctx.Value(traceStreamInputAsyncKey{}).(streamInputAsyncVal); ok {
 		<-stopCh
 	}
 
-	span.Finish()
+	span.Finish(ctx)
 
 	return ctx
 }
@@ -137,9 +141,11 @@ func (l *einoTracer) OnStartWithStreamInput(ctx context.Context, info *callbacks
 		spanName = string(info.Component)
 	}
 
-	span, ctx, err := l.tracer.StartSpan(ctx, spanName,
-		flowtrace.SetStartTime(time.Now()),
-		flowtrace.AsyncChildSpan())
+	span, ctx, err := l.tracer.StartSpan(ctx,
+		spanName,
+		parseSpanTypeFromComponent(info.Component),
+		ob.SetStartTime(time.Now()),
+		ob.AsyncChildSpan())
 	if err != nil {
 		logs.Warnf("[einoTracer][OnStartWithStreamInput] start span failed: %s", err.Error())
 		return ctx
@@ -165,15 +171,16 @@ func (l *einoTracer) OnStartWithStreamInput(ctx context.Context, info *callbacks
 					logs.Warnf("[einoTracer][OnStartWithStreamInput] recovered: %s", e)
 				}
 
-				input.Close()
 				close(stopCh)
 			}()
 
-			si.SetTag(l.parser.ParseStreamInput(ctx, info, input))
+			si.SetTag(ctx, l.parser.ParseStreamInput(ctx, info, input))
 		}()
 	}
 
-	return ctx
+	return setTraceVariablesValue(ctx, &traceVariablesValue{
+		startTime: time.Now(),
+	})
 }
 
 func (l *einoTracer) OnEndWithStreamOutput(ctx context.Context, info *callbacks.RunInfo, output *schema.StreamReader[callbacks.CallbackOutput]) context.Context {
@@ -199,27 +206,25 @@ func (l *einoTracer) OnEndWithStreamOutput(ctx context.Context, info *callbacks.
 				if e := recover(); e != nil {
 					logs.Warnf("[einoTracer][OnEndWithStreamOutput] recovered: %s", e)
 				}
-
-				output.Close()
 			}()
 
-			si.SetTag(l.parser.ParseStreamOutput(ctx, info, output))
+			si.SetTag(ctx, l.parser.ParseStreamOutput(ctx, info, output))
 
 			if stopCh, ok := ctx.Value(traceStreamInputAsyncKey{}).(streamInputAsyncVal); ok {
 				<-stopCh
 			}
 
-			span.Finish()
+			span.Finish(ctx)
 		}()
 	}
 
 	return ctx
 }
 
-func (l *einoTracer) setRunInfo(_ context.Context, span *ob.FornaxSpanImpl, info *callbacks.RunInfo) {
-	span.SetTag(make(spanTags).
-		set(obtag.SpanType, info.Component).
-		set(customSpanTagKeyComponent, info.Component).
+func (l *einoTracer) setRunInfo(ctx context.Context, span *ob.FornaxSpanImpl, info *callbacks.RunInfo) {
+	span.SetTag(ctx, make(spanTags).
+		set(obtag.SpanType, parseSpanTypeFromComponent(info.Component)).
+		set(customSpanTagKeyComponent, string(info.Component)).
 		set(customSpanTagKeyName, info.Name).
 		set(customSpanTagKeyType, info.Type),
 	)
@@ -227,6 +232,7 @@ func (l *einoTracer) setRunInfo(_ context.Context, span *ob.FornaxSpanImpl, info
 
 func (l *einoTracer) setFornaxTags(ctx context.Context, span *ob.FornaxSpanImpl) {
 	tags := make(spanTags).
+		set("psm_env", env.Env()).
 		set(obtag.SpaceID, itoa(l.identity.GetSpaceID())).
 		set(obtag.FornaxSpaceID, itoa(l.identity.GetSpaceID())).
 		set(obtag.Runtime, toJson(getStaticRuntimeTags()))
@@ -243,5 +249,5 @@ func (l *einoTracer) setFornaxTags(ctx context.Context, span *ob.FornaxSpanImpl)
 		tags.set(obtag.ThreadID, tid)
 	}
 
-	span.SetTag(tags)
+	span.SetTag(ctx, tags)
 }

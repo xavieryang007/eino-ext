@@ -12,6 +12,7 @@ import (
 	"code.byted.org/flow/eino/callbacks"
 	"code.byted.org/flow/eino/components"
 	"code.byted.org/flow/eino/components/model"
+	"code.byted.org/flow/eino/compose"
 	"code.byted.org/flow/eino/schema"
 	"code.byted.org/flow/flow-telemetry-common/go/obtag"
 )
@@ -66,7 +67,6 @@ func Test_ParseOutput(t *testing.T) {
 
 		convey.So(tags, convey.ShouldNotBeNil)
 		convey.So(tags[obtag.Output], convey.ShouldNotBeZeroValue)
-		convey.So(tags[obtag.ModelName], convey.ShouldEqual, "mock_name")
 		convey.So(tags[obtag.InputTokens], convey.ShouldEqual, 1)
 		convey.So(tags[obtag.OutputTokens], convey.ShouldEqual, 2)
 		convey.So(tags[obtag.Tokens], convey.ShouldEqual, 3)
@@ -116,7 +116,6 @@ func Test_ParseStreamInput(t *testing.T) {
 			}, fmt.Errorf("mock err"))
 
 			tags := parser.ParseStreamInput(ctx, info, reader)
-			reader.Close()
 			convey.So(tags, convey.ShouldNotBeNil)
 			convey.So(tags[obtag.Error], convey.ShouldEqual, "mock err")
 			convey.So(tags[obtag.StatusCode], convey.ShouldEqual, obtag.VErrDefault)
@@ -152,7 +151,6 @@ func Test_ParseStreamInput(t *testing.T) {
 			}, nil)
 
 			tags := parser.ParseStreamInput(ctx, info, reader)
-			reader.Close()
 			convey.So(tags, convey.ShouldNotBeNil)
 			convey.So(tags[obtag.Input], convey.ShouldNotBeZeroValue)
 		})
@@ -201,7 +199,6 @@ func Test_ParseStreamOutput(t *testing.T) {
 			}, fmt.Errorf("mock err"))
 
 			tags := parser.ParseStreamOutput(ctx, info, reader)
-			reader.Close()
 			convey.So(tags, convey.ShouldNotBeNil)
 			convey.So(tags[obtag.Error], convey.ShouldEqual, "mock err")
 			convey.So(tags[obtag.StatusCode], convey.ShouldEqual, obtag.VErrDefault)
@@ -239,9 +236,7 @@ func Test_ParseStreamOutput(t *testing.T) {
 			}, nil)
 
 			tags := parser.ParseStreamOutput(ctx, info, reader)
-			reader.Close()
 			convey.So(tags, convey.ShouldNotBeNil)
-			convey.So(tags[obtag.ModelName], convey.ShouldEqual, "mock_model_name")
 			convey.So(tags[obtag.Output], convey.ShouldNotBeZeroValue)
 			convey.So(tags[obtag.InputTokens], convey.ShouldEqual, 1)
 			convey.So(tags[obtag.OutputTokens], convey.ShouldEqual, 2)
@@ -315,6 +310,24 @@ func Test_parseAny(t *testing.T) {
 
 		convey.So(len(parseAny(ctx, "asd")), convey.ShouldNotBeZeroValue)
 
+		convey.So(parseAny(ctx, []callbacks.CallbackOutput{
+			&schema.Message{
+				Role:    schema.Assistant,
+				Content: "a",
+				Name:    "name",
+			},
+			&schema.Message{
+				Role:    "",
+				Content: "aa",
+				Name:    "name",
+			},
+			&schema.Message{
+				Role:    schema.User,
+				Content: "b",
+				Name:    "name",
+			},
+		}), convey.ShouldNotBeZeroValue)
+
 	})
 }
 
@@ -346,6 +359,19 @@ func Test_CustomDataParser(t *testing.T) {
 		convey.So(tags, convey.ShouldNotBeNil)
 		convey.So(tags[obtag.Input], convey.ShouldNotBeZeroValue)
 		convey.So(tags[obtag.ModelName], convey.ShouldEqual, "mock_name")
+	})
+}
+
+func Test_parseSpanTypeFromComponent(t *testing.T) {
+	PatchConvey("test parseSpanTypeFromComponent", t, func() {
+		convey.So(parseSpanTypeFromComponent(components.ComponentOfPrompt), convey.ShouldEqual, "prompt")
+		convey.So(parseSpanTypeFromComponent(components.ComponentOfChatModel), convey.ShouldEqual, "model")
+		convey.So(parseSpanTypeFromComponent(components.ComponentOfEmbedding), convey.ShouldEqual, "embedding")
+		convey.So(parseSpanTypeFromComponent(components.ComponentOfIndexer), convey.ShouldEqual, "store")
+		convey.So(parseSpanTypeFromComponent(components.ComponentOfRetriever), convey.ShouldEqual, "retriever")
+		convey.So(parseSpanTypeFromComponent(components.ComponentOfLoaderSplitter), convey.ShouldEqual, "loader")
+		convey.So(parseSpanTypeFromComponent(components.ComponentOfTool), convey.ShouldEqual, "function")
+		convey.So(parseSpanTypeFromComponent(compose.ComponentOfGraph), convey.ShouldEqual, string(compose.ComponentOfGraph))
 	})
 }
 

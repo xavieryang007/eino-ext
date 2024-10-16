@@ -3,6 +3,7 @@ package fornax
 import (
 	"context"
 	"io"
+	"time"
 
 	"code.byted.org/flow/eino/callbacks"
 	"code.byted.org/flow/eino/components"
@@ -34,40 +35,60 @@ func NewDefaultDataParser() CallbackDataParser {
 type defaultDataParser struct{}
 
 func (d defaultDataParser) ParseInput(ctx context.Context, info *callbacks.RunInfo, input callbacks.CallbackInput) map[string]any {
+	if info == nil {
+		return nil
+	}
+
 	tags := make(spanTags)
 
 	switch info.Component {
 	case components.ComponentOfChatModel:
 		cbInput := model.ConvCallbackInput(input)
 		if cbInput != nil {
-			tags.set(obtag.Input, parseAny(ctx, cbInput.Messages))
+			tags.set(obtag.Input, convertModelInput(cbInput))
+
+			if cbInput.Config != nil {
+				tags.set(obtag.ModelName, cbInput.Config.Model)
+				tags.set(obtag.CallOptions, convertModelCallOption(cbInput.Config))
+			}
 		}
 
-		if cbInput.Config != nil {
-			tags.set(obtag.ModelName, cbInput.Config.Model)
-		}
+		tags.set(obtag.ModelProvider, info.Type)
 
 	case components.ComponentOfPrompt:
 		cbInput := prompt.ConvCallbackInput(input)
 		if cbInput != nil {
-			tags.set(obtag.Input, parseAny(ctx, cbInput.Variables))
+			tags.set(obtag.Input, convertPromptInput(cbInput))
+			tags.setFromExtraIfNotZero(obtag.PromptKey, cbInput.Extra)
+			tags.setFromExtraIfNotZero(obtag.PromptVersion, cbInput.Extra)
+			tags.setFromExtraIfNotZero(obtag.PromptProvider, cbInput.Extra)
 		}
 
 	case components.ComponentOfEmbedding:
 		cbInput := embedding.ConvCallbackInput(input)
 		if cbInput != nil {
 			tags.set(obtag.Input, cbInput.Texts)
-		}
 
-		if cbInput.Config != nil {
-			tags.set(obtag.ModelName, cbInput.Config.Model)
+			if cbInput.Config != nil {
+				tags.set(obtag.ModelName, cbInput.Config.Model)
+			}
 		}
 
 	case components.ComponentOfRetriever:
 		cbInput := retriever.ConvCallbackInput(input)
 		if cbInput != nil {
 			tags.set(obtag.Input, parseAny(ctx, cbInput.Query))
+			tags.set(obtag.CallOptions, convertRetrieverCallOption(cbInput))
+
+			tags.setFromExtraIfNotZero(obtag.VikingDBName, cbInput.Extra)
+			tags.setFromExtraIfNotZero(obtag.VikingDBRegion, cbInput.Extra)
+
+			tags.setFromExtraIfNotZero(obtag.ESName, cbInput.Extra)
+			tags.setFromExtraIfNotZero(obtag.ESIndex, cbInput.Extra)
+			tags.setFromExtraIfNotZero(obtag.ESCluster, cbInput.Extra)
 		}
+
+		tags.set(obtag.RetrieverProvider, info.Type)
 
 	case components.ComponentOfIndexer:
 		cbInput := indexer.ConvCallbackInput(input)
@@ -87,45 +108,53 @@ func (d defaultDataParser) ParseInput(ctx context.Context, info *callbacks.RunIn
 }
 
 func (d defaultDataParser) ParseOutput(ctx context.Context, info *callbacks.RunInfo, output callbacks.CallbackOutput) map[string]any {
+	if info == nil {
+		return nil
+	}
+
 	tags := make(spanTags)
 
 	switch info.Component {
 	case components.ComponentOfChatModel:
 		cbOutput := model.ConvCallbackOutput(output)
 		if cbOutput != nil {
-			tags.set(obtag.Output, parseAny(ctx, cbOutput.Message))
+			tags.set(obtag.Output, convertModelOutput(cbOutput))
+
+			if cbOutput.TokenUsage != nil {
+				tags.set(obtag.Tokens, cbOutput.TokenUsage.TotalTokens).
+					set(obtag.InputTokens, cbOutput.TokenUsage.PromptTokens).
+					set(obtag.OutputTokens, cbOutput.TokenUsage.CompletionTokens)
+			}
 		}
 
-		if cbOutput.TokenUsage != nil {
-			tags.set(obtag.Tokens, cbOutput.TokenUsage.TotalTokens).
-				set(obtag.InputTokens, cbOutput.TokenUsage.PromptTokens).
-				set(obtag.OutputTokens, cbOutput.TokenUsage.CompletionTokens)
+		tags.set(obtag.Stream, false)
+
+		if tv, ok := getTraceVariablesValue(ctx); ok {
+			tags.set(obtag.LatencyFirstResp, time.Since(tv.startTime).Milliseconds())
 		}
 
-		if cbOutput.Config != nil {
-			tags.set(obtag.ModelName, cbOutput.Config.Model)
-		}
 	case components.ComponentOfPrompt:
 		cbOutput := prompt.ConvCallbackOutput(output)
 		if cbOutput != nil {
-			tags.set(obtag.Output, parseAny(ctx, cbOutput.Result))
+			tags.set(obtag.Output, convertPromptOutput(cbOutput))
 		}
 
 	case components.ComponentOfEmbedding:
 		cbOutput := embedding.ConvCallbackOutput(output)
 		if cbOutput != nil {
 			tags.set(obtag.Output, parseAny(ctx, cbOutput.Embeddings))
+
+			if cbOutput.TokenUsage != nil {
+				tags.set(obtag.Tokens, cbOutput.TokenUsage.TotalTokens).
+					set(obtag.InputTokens, cbOutput.TokenUsage.PromptTokens).
+					set(obtag.OutputTokens, cbOutput.TokenUsage.CompletionTokens)
+			}
+
+			if cbOutput.Config != nil {
+				tags.set(obtag.ModelName, cbOutput.Config.Model)
+			}
 		}
 
-		if cbOutput.TokenUsage != nil {
-			tags.set(obtag.Tokens, cbOutput.TokenUsage.TotalTokens).
-				set(obtag.InputTokens, cbOutput.TokenUsage.PromptTokens).
-				set(obtag.OutputTokens, cbOutput.TokenUsage.CompletionTokens)
-		}
-
-		if cbOutput.Config != nil {
-			tags.set(obtag.ModelName, cbOutput.Config.Model)
-		}
 	case components.ComponentOfIndexer:
 		cbOutput := indexer.ConvCallbackOutput(output)
 		if cbOutput != nil {
@@ -136,7 +165,7 @@ func (d defaultDataParser) ParseOutput(ctx context.Context, info *callbacks.RunI
 		cbOutput := retriever.ConvCallbackOutput(output)
 		if cbOutput != nil {
 			// rewrite if not suitable here
-			tags.set(obtag.Output, parseAny(ctx, cbOutput.Docs))
+			tags.set(obtag.Output, convertRetrieverOutput(cbOutput))
 		}
 
 	case compose.ComponentOfLambda:
@@ -151,6 +180,8 @@ func (d defaultDataParser) ParseOutput(ctx context.Context, info *callbacks.RunI
 }
 
 func (d defaultDataParser) ParseStreamInput(ctx context.Context, info *callbacks.RunInfo, input *schema.StreamReader[callbacks.CallbackInput]) map[string]any {
+	defer input.Close()
+
 	if info == nil {
 		return nil
 	}
@@ -171,6 +202,8 @@ func (d defaultDataParser) ParseStreamInput(ctx context.Context, info *callbacks
 }
 
 func (d defaultDataParser) ParseStreamOutput(ctx context.Context, info *callbacks.RunInfo, output *schema.StreamReader[callbacks.CallbackOutput]) map[string]any {
+	defer output.Close()
+
 	if info == nil {
 		return nil
 	}
@@ -180,6 +213,10 @@ func (d defaultDataParser) ParseStreamOutput(ctx context.Context, info *callback
 	switch info.Component {
 	case components.ComponentOfChatModel:
 		tags = d.ParseChatModelStreamOutput(ctx, output)
+
+		tags.set(obtag.Stream, true)
+		tags.set(obtag.ModelProvider, info.Type)
+
 	default:
 		chunks, recvErr := d.ParseDefaultStreamOutput(ctx, output)
 		if recvErr != nil {
@@ -215,25 +252,32 @@ func (d defaultDataParser) ParseChatModelStreamOutput(ctx context.Context, outpu
 			continue
 		}
 
-		chunks = append(chunks, cbOutput.Message)
+		if cbOutput.Message != nil {
+			chunks = append(chunks, cbOutput.Message)
+		}
 
 		if cbOutput.TokenUsage != nil {
-			if usage == nil {
-				usage = &model.TokenUsage{}
+			usage = &model.TokenUsage{
+				PromptTokens:     cbOutput.TokenUsage.PromptTokens,
+				CompletionTokens: cbOutput.TokenUsage.CompletionTokens,
+				TotalTokens:      cbOutput.TokenUsage.TotalTokens,
 			}
-
-			usage.PromptTokens += cbOutput.TokenUsage.PromptTokens
-			usage.TotalTokens += cbOutput.TokenUsage.TotalTokens
-			usage.CompletionTokens += cbOutput.TokenUsage.CompletionTokens
 		}
 
 		if cbOutput.Config != nil && !onceSet {
 			onceSet = true
-			tags.set(obtag.ModelName, cbOutput.Config.Model)
+
+			if tv, ok := getTraceVariablesValue(ctx); ok {
+				tags.set(obtag.LatencyFirstResp, time.Since(tv.startTime).Milliseconds())
+			}
 		}
 	}
 
-	tags.set(obtag.Output, parseAny(ctx, chunks))
+	if msg, concatErr := schema.ConcatMessages(chunks); concatErr != nil { // unexpected
+		tags.set(obtag.Output, parseAny(ctx, chunks))
+	} else {
+		tags.set(obtag.Output, convertModelOutput(&model.CallbackOutput{Message: msg}))
+	}
 
 	if usage != nil {
 		tags.set(obtag.Tokens, usage.TotalTokens).
@@ -285,54 +329,131 @@ func parseAny(ctx context.Context, v any) string {
 
 	switch t := v.(type) {
 	case []*schema.Message:
-		var mgr []*schema.Message
+		msgs, err := concatMessagesWithRoles(t)
+		if err != nil {
+			logs.CtxError(ctx, "[parseAny] parse []*schema.Message failed, err=%v", err)
+			return ""
+		}
 
-		r := len(t) - 1
-		for l := len(t) - 1; l >= 0; l-- {
-			if t[l].Role != t[r].Role {
-				var (
-					msg *schema.Message
-					err error
-				)
+		return toJson(msgs)
 
-				if t[r].Role == "" {
-					msg, err = schema.ConcatMessages(t[l : r+1])
-					r = l - 1
-				} else if r-l == 1 {
-					msg = t[r]
-					r = l
-				} else {
-					msg, err = schema.ConcatMessages(t[l+1 : r+1])
-					r = l
+	case *schema.Message:
+		return toJson(t)
+
+	case interface{ String() string }:
+		return t.String()
+
+	case map[string]any:
+		return toJson(t)
+
+	case []callbacks.CallbackInput:
+		return parseAny(ctx, toAnySlice(t))
+
+	case []callbacks.CallbackOutput:
+		return parseAny(ctx, toAnySlice(t))
+
+	case []any:
+		if len(t) > 0 {
+			if _, ok := t[0].(*schema.Message); ok {
+				msgs := make([]*schema.Message, 0, len(t))
+				for i := range t {
+					msg, ok := t[i].(*schema.Message)
+					if ok {
+						msgs = append(msgs, msg)
+					}
 				}
 
-				if err != nil {
-					logs.CtxError(ctx, "[parseAny] parse []*schema.Message failed, err=%v", err)
-					return ""
-				}
-
-				mgr = append(mgr, msg)
+				return parseAny(ctx, msgs)
 			}
 		}
 
-		if r >= 0 {
-			msg, err := schema.ConcatMessages(t[:r+1])
+		return toJson(t)
+
+	default:
+		return toJson(v)
+	}
+}
+
+func toAnySlice[T any](src []T) []any {
+	resp := make([]any, len(src))
+	for i := range src {
+		resp[i] = src[i]
+	}
+
+	return resp
+}
+
+func concatMessagesWithRoles(src []*schema.Message) ([]*schema.Message, error) {
+	var mgr []*schema.Message
+
+	r := len(src) - 1
+	for l := len(src) - 1; l >= 0; l-- {
+		if src[l].Role != src[r].Role {
+			var (
+				msg *schema.Message
+				err error
+			)
+
+			if src[r].Role == "" {
+				msg, err = schema.ConcatMessages(src[l : r+1])
+				r = l - 1
+			} else if r-l == 1 {
+				msg = src[r]
+				r = l
+			} else {
+				msg, err = schema.ConcatMessages(src[l+1 : r+1])
+				r = l
+			}
+
 			if err != nil {
-				logs.CtxError(ctx, "[parseAny] parse []*schema.Message failed, err=%v", err)
-				return ""
+				return nil, err
 			}
 
 			mgr = append(mgr, msg)
 		}
+	}
 
-		return toJson(gslice.ReverseClone(mgr))
-	case *schema.Message:
-		return toJson(t)
-	case interface{ String() string }:
-		return t.String()
-	case map[string]any:
-		return toJson(t)
+	if r >= 0 {
+		msg, err := schema.ConcatMessages(src[:r+1])
+		if err != nil {
+			return nil, err
+		}
+
+		mgr = append(mgr, msg)
+	}
+
+	return gslice.ReverseClone(mgr), nil
+}
+
+// parseSpanTypeFromComponent 转换 component 到 fornax 可以识别的 span_type
+// span_type 会影响到 fornax 界面的展示
+// TODO:
+//   - 当前框架相比于之前缺失的后续需要补齐, 当前按照`原来的字符串`处理
+//   - compose 相关概念的 component 概念(Chain/Graph/...), 当前也先按照`原来的字符串`处理
+func parseSpanTypeFromComponent(c components.Component) string {
+	switch c {
+	case components.ComponentOfPrompt:
+		return "prompt"
+
+	case components.ComponentOfChatModel:
+		return "model"
+
+	case components.ComponentOfEmbedding:
+		return "embedding"
+
+	case components.ComponentOfIndexer:
+		return "store"
+
+	case components.ComponentOfRetriever:
+		return "retriever"
+
+	case components.ComponentOfLoaderSplitter:
+		return "loader"
+
+	case components.ComponentOfTool:
+		return "function"
+
 	default:
-		return toJson(v)
+		return string(c)
 	}
 }
