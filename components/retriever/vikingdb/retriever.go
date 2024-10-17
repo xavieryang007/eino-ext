@@ -62,14 +62,10 @@ type Retriever struct {
 }
 
 func NewRetriever(ctx context.Context, conf *RetrieverConfig) (*Retriever, error) {
-	if conf.EmbeddingConfig.UseBuiltin {
-		if conf.Region != viking.Region_CN {
-			return nil, fmt.Errorf("[VikingDBRetriever] built-in vectorization method not support in non-CN regions")
-		} else if conf.EmbeddingConfig.Embedding != nil {
-			return nil, fmt.Errorf("[VikingDBRetriever] no need to provide Embedding when UseBuiltin vectorization method")
-		}
-	} else if conf.EmbeddingConfig.Embedding == nil {
-		return nil, fmt.Errorf("[NewRetriever] embedding not provided")
+	if conf.EmbeddingConfig.UseBuiltin && conf.EmbeddingConfig.Embedding != nil {
+		return nil, fmt.Errorf("[VikingDBRetriever] no need to provide Embedding when UseBuiltin embedding is true")
+	} else if !conf.EmbeddingConfig.UseBuiltin && conf.EmbeddingConfig.Embedding == nil {
+		return nil, fmt.Errorf("[VikingDBRetriever] need provide Embedding when UseBuiltin embedding is false")
 	}
 
 	if len(conf.SubIndex) == 0 {

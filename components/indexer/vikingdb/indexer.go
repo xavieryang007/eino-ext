@@ -49,14 +49,10 @@ type Indexer struct {
 }
 
 func NewIndexer(_ context.Context, conf *IndexerConfig) (*Indexer, error) {
-	if conf.EmbeddingConfig.UseBuiltin {
-		if conf.Region != viking.Region_CN {
-			return nil, fmt.Errorf("[VikingDBIndexer] built-in vectorization method not support in non-CN regions")
-		} else if conf.EmbeddingConfig.Embedding != nil {
-			return nil, fmt.Errorf("[VikingDBIndexer] no need to provide Embedding when UseBuiltin vectorization method")
-		}
-	} else if conf.EmbeddingConfig.Embedding == nil {
-		return nil, fmt.Errorf("[NewIndexer] embedding not provided")
+	if conf.EmbeddingConfig.UseBuiltin && conf.EmbeddingConfig.Embedding != nil {
+		return nil, fmt.Errorf("[VikingDBIndexer] no need to provide Embedding when UseBuiltin embedding is true")
+	} else if !conf.EmbeddingConfig.UseBuiltin && conf.EmbeddingConfig.Embedding == nil {
+		return nil, fmt.Errorf("[VikingDBIndexer] need provide Embedding when UseBuiltin embedding is false")
 	}
 
 	if conf.AddBatchSize == 0 {
