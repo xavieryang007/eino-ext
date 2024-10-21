@@ -1,6 +1,6 @@
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
-code.byted.org/flow/eino v0.1.2 h1:iUgtGba9mQN8jGXil6NGvNppHoqzGBu+1rikYPpFqd4=
-code.byted.org/flow/eino v0.1.2/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
+code.byted.org/flow/eino v0.1.3 h1:Rg6+VSEKftPFK3I4UaT5e1ZHsTqYszYuOVopq101vHM=
+code.byted.org/flow/eino v0.1.3/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
 github.com/BurntSushi/toml v0.3.1/go.mod h1:xHWCNGjB5oqiDr8zfno3MHue2Ht5sIBksp03qcyfWMU=
 github.com/airbrake/gobrake v3.6.1+incompatible/go.mod h1:wM4gu3Cn0W0K7GUuVWnlXZU11AGBXMILnrdOU8Kn00o=
 github.com/avast/retry-go v3.0.0+incompatible/go.mod h1:XtSnn+n/sHqQIpZ10K1qAevBhOOCWBLXXy3hyiqqBrY=

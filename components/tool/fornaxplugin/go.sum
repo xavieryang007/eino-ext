@@ -60,8 +60,8 @@ code.byted.org/bytedtrace/serializer-go v1.0.0/go.mod h1:fOL6VcdN3BGeCIevGebxZW0
 code.byted.org/duanyi.aster/gopkg v0.0.1/go.mod h1:gxOcKCeV3yQ+J37/A3h5kQqxu/On27n+zdkZuzCbPac=
 code.byted.org/duanyi.aster/gopkg v0.0.3 h1:vQve62C3QiafPw2w8kAK/P+VVwW5Bi+p6foeVxlFydo=
 code.byted.org/duanyi.aster/gopkg v0.0.3/go.mod h1:gxOcKCeV3yQ+J37/A3h5kQqxu/On27n+zdkZuzCbPac=
-code.byted.org/flow/eino v0.1.2 h1:iUgtGba9mQN8jGXil6NGvNppHoqzGBu+1rikYPpFqd4=
-code.byted.org/flow/eino v0.1.2/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
+code.byted.org/flow/eino v0.1.3 h1:Rg6+VSEKftPFK3I4UaT5e1ZHsTqYszYuOVopq101vHM=
+code.byted.org/flow/eino v0.1.3/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
 code.byted.org/gopkg/apm_vendor_interface v0.0.0-20221009080406-e34204c65cba/go.mod h1:njhrS0YBKyO11ufZKOq2xfZHR6ku4HJ9yBVszWxLQuA=
 code.byted.org/gopkg/apm_vendor_interface v0.0.2/go.mod h1:njhrS0YBKyO11ufZKOq2xfZHR6ku4HJ9yBVszWxLQuA=
 code.byted.org/gopkg/apm_vendor_interface v0.0.3 h1:pUuar9UkjoruehbbwvGyEdX+ar+W3YNBJ8smk/W+cPM=

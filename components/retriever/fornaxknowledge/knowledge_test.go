@@ -13,7 +13,7 @@ import (
 	"code.byted.org/flowdevops/fornax_sdk"
 	fknowledge "code.byted.org/flowdevops/fornax_sdk/domain/knowledge"
 
-	"code.byted.org/flow/eino-ext/components/retriever/fornaxknowledge/internal/mock/fornax"
+	"code.byted.org/flow/eino-ext/components/retriever/fornaxknowledge/internal/mock"
 )
 
 func TestKnowledge(t *testing.T) {
@@ -23,7 +23,7 @@ func TestKnowledge(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockFornaxCli := fornax.NewMockIClient(ctrl)
+		mockFornaxCli := mock.NewMockIClient(ctrl)
 
 		defer mockey.Mock(fornax_sdk.NewClient).Return(nil, nil).Build().UnPatch()
 
@@ -65,7 +65,7 @@ func TestKnowledgeStream(t *testing.T) {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
-		mockFornaxCli := fornax.NewMockIClient(ctrl)
+		mockFornaxCli := mock.NewMockIClient(ctrl)
 
 		defer mockey.Mock(fornax_sdk.NewClient).Return(nil, nil).Build().UnPatch()
 

@@ -1,18 +1,16 @@
 module code.byted.org/flow/eino-ext/components/retriever/fornaxknowledge
 
-go 1.21
-
-toolchain go1.22.0
+go 1.18
 
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
-	code.byted.org/flow/eino v0.1.2
-	code.byted.org/flowdevops/fornax_sdk v0.0.0-20240923060838-825174c57aab
+	code.byted.org/flow/eino v0.1.3
+	code.byted.org/flowdevops/fornax_sdk v1.0.0
 	code.byted.org/lang/gg v0.19.1
-	code.byted.org/obric/flow_telemetry_go v0.4.3-0.20240930033149-64fccee39cf9
+	code.byted.org/obric/flow_telemetry_go v0.4.4
 	github.com/bytedance/mockey v1.2.12
-	github.com/bytedance/sonic v1.12.2
+	github.com/bytedance/sonic v1.12.3
 	github.com/smartystreets/goconvey v1.8.1
 	go.uber.org/mock v0.4.0
 )
@@ -29,7 +27,7 @@ require (
 	code.byted.org/bytedtrace/bytedtrace-client-go v1.2.2 // indirect
 	code.byted.org/bytedtrace/bytedtrace-common/go v0.0.13 // indirect
 	code.byted.org/bytedtrace/bytedtrace-compatible-lightweight-go v1.0.1 // indirect
-	code.byted.org/bytedtrace/bytedtrace-conf-provider-client-go v0.0.26 // indirect
+	code.byted.org/bytedtrace/bytedtrace-conf-provider-client-go v0.0.27 // indirect
 	code.byted.org/bytedtrace/bytedtrace-reporter-factory v1.0.0 // indirect
 	code.byted.org/bytedtrace/bytedtrace-utils-go v1.0.3 // indirect
 	code.byted.org/bytedtrace/interface-go v1.0.20 // indirect
@@ -40,7 +38,7 @@ require (
 	code.byted.org/data/mario_collector v1.2.27 // indirect
 	code.byted.org/dp/mario_common v1.0.4 // indirect
 	code.byted.org/duanyi.aster/gopkg v0.0.3 // indirect
-	code.byted.org/flow/flow-telemetry-common/go v0.0.0-20240919074455-8e57761161a1 // indirect
+	code.byted.org/flow/flow-telemetry-common/go v0.0.0-20241011125720-ebc2858921ed // indirect
 	code.byted.org/flowdevops/fornax/pkg/auth v0.0.0-20240530115429-4a4ba39f6406 // indirect
 	code.byted.org/golf/buffer_pool v0.1.0 // indirect
 	code.byted.org/golf/consul v2.1.13+incompatible // indirect

@@ -3,7 +3,7 @@ module code.byted.org/flow/eino-ext/components/document/loadersplitter/idp
 go 1.18
 
 require (
-	code.byted.org/flow/eino v0.1.2
+	code.byted.org/flow/eino v0.1.3
 	code.byted.org/gopkg/lang v0.21.8
 	code.byted.org/lark_ai/idp_sdk v0.0.0-20240703094640-9ac71589a994
 	code.byted.org/overpass/lark_ai_davinci v0.0.0-20240705053244-4917f91e70cc

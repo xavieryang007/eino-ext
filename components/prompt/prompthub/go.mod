@@ -3,10 +3,10 @@ module code.byted.org/flow/eino-ext/components/prompt/prompthub
 go 1.18
 
 require (
-	code.byted.org/flow/eino v0.1.2
-	code.byted.org/flowdevops/fornax_sdk v0.0.0-20240923060838-825174c57aab
+	code.byted.org/flow/eino v0.1.3
+	code.byted.org/flowdevops/fornax_sdk v1.0.0
 	code.byted.org/gopkg/logs/v2 v2.2.0-beta.9
-	code.byted.org/lang/gg v0.18.0
+	code.byted.org/lang/gg v0.19.1
 )
 
 require (
@@ -21,7 +21,7 @@ require (
 	code.byted.org/bytedtrace/bytedtrace-client-go v1.2.2 // indirect
 	code.byted.org/bytedtrace/bytedtrace-common/go v0.0.13 // indirect
 	code.byted.org/bytedtrace/bytedtrace-compatible-lightweight-go v1.0.1 // indirect
-	code.byted.org/bytedtrace/bytedtrace-conf-provider-client-go v0.0.26 // indirect
+	code.byted.org/bytedtrace/bytedtrace-conf-provider-client-go v0.0.27 // indirect
 	code.byted.org/bytedtrace/bytedtrace-reporter-factory v1.0.0 // indirect
 	code.byted.org/bytedtrace/bytedtrace-utils-go v1.0.3 // indirect
 	code.byted.org/bytedtrace/interface-go v1.0.20 // indirect
@@ -32,7 +32,7 @@ require (
 	code.byted.org/data/mario_collector v1.2.27 // indirect
 	code.byted.org/dp/mario_common v1.0.4 // indirect
 	code.byted.org/duanyi.aster/gopkg v0.0.3 // indirect
-	code.byted.org/flow/flow-telemetry-common/go v0.0.0-20240730122926-a412175fd637 // indirect
+	code.byted.org/flow/flow-telemetry-common/go v0.0.0-20241011125720-ebc2858921ed // indirect
 	code.byted.org/flowdevops/fornax/pkg/auth v0.0.0-20240530115429-4a4ba39f6406 // indirect
 	code.byted.org/golf/buffer_pool v0.1.0 // indirect
 	code.byted.org/golf/consul v2.1.13+incompatible // indirect
@@ -43,7 +43,7 @@ require (
 	code.byted.org/gopkg/context v0.0.1 // indirect
 	code.byted.org/gopkg/ctxvalues v0.6.0 // indirect
 	code.byted.org/gopkg/debug v0.10.1 // indirect
-	code.byted.org/gopkg/env v1.6.3 // indirect
+	code.byted.org/gopkg/env v1.6.11 // indirect
 	code.byted.org/gopkg/etcd_util v2.3.3+incompatible // indirect
 	code.byted.org/gopkg/etcdproxy v0.1.1 // indirect
 	code.byted.org/gopkg/facility v1.0.14 // indirect
@@ -91,7 +91,7 @@ require (
 	code.byted.org/middleware/eino v1.0.0-rc.2.0.20240823110904-6cc11e3d8c3e // indirect
 	code.byted.org/middleware/fic_client v0.2.8 // indirect
 	code.byted.org/middleware/hertz v1.12.1 // indirect
-	code.byted.org/obric/flow_telemetry_go v0.3.2-0.20240730113712-de4c24da0e12 // indirect
+	code.byted.org/obric/flow_telemetry_go v0.4.4 // indirect
 	code.byted.org/security/go-spiffe-v2 v1.0.8 // indirect
 	code.byted.org/security/memfd v0.0.2 // indirect
 	code.byted.org/security/sensitive_finder_engine v0.3.18 // indirect
@@ -120,7 +120,7 @@ require (
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/bluele/gcache v0.0.2 // indirect
 	github.com/bytedance/go-tagexpr/v2 v2.9.2 // indirect
-	github.com/bytedance/gopkg v0.0.0-20240315062850-21fc7a1671a8 // indirect
+	github.com/bytedance/gopkg v0.0.0-20240514070511-01b2cbcf35e1 // indirect
 	github.com/bytedance/sonic v1.12.2 // indirect
 	github.com/bytedance/sonic/loader v0.2.0 // indirect
 	github.com/caarlos0/env/v6 v6.10.1 // indirect
@@ -128,20 +128,18 @@ require (
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
 	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/cespare/xxhash/v2 v2.2.0 // indirect
-	github.com/chenzhuoyu/base64x v0.0.0-20230717121745-296ad89f973d // indirect
-	github.com/chenzhuoyu/iasm v0.9.1 // indirect
-	github.com/choleraehyq/pid v0.0.18 // indirect
 	github.com/cloudwego/base64x v0.1.4 // indirect
-	github.com/cloudwego/configmanager v0.2.0 // indirect
-	github.com/cloudwego/dynamicgo v0.2.0 // indirect
+	github.com/cloudwego/configmanager v0.2.2 // indirect
+	github.com/cloudwego/dynamicgo v0.2.9 // indirect
 	github.com/cloudwego/fastpb v0.0.4 // indirect
-	github.com/cloudwego/frugal v0.1.14 // indirect
+	github.com/cloudwego/frugal v0.1.15 // indirect
 	github.com/cloudwego/hertz v0.8.1 // indirect
 	github.com/cloudwego/iasm v0.2.0 // indirect
-	github.com/cloudwego/kitex v0.9.1 // indirect
+	github.com/cloudwego/kitex v0.10.3 // indirect
 	github.com/cloudwego/localsession v0.0.2 // indirect
-	github.com/cloudwego/netpoll v0.6.0 // indirect
-	github.com/cloudwego/thriftgo v0.3.6 // indirect
+	github.com/cloudwego/netpoll v0.6.3 // indirect
+	github.com/cloudwego/runtimex v0.1.0 // indirect
+	github.com/cloudwego/thriftgo v0.3.15 // indirect
 	github.com/coocood/freecache v1.2.0 // indirect
 	github.com/danielgtaylor/huma v1.14.2 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
