@@ -8,6 +8,7 @@ import (
 
 	"github.com/cloudwego/kitex/client/callopt/streamcall"
 
+	"code.byted.org/flow/eino/callbacks"
 	"code.byted.org/kite/kitex/client/callopt"
 	"code.byted.org/kite/kitutil"
 	"code.byted.org/overpass/ocean_cloud_plugin/kitex_gen/ocean/cloud/plugin"
@@ -156,10 +157,17 @@ func (c *cozePlugin) Info(ctx context.Context) (*schema.ToolInfo, error) {
 	}, nil
 }
 
-func (c *cozePlugin) InvokableRun(ctx context.Context, argumentsInJSON string, opts ...tool.Option) (string, error) {
+func (c *cozePlugin) InvokableRun(ctx context.Context, argumentsInJSON string, opts ...tool.Option) (output string, err error) {
 	plgOpt := tool.GetImplSpecificOptions(&pluginOptions{}, opts...)
 
-	var err error
+	cbm, cbmOK := callbacks.ManagerFromCtx(ctx)
+
+	defer func() {
+		if err != nil && cbmOK {
+			cbm.OnError(ctx, err)
+		}
+	}()
+
 	if plgOpt.InputModifier != nil {
 		argumentsInJSON, err = plgOpt.InputModifier(ctx, argumentsInJSON)
 		if err != nil {
@@ -180,6 +188,21 @@ func (c *cozePlugin) InvokableRun(ctx context.Context, argumentsInJSON string, o
 	if _, ok := kitutil.GetCtxEnv(ctx); !ok && defaultENV != "" {
 		ctx = kitutil.NewCtxWithEnv(ctx, defaultENV)
 	}
+
+	if cbmOK {
+		ctx = cbm.OnStart(ctx, &tool.CallbackInput{
+			ArgumentsInJSON: argumentsInJSON,
+			Extra: map[string]any{
+				callbackExtraInputDetail: &InputExtraDetail{
+					API:      c.API,
+					UserID:   req.UserID,
+					DeviceID: req.DeviceID,
+					Ext:      req.Ext,
+				},
+			},
+		})
+	}
+
 	resp, err := kitexClient.DoAction(ctx, req, append(defaultCallOpts, plgOpt.callOpts...)...)
 	if err != nil {
 		return "", fmt.Errorf("request to execute coze plugin fail: %w", err)
@@ -189,7 +212,26 @@ func (c *cozePlugin) InvokableRun(ctx context.Context, argumentsInJSON string, o
 		return "", fmt.Errorf("execute coze plugin fail, plugin:%+v, input:%s, code:%d, message:%s", *c, argumentsInJSON, resp.BaseResp.StatusCode, resp.BaseResp.StatusMessage)
 	}
 
+	if cbmOK {
+		ctx = cbm.OnEnd(ctx, &tool.CallbackOutput{
+			Response: resp.Resp,
+			Extra: map[string]any{
+				callbackExtraOutputDetail: &OutputExtraDetail{
+					Tokens:              resp.Tokens,
+					Cost:                resp.Cost,
+					MockHitStatus:       resp.MockHitStatus,
+					PluginInterruptData: resp.PluginInterruptData,
+					SSEEventID:          "",
+				},
+			},
+		})
+	}
+
 	return resp.Resp, nil
+}
+
+func (c *cozePlugin) GetType() string {
+	return typ
 }
 
 type streamCozePlugin struct {
@@ -220,10 +262,17 @@ func (s *streamCozePlugin) Info(ctx context.Context) (*schema.ToolInfo, error) {
 	}, nil
 }
 
-func (s *streamCozePlugin) StreamableRun(ctx context.Context, argumentsInJSON string, opts ...tool.Option) (*schema.StreamReader[string], error) {
+func (s *streamCozePlugin) StreamableRun(ctx context.Context, argumentsInJSON string, opts ...tool.Option) (sr *schema.StreamReader[string], err error) {
+	cbm, cbmOK := callbacks.ManagerFromCtx(ctx)
+
+	defer func() {
+		if err != nil && cbmOK {
+			cbm.OnError(ctx, err)
+		}
+	}()
+
 	plgOpt := tool.GetImplSpecificOptions(&pluginOptions{}, opts...)
 
-	var err error
 	if plgOpt.InputModifier != nil {
 		argumentsInJSON, err = plgOpt.InputModifier(ctx, argumentsInJSON)
 		if err != nil {
@@ -244,17 +293,32 @@ func (s *streamCozePlugin) StreamableRun(ctx context.Context, argumentsInJSON st
 	if _, ok := kitutil.GetCtxEnv(ctx); !ok && defaultENV != "" {
 		ctx = kitutil.NewCtxWithEnv(ctx, defaultENV)
 	}
+
+	if cbmOK {
+		ctx = cbm.OnStart(ctx, &tool.CallbackInput{
+			ArgumentsInJSON: argumentsInJSON,
+			Extra: map[string]any{
+				callbackExtraInputDetail: &InputExtraDetail{
+					API:      s.API,
+					UserID:   req.UserID,
+					DeviceID: req.DeviceID,
+					Ext:      req.Ext,
+				},
+			},
+		})
+	}
+
 	resp, err := streamClient.StreamDoAction(ctx, req, append(defaultStreamCallOpts, plgOpt.streamCallOpts...)...)
 	if err != nil {
 		return nil, fmt.Errorf("request to stream execute coze plugin fail: %w", err)
 	}
 
-	sr, sw := schema.Pipe[string](1)
+	rawSr, sw := schema.Pipe[*plugin.StreamDoActionResponse](1)
 	go func() {
 		defer func() {
 			panicErr := recover()
 			if panicErr != nil {
-				sw.Send("", safe.NewPanicErr(panicErr, debug.Stack()))
+				sw.Send(nil, safe.NewPanicErr(panicErr, debug.Stack()))
 			}
 			sw.Close()
 			_ = resp.Close()
@@ -266,17 +330,19 @@ func (s *streamCozePlugin) StreamableRun(ctx context.Context, argumentsInJSON st
 				break
 			}
 			if err != nil {
-				sw.Send("", fmt.Errorf("execute coze plugin stream response error: %w", err))
+				sw.Send(nil, fmt.Errorf("execute coze plugin stream response error: %w", err))
 				break
 			}
 			if !chunk.Success {
-				sw.Send("", fmt.Errorf("stream execute coze plugin fail"))
+				sw.Send(nil, fmt.Errorf("stream execute coze plugin fail"))
 				break
 			}
-			if chunk.Resp.SSEData != nil {
-				sw.Send(*chunk.Resp.SSEData, nil)
-			} else {
-				sw.Send("", fmt.Errorf("stream execute coze plugin success, but SSEData is empty"))
+			if chunk.Resp == nil {
+				sw.Send(nil, fmt.Errorf("stream execute coze plugin success, but Resp is empty"))
+				break
+			}
+			if chunk.Resp.SSEData == nil {
+				sw.Send(nil, fmt.Errorf("stream execute coze plugin success, but SSEData is empty"))
 				break
 			}
 			if chunk.IsFinish {
@@ -285,5 +351,39 @@ func (s *streamCozePlugin) StreamableRun(ctx context.Context, argumentsInJSON st
 		}
 	}()
 
+	rawStreamArr := make([]*schema.StreamReader[*plugin.StreamDoActionResponse], 2)
+	if cbmOK {
+		rawStreamArr = rawSr.Copy(2)
+	} else {
+		rawStreamArr[0] = rawSr
+	}
+
+	sr = schema.StreamReaderWithConvert(rawStreamArr[0], func(src *plugin.StreamDoActionResponse) (string, error) {
+		return src.Resp.GetSSEData(), nil
+	})
+
+	if cbmOK {
+		cbStream := schema.StreamReaderWithConvert(rawStreamArr[1], func(src *plugin.StreamDoActionResponse) (callbacks.CallbackOutput, error) {
+			return &tool.CallbackOutput{
+				Response: src.Resp.GetSSEData(),
+				Extra: map[string]any{
+					callbackExtraOutputDetail: &OutputExtraDetail{
+						Tokens:              src.Tokens,
+						Cost:                src.Cost,
+						MockHitStatus:       nil,
+						PluginInterruptData: src.PluginInterruptData,
+						SSEEventID:          src.SSEEventId,
+					},
+				},
+			}, nil
+		})
+
+		_ = cbm.OnEndWithStreamOutput(ctx, cbStream)
+	}
+
 	return sr, nil
+}
+
+func (s *streamCozePlugin) GetType() string {
+	return typ
 }
