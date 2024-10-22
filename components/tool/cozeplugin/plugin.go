@@ -234,6 +234,10 @@ func (c *cozePlugin) GetType() string {
 	return typ
 }
 
+func (c *cozePlugin) IsCallbacksEnabled() bool {
+	return true
+}
+
 type streamCozePlugin struct {
 	API *plugin.API
 
@@ -344,6 +348,8 @@ func (s *streamCozePlugin) StreamableRun(ctx context.Context, argumentsInJSON st
 			if chunk.Resp.SSEData == nil {
 				sw.Send(nil, fmt.Errorf("stream execute coze plugin success, but SSEData is empty"))
 				break
+			} else {
+				sw.Send(chunk, nil)
 			}
 			if chunk.IsFinish {
 				break
@@ -386,4 +392,8 @@ func (s *streamCozePlugin) StreamableRun(ctx context.Context, argumentsInJSON st
 
 func (s *streamCozePlugin) GetType() string {
 	return typ
+}
+
+func (s *streamCozePlugin) IsCallbacksEnabled() bool {
+	return true
 }

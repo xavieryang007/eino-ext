@@ -6,7 +6,10 @@ import (
 	"testing"
 	"time"
 
-	model "code.byted.org/flow/eino/components/model"
+	"github.com/bytedance/mockey"
+	"github.com/stretchr/testify/assert"
+
+	"code.byted.org/flow/eino/components/model"
 	compTool "code.byted.org/flow/eino/components/tool"
 	"code.byted.org/flow/eino/compose"
 	"code.byted.org/flow/eino/flow/agent/react"
@@ -16,8 +19,6 @@ import (
 	"code.byted.org/overpass/flow_devops_plugin/kitex_gen/flow/devops/plugin/domain/definition"
 	"code.byted.org/overpass/flow_devops_plugin/kitex_gen/flow/devops/plugin/domain/tool"
 	"code.byted.org/overpass/flow_devops_plugin/kitex_gen/flow/devops/plugin/executor"
-	"github.com/bytedance/mockey"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestIntentionAndExecution(t *testing.T) {
