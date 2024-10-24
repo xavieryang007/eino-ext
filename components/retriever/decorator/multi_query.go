@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"sync"
 
 	"code.byted.org/flow/eino/callbacks"
 	"code.byted.org/flow/eino/components"
@@ -25,7 +24,7 @@ const (
 	defaultMaxQueriesNum = 5
 )
 
-var defaultFusionFunc = func(ctx context.Context, docs [][]*schema.Document) ([]*schema.Document, error) {
+var deduplicateFusion = func(ctx context.Context, docs [][]*schema.Document) ([]*schema.Document, error) {
 	m := map[string]bool{}
 	var ret []*schema.Document
 	for i := range docs {
@@ -39,6 +38,7 @@ var defaultFusionFunc = func(ctx context.Context, docs [][]*schema.Document) ([]
 	return ret, nil
 }
 
+// NewMultiQueryRetriever https://bytedance.larkoffice.com/wiki/G8T2w5bYuigJ4LkMi1ycw6VznAh#A4PqdcJmpoveWcxv8NPc70TanLb
 func NewMultiQueryRetriever(ctx context.Context, config *MultiQueryConfig) (retriever.Retriever, error) {
 	var err error
 
@@ -88,7 +88,7 @@ func NewMultiQueryRetriever(ctx context.Context, config *MultiQueryConfig) (retr
 
 	fusionFunc := config.FusionFunc
 	if fusionFunc == nil {
-		fusionFunc = defaultFusionFunc
+		fusionFunc = deduplicateFusion
 	}
 
 	return &multiQueryRetriever{
@@ -139,52 +139,12 @@ func (m *multiQueryRetriever) Retrieve(ctx context.Context, query string, opts .
 		queries = queries[:m.maxQueriesNum]
 	}
 
-	// multi retrieve
-	ctx = ctxWithRetrieverCBM(ctx, m.origRetriever)
-	retrieverCBM, ok := callbacks.ManagerFromCtx(ctx)
-	needCallback := !callbacks.IsCallbacksEnabled(m.origRetriever)
-	type retrieveTask struct {
-		query  string
-		result []*schema.Document
-		err    error
-	}
+	// retrieve
 	tasks := make([]*retrieveTask, len(queries))
 	for i := range queries {
-		tasks[i] = &retrieveTask{query: queries[i]}
+		tasks[i] = &retrieveTask{retriever: m.origRetriever, query: queries[i]}
 	}
-	wg := sync.WaitGroup{}
-	for i := range tasks {
-		wg.Add(1)
-		go func(ctx context.Context, t *retrieveTask) {
-			defer func() {
-				if e := recover(); e != nil {
-					t.err = fmt.Errorf("retrieve panic, query: %s, error: %v", t.query, e)
-					if needCallback && ok {
-						ctx = retrieverCBM.OnError(ctx, t.err)
-					}
-				}
-				wg.Done()
-			}()
-
-			if needCallback && ok {
-				ctx = retrieverCBM.OnStart(ctx, t.query)
-			}
-			docs, err := m.origRetriever.Retrieve(ctx, t.query, opts...)
-			if err != nil {
-				if needCallback && ok {
-					retrieverCBM.OnError(ctx, err)
-				}
-				t.err = err
-				return
-			}
-			if needCallback && ok {
-				retrieverCBM.OnEnd(ctx, docs)
-			}
-			t.result = docs
-		}(ctx, tasks[i])
-	}
-	wg.Wait()
-
+	concurrentRetrieveWithCallback(ctx, tasks)
 	result := make([][]*schema.Document, len(queries))
 	for i, task := range tasks {
 		if task.err != nil {

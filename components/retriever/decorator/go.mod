@@ -2,7 +2,7 @@ module code.byted.org/flow/eino-ext/components/retriever/decorator
 
 go 1.18
 
-require code.byted.org/flow/eino v0.1.3
+require code.byted.org/flow/eino v0.1.5
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
