@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"io"
 	"os"
-
-	"code.byted.org/gopkg/logs/v2"
 
 	"code.byted.org/flow/eino/schema"
 
@@ -13,75 +13,73 @@ import (
 
 func main() {
 	accessKey := os.Getenv("OPENAI_API_KEY")
-	defaultTemperature := float32(0.7)
-
 	ctx := context.Background()
 	chatModel, err := openai.NewChatModel(ctx, &openai.ChatModelConfig{
-		BaseURL:     "https://search.bytedance.net/gpt/openapi/online/multimodal/crawl",
-		APIKey:      accessKey,
-		ByAzure:     true,
-		Model:       "gpt-35-turbo-1106",
-		Temperature: &defaultTemperature,
-		// API Specs: https://github.com/Azure/azure-rest-api-specs/blob/4b847aabd57c3477f6018bcce7d5156006dd214d/specification/cognitiveservices/data-plane/AzureOpenAI/inference/stable/2024-06-01/inference.json
-		APIVersion: "2024-06-01",
+		APIKey:  accessKey,
+		ByAzure: false,
+		Model:   "gpt-4o",
 	})
 	if err != nil {
-		logs.Errorf("NewChatModel failed, err=%v", err)
-		return
+		panic(fmt.Errorf("NewChatModel failed, err=%v", err))
 	}
-
 	err = chatModel.BindForcedTools([]*schema.ToolInfo{
 		{
 			Name: "user_company",
-			Desc: "根据用户的姓名和邮箱，查询用户的公司和职位信息",
+			Desc: "Retrieve the user's company and position based on their name and email.",
 			ParamsOneOf: schema.NewParamsOneOfByParams(
 				map[string]*schema.ParameterInfo{
-					"name": {
-						Type: "string",
-						Desc: "用户的姓名",
-					},
-					"email": {
-						Type: "string",
-						Desc: "用户的邮箱",
-					},
-				}),
-		},
-		{
+					"name":  {Type: "string", Desc: "user's name"},
+					"email": {Type: "string", Desc: "user's email"}}),
+		}, {
 			Name: "user_salary",
-			Desc: "根据用户的姓名和邮箱，查询用户的薪酬信息",
+			Desc: "Retrieve the user's salary based on their name and email.\n",
 			ParamsOneOf: schema.NewParamsOneOfByParams(
 				map[string]*schema.ParameterInfo{
-					"name": {
-						Type: "string",
-						Desc: "用户的姓名",
-					},
-					"email": {
-						Type: "string",
-						Desc: "用户的邮箱",
-					},
+					"name":  {Type: "string", Desc: "user's name"},
+					"email": {Type: "string", Desc: "user's email"},
 				}),
-		},
-	})
+		}})
 	if err != nil {
-		logs.Errorf("BindForcedTools failed, err=%v", err)
-		return
+		panic(fmt.Errorf("BindForcedTools failed, err=%v", err))
 	}
+	resp, err := chatModel.Generate(ctx, []*schema.Message{{
+		Role:    schema.System,
+		Content: "As a real estate agent, provide relevant property information based on the user's salary and job using the user_company and user_salary APIs. An email address is required.",
+	}, {
+		Role:    schema.User,
+		Content: "My name is John and my email is john@abc.com，Please recommend some houses that suit me.",
+	}})
+	if err != nil {
+		panic(fmt.Errorf("generate failed, err=%v", err))
+	}
+	fmt.Printf("output: \n%v", resp)
 
-	resp, err := chatModel.Generate(ctx, []*schema.Message{
+	streamResp, err := chatModel.Stream(ctx, []*schema.Message{
 		{
 			Role:    schema.System,
-			Content: "你是一名房产经纪人，结合用户的薪酬和工作，使用 user_company、user_salary 两个 API，为其提供相关的房产信息。邮箱是必须的",
-		},
-		{
+			Content: "As a real estate agent, provide relevant property information based on the user's salary and job using the user_company and user_salary APIs. An email address is required.",
+		}, {
 			Role:    schema.User,
-			Content: "我的姓名是 zhangsan，我的邮箱是 zhangsan@bytedance.com，请帮我推荐一些适合我的房子。",
+			Content: "My name is John and my email is john@abc.com，Please recommend some houses that suit me.",
 		},
 	})
-
 	if err != nil {
-		logs.Errorf("Generate failed, err=%v", err)
-		return
+		panic(fmt.Errorf("generate failed, err=%v", err))
 	}
-
-	logs.Infof("output: \n%v", resp)
+	var messages []*schema.Message
+	for {
+		chunk, err := streamResp.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			panic(fmt.Errorf("recv failed, err=%v", err))
+		}
+		messages = append(messages, chunk)
+	}
+	resp, err = schema.ConcatMessages(messages)
+	if err != nil {
+		panic(fmt.Errorf("ConcatMessages failed, err=%v", err))
+	}
+	fmt.Printf("stream output: \n%v", resp)
 }

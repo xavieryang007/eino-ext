@@ -6,9 +6,11 @@ import (
 	"io"
 	"os"
 
+	"code.byted.org/gopkg/logs/v2"
+
 	"code.byted.org/flow/eino/schema"
 
-	"code.byted.org/flow/eino-ext/components/model/openai"
+	"code.byted.org/flow/eino-ext/components/model/bytedgpt"
 )
 
 func main() {
@@ -16,7 +18,7 @@ func main() {
 
 	N := 3
 	ctx := context.Background()
-	chatModel, err := openai.NewChatModel(ctx, &openai.ChatModelConfig{
+	chatModel, err := bytedgpt.NewChatModel(ctx, &bytedgpt.ChatModelConfig{
 		BaseURL: "https://search.bytedance.net/gpt/openapi/online/multimodal/crawl",
 		N:       &N,
 		APIKey:  accessKey,
@@ -24,7 +26,8 @@ func main() {
 		Model:   "gpt-4o-2024-05-13",
 	})
 	if err != nil {
-		panic(fmt.Errorf("NewChatModel failed, err=%v", err))
+		logs.Errorf("NewChatModel failed, err=%v", err)
+		return
 	}
 
 	streamMsgs, err := chatModel.Stream(ctx, []*schema.Message{
@@ -35,19 +38,21 @@ func main() {
 	})
 
 	if err != nil {
-		panic(fmt.Errorf("generate failed, err=%v", err))
+		logs.Errorf("Generate failed, err=%v", err)
+		return
 	}
 
 	defer streamMsgs.Close()
 
-	fmt.Printf("typewriter output:")
+	logs.Infof("typewriter output:")
 	for {
 		msg, err := streamMsgs.Recv()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
-			panic(fmt.Errorf("\nstream.Recv failed, err=%v", err))
+			logs.Errorf("\nstream.Recv failed, err=%v", err)
+			return
 		}
 		fmt.Print(msg.Content)
 	}

@@ -2,11 +2,8 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
-
-	"code.byted.org/gopkg/ctxvalues"
-	"code.byted.org/gopkg/logid"
-	"code.byted.org/gopkg/logs/v2"
 
 	"code.byted.org/flow/eino/schema"
 
@@ -16,31 +13,28 @@ import (
 func main() {
 	accessKey := os.Getenv("OPENAI_API_KEY")
 
-	id := logid.GenLogID()
 	ctx := context.Background()
-	ctx = ctxvalues.SetLogID(ctx, id)
 
 	chatModel, err := openai.NewChatModel(ctx, &openai.ChatModelConfig{
-		BaseURL: "https://search.bytedance.net/gpt/openapi/online/multimodal/crawl",
 		APIKey:  accessKey,
-		ByAzure: true,
+		ByAzure: false,
 		Model:   "gpt-4o-2024-05-13",
 	})
 	if err != nil {
-		logs.Errorf("NewChatModel failed, err=%v", err)
-		return
+		panic(fmt.Errorf("NewChatModel failed, err=%v", err))
+
 	}
 
 	multiModalMsg := schema.UserMessage("")
 	multiModalMsg.MultiContent = []schema.ChatMessagePart{
 		{
 			Type: schema.ChatMessagePartTypeText,
-			Text: "this picture is LangDChain's architecture, what's the picture's content",
+			Text: "this picture is a landscape photo, what's the picture's content",
 		},
 		{
 			Type: schema.ChatMessagePartTypeImageURL,
 			ImageURL: &schema.ChatMessageImageURL{
-				URL:    "https://d2908q01vomqb2.cloudfront.net/887309d048beef83ad3eabf2a79a64a389ab1c9f/2023/07/13/DBBLOG-3334-image001.png",
+				URL:    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT11qEDxU4X_MVKYQVU5qiAVFidA58f8GG0bQ&s",
 				Detail: schema.ImageURLDetailAuto,
 			},
 		},
@@ -50,9 +44,8 @@ func main() {
 		multiModalMsg,
 	})
 	if err != nil {
-		logs.Errorf("Generate failed, err=%v", err)
-		return
+		panic(fmt.Errorf("generate failed, err=%v", err))
 	}
 
-	logs.Infof("log_id=%v, output: \n%v", id, resp)
+	fmt.Printf("output: \n%v", resp)
 }
