@@ -2,9 +2,8 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
-
-	"code.byted.org/gopkg/logs/v2"
 
 	"code.byted.org/flow/eino-ext/components/embedding/openai"
 )
@@ -19,23 +18,19 @@ func main() {
 	)
 
 	embedding, err := openai.NewEmbedder(ctx, &openai.EmbeddingConfig{
-		BaseURL:    "https://search.bytedance.net/gpt/openapi/online/multimodal/crawl",
 		APIKey:     accessKey,
-		ByAzure:    true,
 		Model:      "text-embedding-3-large",
 		Dimensions: &defaultDim,
 		Timeout:    0,
 	})
 	if err != nil {
-		logs.Errorf("new embedder error: %v\n", err)
-		return
+		panic(fmt.Errorf("new embedder error: %v\n", err))
 	}
 
 	resp, err := embedding.EmbedStrings(ctx, []string{"hello", "how are you"})
 	if err != nil {
-		logs.Errorf("Generate failed, err=%v", err)
-		return
+		panic(fmt.Errorf("generate failed, err=%v", err))
 	}
 
-	logs.CtxInfo(ctx, "output=%v", resp)
+	fmt.Printf("output=%v", resp)
 }
