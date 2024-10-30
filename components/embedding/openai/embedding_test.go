@@ -11,6 +11,8 @@ import (
 
 	"code.byted.org/flow/eino/callbacks"
 	"code.byted.org/flow/eino/components/embedding"
+
+	openai2 "code.byted.org/flow/eino-ext/components/embedding/protocols/openai"
 )
 
 func TestEmbedding(t *testing.T) {
@@ -41,7 +43,7 @@ func TestEmbedding(t *testing.T) {
 
 	t.Run("full param", func(t *testing.T) {
 		ctx := context.Background()
-		expectedFormat := EmbeddingEncodingFormatFloat
+		expectedFormat := openai2.EmbeddingEncodingFormatFloat
 		expectedDimensions := 1024
 		expectedUser := "megumin"
 		emb, err := NewEmbedder(ctx, &EmbeddingConfig{

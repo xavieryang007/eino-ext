@@ -9,7 +9,6 @@ require (
 	code.byted.org/gopkg/ctxvalues v0.6.0
 	code.byted.org/gopkg/logid v0.0.0-20211104042040-f78600e482f2
 	code.byted.org/gopkg/logs/v2 v2.2.0-beta.9
-	github.com/getkin/kin-openapi v0.118.0
 	github.com/sashabaranov/go-openai v1.32.5
 	github.com/stretchr/testify v1.9.0
 )
@@ -34,6 +33,7 @@ require (
 	github.com/caarlos0/env/v6 v6.2.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/getkin/kin-openapi v0.118.0 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect

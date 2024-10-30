@@ -53,28 +53,31 @@ type ChatModel struct {
 }
 
 func NewChatModel(ctx context.Context, config *ChatModelConfig) (*ChatModel, error) {
-	cli, err := openai.NewClient(ctx, &openai.Config{
-		ByAzure:          config.ByAzure,
-		BaseURL:          config.BaseURL,
-		APIVersion:       config.APIVersion,
-		APIKey:           config.APIKey,
-		HTTPClient:       &http.Client{Timeout: config.Timeout, Transport: &transport.HeaderTransport{Origin: http.DefaultTransport}},
-		Model:            config.Model,
-		MaxTokens:        config.MaxTokens,
-		Temperature:      config.Temperature,
-		TopP:             config.TopP,
-		N:                config.N,
-		Stop:             config.Stop,
-		PresencePenalty:  config.PresencePenalty,
-		ResponseFormat:   config.ResponseFormat,
-		Seed:             config.Seed,
-		FrequencyPenalty: config.FrequencyPenalty,
-		LogitBias:        config.LogitBias,
-		LogProbs:         config.LogProbs,
-		TopLogProbs:      config.TopLogProbs,
-		User:             config.User,
-	})
-
+	var nConf *openai.Config
+	if config != nil {
+		nConf = &openai.Config{
+			ByAzure:          config.ByAzure,
+			BaseURL:          config.BaseURL,
+			APIVersion:       config.APIVersion,
+			APIKey:           config.APIKey,
+			HTTPClient:       &http.Client{Timeout: config.Timeout, Transport: &transport.HeaderTransport{Origin: http.DefaultTransport}},
+			Model:            config.Model,
+			MaxTokens:        config.MaxTokens,
+			Temperature:      config.Temperature,
+			TopP:             config.TopP,
+			N:                config.N,
+			Stop:             config.Stop,
+			PresencePenalty:  config.PresencePenalty,
+			ResponseFormat:   config.ResponseFormat,
+			Seed:             config.Seed,
+			FrequencyPenalty: config.FrequencyPenalty,
+			LogitBias:        config.LogitBias,
+			LogProbs:         config.LogProbs,
+			TopLogProbs:      config.TopLogProbs,
+			User:             config.User,
+		}
+	}
+	cli, err := openai.NewClient(ctx, nConf)
 	if err != nil {
 		return nil, err
 	}
