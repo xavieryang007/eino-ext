@@ -50,7 +50,7 @@ func (p *promptHub) Format(ctx context.Context, vs map[string]any, opts ...promp
 		getPromptOptions = append(getPromptOptions, prompt2.WithGrayContext(grayContext))
 	}
 
-	template, err := p.cli.PromptService.GetPrompt(ctx, &prompt2.GetPromptParam{
+	template, err := p.cli.GetPrompt(ctx, &prompt2.GetPromptParam{
 		Key:     p.key,
 		Version: p.version,
 	}, getPromptOptions...)
