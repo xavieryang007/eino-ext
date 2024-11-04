@@ -15,8 +15,6 @@ import (
 	"code.byted.org/flow/eino/compose"
 	"code.byted.org/flow/eino/schema"
 	"code.byted.org/flow/flow-telemetry-common/go/obtag"
-	"code.byted.org/gopkg/logs/v2"
-	"code.byted.org/lang/gg/gslice"
 )
 
 // CallbackDataParser tag parser for trace
@@ -77,7 +75,7 @@ func (d defaultDataParser) ParseInput(ctx context.Context, info *callbacks.RunIn
 	case components.ComponentOfRetriever:
 		cbInput := retriever.ConvCallbackInput(input)
 		if cbInput != nil {
-			tags.set(obtag.Input, parseAny(ctx, cbInput.Query))
+			tags.set(obtag.Input, parseAny(ctx, cbInput.Query, false))
 			tags.set(obtag.CallOptions, convertRetrieverCallOption(cbInput))
 
 			tags.setFromExtraIfNotZero(obtag.VikingDBName, cbInput.Extra)
@@ -94,14 +92,14 @@ func (d defaultDataParser) ParseInput(ctx context.Context, info *callbacks.RunIn
 		cbInput := indexer.ConvCallbackInput(input)
 		if cbInput != nil {
 			// rewrite if not suitable here
-			tags.set(obtag.Input, parseAny(ctx, cbInput.Docs))
+			tags.set(obtag.Input, parseAny(ctx, cbInput.Docs, false))
 		}
 
 	case compose.ComponentOfLambda:
-		tags.set(obtag.Input, parseAny(ctx, input))
+		tags.set(obtag.Input, parseAny(ctx, input, false))
 
 	default:
-		tags.set(obtag.Input, parseAny(ctx, input))
+		tags.set(obtag.Input, parseAny(ctx, input, false))
 	}
 
 	return tags
@@ -142,7 +140,7 @@ func (d defaultDataParser) ParseOutput(ctx context.Context, info *callbacks.RunI
 	case components.ComponentOfEmbedding:
 		cbOutput := embedding.ConvCallbackOutput(output)
 		if cbOutput != nil {
-			tags.set(obtag.Output, parseAny(ctx, cbOutput.Embeddings))
+			tags.set(obtag.Output, parseAny(ctx, cbOutput.Embeddings, false))
 
 			if cbOutput.TokenUsage != nil {
 				tags.set(obtag.Tokens, cbOutput.TokenUsage.TotalTokens).
@@ -158,7 +156,7 @@ func (d defaultDataParser) ParseOutput(ctx context.Context, info *callbacks.RunI
 	case components.ComponentOfIndexer:
 		cbOutput := indexer.ConvCallbackOutput(output)
 		if cbOutput != nil {
-			tags.set(obtag.Output, parseAny(ctx, cbOutput.IDs))
+			tags.set(obtag.Output, parseAny(ctx, cbOutput.IDs, false))
 		}
 
 	case components.ComponentOfRetriever:
@@ -169,10 +167,10 @@ func (d defaultDataParser) ParseOutput(ctx context.Context, info *callbacks.RunI
 		}
 
 	case compose.ComponentOfLambda:
-		tags.set(obtag.Output, parseAny(ctx, output))
+		tags.set(obtag.Output, parseAny(ctx, output, false))
 
 	default:
-		tags.set(obtag.Output, parseAny(ctx, output))
+		tags.set(obtag.Output, parseAny(ctx, output, false))
 
 	}
 
@@ -195,7 +193,7 @@ func (d defaultDataParser) ParseStreamInput(ctx context.Context, info *callbacks
 			return tags.setTags(getErrorTags(ctx, recvErr))
 		}
 
-		tags.set(obtag.Input, parseAny(ctx, chunks))
+		tags.set(obtag.Input, parseAny(ctx, chunks, true))
 	}
 
 	return tags
@@ -223,7 +221,7 @@ func (d defaultDataParser) ParseStreamOutput(ctx context.Context, info *callback
 			return tags.setTags(getErrorTags(ctx, recvErr))
 		}
 
-		tags.set(obtag.Output, parseAny(ctx, chunks))
+		tags.set(obtag.Output, parseAny(ctx, chunks, true))
 	}
 
 	return tags
@@ -274,7 +272,7 @@ func (d defaultDataParser) ParseChatModelStreamOutput(ctx context.Context, outpu
 	}
 
 	if msg, concatErr := schema.ConcatMessages(chunks); concatErr != nil { // unexpected
-		tags.set(obtag.Output, parseAny(ctx, chunks))
+		tags.set(obtag.Output, parseAny(ctx, chunks, true))
 	} else {
 		tags.set(obtag.Output, convertModelOutput(&model.CallbackOutput{Message: msg}))
 	}
@@ -322,35 +320,36 @@ func (d defaultDataParser) ParseDefaultStreamOutput(ctx context.Context, output 
 	return chunks, nil
 }
 
-func parseAny(ctx context.Context, v any) string {
+func parseAny(ctx context.Context, v any, bStream bool) string {
 	if v == nil {
 		return ""
 	}
 
 	switch t := v.(type) {
 	case []*schema.Message:
-		msgs, err := concatMessagesWithRoles(t)
-		if err != nil {
-			logs.CtxError(ctx, "[parseAny] parse []*schema.Message failed, err=%v", err)
-			return ""
-		}
-
-		return toJson(msgs)
+		return toJson(t, bStream)
 
 	case *schema.Message:
-		return toJson(t)
-
+		return toJson(t, bStream)
+	case string:
+		if bStream {
+			return toJson(t, bStream)
+		}
+		return t
 	case interface{ String() string }:
+		if bStream {
+			return toJson(t.String(), bStream)
+		}
 		return t.String()
 
 	case map[string]any:
-		return toJson(t)
+		return toJson(t, bStream)
 
 	case []callbacks.CallbackInput:
-		return parseAny(ctx, toAnySlice(t))
+		return parseAny(ctx, toAnySlice(t), bStream)
 
 	case []callbacks.CallbackOutput:
-		return parseAny(ctx, toAnySlice(t))
+		return parseAny(ctx, toAnySlice(t), bStream)
 
 	case []any:
 		if len(t) > 0 {
@@ -363,14 +362,14 @@ func parseAny(ctx context.Context, v any) string {
 					}
 				}
 
-				return parseAny(ctx, msgs)
+				return parseAny(ctx, msgs, bStream)
 			}
 		}
 
-		return toJson(t)
+		return toJson(t, bStream)
 
 	default:
-		return toJson(v)
+		return toJson(v, bStream)
 	}
 }
 
@@ -381,48 +380,6 @@ func toAnySlice[T any](src []T) []any {
 	}
 
 	return resp
-}
-
-func concatMessagesWithRoles(src []*schema.Message) ([]*schema.Message, error) {
-	var mgr []*schema.Message
-
-	r := len(src) - 1
-	for l := len(src) - 1; l >= 0; l-- {
-		if src[l].Role != src[r].Role {
-			var (
-				msg *schema.Message
-				err error
-			)
-
-			if src[r].Role == "" {
-				msg, err = schema.ConcatMessages(src[l : r+1])
-				r = l - 1
-			} else if r-l == 1 {
-				msg = src[r]
-				r = l
-			} else {
-				msg, err = schema.ConcatMessages(src[l+1 : r+1])
-				r = l
-			}
-
-			if err != nil {
-				return nil, err
-			}
-
-			mgr = append(mgr, msg)
-		}
-	}
-
-	if r >= 0 {
-		msg, err := schema.ConcatMessages(src[:r+1])
-		if err != nil {
-			return nil, err
-		}
-
-		mgr = append(mgr, msg)
-	}
-
-	return gslice.ReverseClone(mgr), nil
 }
 
 // parseSpanTypeFromComponent 转换 component 到 fornax 可以识别的 span_type

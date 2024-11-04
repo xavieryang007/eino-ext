@@ -247,8 +247,8 @@ func Test_ParseStreamOutput(t *testing.T) {
 
 func Test_parseAny(t *testing.T) {
 	ctx := context.Background()
-	PatchConvey("test parseAny", t, func() {
-		convey.So(len(parseAny(ctx, []*schema.Message{
+	PatchConvey("test non-stream parseAny", t, func() {
+		convey.So(parseAny(ctx, []*schema.Message{
 			{
 				Role:    schema.Assistant,
 				Content: "a",
@@ -259,9 +259,9 @@ func Test_parseAny(t *testing.T) {
 				Content: "b",
 				Name:    "name",
 			},
-		})), convey.ShouldNotBeZeroValue)
+		}, false), convey.ShouldEqual, "[{\"role\":\"assistant\",\"content\":\"a\",\"name\":\"name\"},{\"role\":\"assistant\",\"content\":\"b\",\"name\":\"name\"}]")
 
-		convey.So(len(parseAny(ctx, []*schema.Message{
+		convey.So(parseAny(ctx, []*schema.Message{
 			{
 				Role:    schema.Assistant,
 				Content: "a",
@@ -272,15 +272,15 @@ func Test_parseAny(t *testing.T) {
 				Content: "b",
 				Name:    "name",
 			},
-		})), convey.ShouldNotBeZeroValue)
+		}, false), convey.ShouldEqual, "[{\"role\":\"assistant\",\"content\":\"a\",\"name\":\"name\"},{\"role\":\"system\",\"content\":\"b\",\"name\":\"name\"}]")
 
-		convey.So(len(parseAny(ctx, &schema.Message{
+		convey.So(parseAny(ctx, &schema.Message{
 			Role:    schema.Assistant,
 			Content: "a",
 			Name:    "name",
-		})), convey.ShouldNotBeZeroValue)
+		}, false), convey.ShouldEqual, "{\"role\":\"assistant\",\"content\":\"a\",\"name\":\"name\"}")
 
-		convey.So(len(parseAny(ctx, []*schema.Message{
+		convey.So(parseAny(ctx, []*schema.Message{
 			{
 				Role:    schema.Assistant,
 				Content: "a",
@@ -300,15 +300,15 @@ func Test_parseAny(t *testing.T) {
 				Content: "d",
 				Name:    "name",
 			},
-		})), convey.ShouldNotBeZeroValue)
+		}, false), convey.ShouldEqual, "[{\"role\":\"assistant\",\"content\":\"a\",\"name\":\"name\"},{\"role\":\"user\",\"content\":\"b\",\"name\":\"name\"},{\"role\":\"system\",\"content\":\"c\",\"name\":\"name\"},{\"role\":\"\",\"content\":\"d\",\"name\":\"name\"}]")
 
-		sb := strings.Builder{}
+		sb := &strings.Builder{}
 		sb.WriteString("asd")
-		convey.So(len(parseAny(ctx, sb)), convey.ShouldNotBeZeroValue)
+		convey.So(parseAny(ctx, sb, false), convey.ShouldEqual, "asd")
 
-		convey.So(len(parseAny(ctx, map[string]any{"asd": 1})), convey.ShouldNotBeZeroValue)
+		convey.So(parseAny(ctx, map[string]any{"asd": 1}, false), convey.ShouldEqual, "{\"asd\":1}")
 
-		convey.So(len(parseAny(ctx, "asd")), convey.ShouldNotBeZeroValue)
+		convey.So(parseAny(ctx, "asd", false), convey.ShouldEqual, "asd")
 
 		convey.So(parseAny(ctx, []callbacks.CallbackOutput{
 			&schema.Message{
@@ -326,7 +326,90 @@ func Test_parseAny(t *testing.T) {
 				Content: "b",
 				Name:    "name",
 			},
-		}), convey.ShouldNotBeZeroValue)
+		}, false), convey.ShouldEqual, "[{\"role\":\"assistant\",\"content\":\"a\",\"name\":\"name\"},{\"role\":\"\",\"content\":\"aa\",\"name\":\"name\"},{\"role\":\"user\",\"content\":\"b\",\"name\":\"name\"}]")
+
+	})
+
+	PatchConvey("test stream parseAny", t, func() {
+		convey.So(parseAny(ctx, []*schema.Message{
+			{
+				Role:    schema.Assistant,
+				Content: "a",
+				Name:    "name",
+			},
+			{
+				Role:    schema.Assistant,
+				Content: "b",
+				Name:    "name",
+			},
+		}, true), convey.ShouldEqual, "{\"stream\":[{\"role\":\"assistant\",\"content\":\"a\",\"name\":\"name\"},{\"role\":\"assistant\",\"content\":\"b\",\"name\":\"name\"}]}")
+
+		convey.So(parseAny(ctx, []*schema.Message{
+			{
+				Role:    schema.Assistant,
+				Content: "a",
+				Name:    "name",
+			},
+			{
+				Role:    schema.System,
+				Content: "b",
+				Name:    "name",
+			},
+		}, true), convey.ShouldEqual, "{\"stream\":[{\"role\":\"assistant\",\"content\":\"a\",\"name\":\"name\"},{\"role\":\"system\",\"content\":\"b\",\"name\":\"name\"}]}")
+
+		convey.So(parseAny(ctx, &schema.Message{
+			Role:    schema.Assistant,
+			Content: "a",
+			Name:    "name",
+		}, true), convey.ShouldEqual, "{\"stream\":{\"role\":\"assistant\",\"content\":\"a\",\"name\":\"name\"}}")
+
+		convey.So(parseAny(ctx, []*schema.Message{
+			{
+				Role:    schema.Assistant,
+				Content: "a",
+				Name:    "name",
+			},
+			{
+				Role:    schema.User,
+				Content: "b",
+				Name:    "name",
+			},
+			{
+				Role:    schema.System,
+				Content: "c",
+				Name:    "name",
+			}, {
+				Role:    "",
+				Content: "d",
+				Name:    "name",
+			},
+		}, true), convey.ShouldEqual, "{\"stream\":[{\"role\":\"assistant\",\"content\":\"a\",\"name\":\"name\"},{\"role\":\"user\",\"content\":\"b\",\"name\":\"name\"},{\"role\":\"system\",\"content\":\"c\",\"name\":\"name\"},{\"role\":\"\",\"content\":\"d\",\"name\":\"name\"}]}")
+
+		sb := &strings.Builder{}
+		sb.WriteString("asd")
+		convey.So(parseAny(ctx, sb, true), convey.ShouldEqual, "{\"stream\":\"asd\"}")
+
+		convey.So(parseAny(ctx, map[string]any{"asd": 1}, true), convey.ShouldEqual, "{\"stream\":{\"asd\":1}}")
+
+		convey.So(parseAny(ctx, "asd", true), convey.ShouldEqual, "{\"stream\":\"asd\"}")
+
+		convey.So(parseAny(ctx, []callbacks.CallbackOutput{
+			&schema.Message{
+				Role:    schema.Assistant,
+				Content: "a",
+				Name:    "name",
+			},
+			&schema.Message{
+				Role:    "",
+				Content: "aa",
+				Name:    "name",
+			},
+			&schema.Message{
+				Role:    schema.User,
+				Content: "b",
+				Name:    "name",
+			},
+		}, true), convey.ShouldEqual, "{\"stream\":[{\"role\":\"assistant\",\"content\":\"a\",\"name\":\"name\"},{\"role\":\"\",\"content\":\"aa\",\"name\":\"name\"},{\"role\":\"user\",\"content\":\"b\",\"name\":\"name\"}]}")
 
 	})
 }

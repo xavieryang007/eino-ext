@@ -45,7 +45,7 @@ func (t spanTags) set(key string, value any) spanTags {
 		reflect.Pointer,
 		reflect.Slice,
 		reflect.Struct:
-		value = toJson(value)
+		value = toJson(value, false)
 	default:
 
 	}
@@ -120,9 +120,12 @@ func isInfraComponent(component components.Component) bool {
 	return found
 }
 
-func toJson(v any) string {
+func toJson(v any, bStream bool) string {
 	if v == nil {
 		return fmt.Sprintf("%s", errors.New("try to marshal nil error"))
+	}
+	if bStream {
+		v = map[string]any{"stream": v}
 	}
 	b, err := sonic.MarshalString(v)
 	if err != nil {

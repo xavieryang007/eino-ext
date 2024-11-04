@@ -235,7 +235,7 @@ func (l *einoTracer) setFornaxTags(ctx context.Context, span *ob.FornaxSpanImpl)
 		set("psm_env", env.Env()).
 		set(obtag.SpaceID, itoa(l.identity.GetSpaceID())).
 		set(obtag.FornaxSpaceID, itoa(l.identity.GetSpaceID())).
-		set(obtag.Runtime, toJson(getStaticRuntimeTags()))
+		set(obtag.Runtime, toJson(getStaticRuntimeTags(), false))
 
 	if uid, ok := getUserID(ctx); ok {
 		tags.set(obtag.UserID, uid)
