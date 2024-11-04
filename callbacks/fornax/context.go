@@ -8,14 +8,20 @@ import (
 	"code.byted.org/flowdevops/fornax_sdk/infra/ctxmeta"
 )
 
+// InjectUserID is Deprecated.
+// Use fornax_sdk.InjectUserID()
 func InjectUserID(ctx context.Context, userID string) context.Context {
 	return fornax_sdk.InjectUserID(ctx, userID)
 }
 
+// InjectDeviceID is Deprecated.
+// Use fornax_sdk.InjectDeviceID()
 func InjectDeviceID(ctx context.Context, deviceID string) context.Context {
 	return fornax_sdk.InjectDeviceID(ctx, deviceID)
 }
 
+// InjectThreadID is Deprecated.
+// Use fornax_sdk.InjectThreadID()
 func InjectThreadID(ctx context.Context, threadID string) context.Context {
 	return fornax_sdk.InjectThreadID(ctx, threadID)
 }

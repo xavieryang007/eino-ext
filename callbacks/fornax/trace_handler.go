@@ -6,19 +6,15 @@ import (
 
 	"code.byted.org/flow/eino/callbacks"
 	"code.byted.org/flow/eino/schema"
-	"code.byted.org/flow/flow-telemetry-common/go/obtag"
 	"code.byted.org/flowdevops/fornax_sdk"
-	"code.byted.org/flowdevops/fornax_sdk/domain"
 	"code.byted.org/flowdevops/fornax_sdk/infra/ob"
-	"code.byted.org/gopkg/env"
 	"code.byted.org/gopkg/logs/v2"
 )
 
 func newTraceCallbackHandler(client *fornax_sdk.Client, o *options) callbacks.Handler {
 	tracer := &einoTracer{
-		tracer:   ob.NewFornaxTracer(client.CommonService.GetIdentity()),
-		identity: client.CommonService.GetIdentity(),
-		parser:   &defaultDataParser{},
+		client: client,
+		parser: &defaultDataParser{},
 	}
 
 	if o.parser != nil {
@@ -29,9 +25,8 @@ func newTraceCallbackHandler(client *fornax_sdk.Client, o *options) callbacks.Ha
 }
 
 type einoTracer struct {
-	tracer   ob.FornaxTracer
-	identity *domain.Identity
-	parser   CallbackDataParser
+	client *fornax_sdk.Client
+	parser CallbackDataParser
 }
 
 func (l *einoTracer) OnStart(ctx context.Context, info *callbacks.RunInfo, input callbacks.CallbackInput) context.Context {
@@ -44,7 +39,7 @@ func (l *einoTracer) OnStart(ctx context.Context, info *callbacks.RunInfo, input
 		spanName = string(info.Component)
 	}
 
-	span, ctx, err := l.tracer.StartSpan(
+	span, ctx, err := l.client.StartSpan(
 		ctx,
 		spanName,
 		parseSpanTypeFromComponent(info.Component),
@@ -59,8 +54,6 @@ func (l *einoTracer) OnStart(ctx context.Context, info *callbacks.RunInfo, input
 		logs.Warnf("[einoTracer][OnStart] span type assertion failed, actual=%T", si)
 		return ctx
 	}
-
-	l.setFornaxTags(ctx, si)
 
 	l.setRunInfo(ctx, si, info)
 
@@ -78,7 +71,7 @@ func (l *einoTracer) OnEnd(ctx context.Context, info *callbacks.RunInfo, output 
 		return ctx
 	}
 
-	span := l.tracer.GetSpanFromContext(ctx)
+	span := l.client.GetSpanFromContext(ctx)
 	if span == nil {
 		logs.Warn("[einoTracer][OnEnd] span not found in callback ctx")
 		return ctx
@@ -108,7 +101,7 @@ func (l *einoTracer) OnError(ctx context.Context, info *callbacks.RunInfo, err e
 		return ctx
 	}
 
-	span := l.tracer.GetSpanFromContext(ctx)
+	span := l.client.GetSpanFromContext(ctx)
 	if span == nil {
 		logs.Warn("[einoTracer][OnError] span not found in callback ctx")
 		return ctx
@@ -141,7 +134,7 @@ func (l *einoTracer) OnStartWithStreamInput(ctx context.Context, info *callbacks
 		spanName = string(info.Component)
 	}
 
-	span, ctx, err := l.tracer.StartSpan(ctx,
+	span, ctx, err := l.client.StartSpan(ctx,
 		spanName,
 		parseSpanTypeFromComponent(info.Component),
 		ob.SetStartTime(time.Now()),
@@ -159,8 +152,6 @@ func (l *einoTracer) OnStartWithStreamInput(ctx context.Context, info *callbacks
 		logs.Warnf("[einoTracer][OnStartWithStreamInput] span type assertion failed, actual=%T", si)
 		return ctx
 	}
-
-	l.setFornaxTags(ctx, si)
 
 	l.setRunInfo(ctx, si, info)
 
@@ -188,7 +179,7 @@ func (l *einoTracer) OnEndWithStreamOutput(ctx context.Context, info *callbacks.
 		return ctx
 	}
 
-	span := l.tracer.GetSpanFromContext(ctx)
+	span := l.client.GetSpanFromContext(ctx)
 	if span == nil {
 		logs.Warn("[einoTracer][OnEndWithStreamOutput] span not found in callback ctx")
 		return ctx
@@ -223,31 +214,34 @@ func (l *einoTracer) OnEndWithStreamOutput(ctx context.Context, info *callbacks.
 
 func (l *einoTracer) setRunInfo(ctx context.Context, span *ob.FornaxSpanImpl, info *callbacks.RunInfo) {
 	span.SetTag(ctx, make(spanTags).
-		set(obtag.SpanType, parseSpanTypeFromComponent(info.Component)).
 		set(customSpanTagKeyComponent, string(info.Component)).
 		set(customSpanTagKeyName, info.Name).
 		set(customSpanTagKeyType, info.Type),
 	)
+	span.SetLibrary(ctx, einoLibrary)
+	span.SetEinoVersion(ctx, getEinoSdkVersion())
 }
 
+// setFornaxTags set fornax inner tags
+// Deprecated, because fornax span do the th
 func (l *einoTracer) setFornaxTags(ctx context.Context, span *ob.FornaxSpanImpl) {
-	tags := make(spanTags).
-		set("psm_env", env.Env()).
-		set(obtag.SpaceID, itoa(l.identity.GetSpaceID())).
-		set(obtag.FornaxSpaceID, itoa(l.identity.GetSpaceID())).
-		set(obtag.Runtime, toJson(getStaticRuntimeTags(), false))
-
-	if uid, ok := getUserID(ctx); ok {
-		tags.set(obtag.UserID, uid)
-	}
-
-	if did, ok := getDeviceID(ctx); ok {
-		tags.set(obtag.DeviceID, did)
-	}
-
-	if tid, ok := getThreadID(ctx); ok {
-		tags.set(obtag.ThreadID, tid)
-	}
-
-	span.SetTag(ctx, tags)
+	//tags := make(spanTags).
+	//	set("psm_env", env.Env()).
+	//	set(obtag.SpaceID, itoa(l.identity.GetSpaceID())).
+	//	set(obtag.FornaxSpaceID, itoa(l.identity.GetSpaceID())).
+	//  set(obtag.Runtime, toJson(getStaticRuntimeTags(), false))
+	//
+	//if uid, ok := getUserID(ctx); ok {
+	//	tags.set(obtag.UserID, uid)
+	//}
+	//
+	//if did, ok := getDeviceID(ctx); ok {
+	//	tags.set(obtag.DeviceID, did)
+	//}
+	//
+	//if tid, ok := getThreadID(ctx); ok {
+	//	tags.set(obtag.ThreadID, tid)
+	//}
+	//
+	//span.SetTag(ctx, tags)
 }

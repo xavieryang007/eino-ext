@@ -14,16 +14,14 @@ import (
 	"code.byted.org/flow/eino/compose"
 	"code.byted.org/flow/eino/schema"
 	"code.byted.org/flowdevops/fornax_sdk"
-	"code.byted.org/flowdevops/fornax_sdk/domain"
 	"code.byted.org/flowdevops/fornax_sdk/infra/ob"
-	"code.byted.org/flowdevops/fornax_sdk/infra/openapi"
-	"code.byted.org/flowdevops/fornax_sdk/infra/service"
 )
 
 func Test_FornaxMetrics_ChatModel(t *testing.T) {
 	mockers := []*Mocker{
 		Mock(mario_collector.NewMarioCollector).Return(&mario_collector.MarioCollector{}).Build(),
 		Mock((*mario_collector.MarioCollector).CollectEvent).Return(nil).Build(),
+		Mock((*fornax_sdk.Client).GetSpaceID).Return(123).Build(),
 	}
 
 	defer func() {
@@ -37,9 +35,7 @@ func Test_FornaxMetrics_ChatModel(t *testing.T) {
 	}
 
 	ctx := context.Background()
-	identity := &domain.Identity{}
-	identity.SetSpaceID(123)
-	client := &fornax_sdk.Client{CommonService: service.NewCommonServiceImpl(&openapi.FornaxHTTPClient{Identity: identity})}
+	client := &fornax_sdk.Client{}
 	handler := newMetricsCallbackHandler(client, &options{})
 
 	PatchConvey("test einoMetrics ChatModel", t, func() {

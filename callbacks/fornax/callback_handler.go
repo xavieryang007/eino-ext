@@ -6,7 +6,6 @@ import (
 	"code.byted.org/flow/eino/callbacks"
 	"code.byted.org/flow/eino/schema"
 	"code.byted.org/flowdevops/fornax_sdk"
-	"code.byted.org/flowdevops/fornax_sdk/infra/ob"
 )
 
 // NewDefaultCallbackHandler customize with options
@@ -37,7 +36,7 @@ func NewDefaultCallbackHandler(client *fornax_sdk.Client, opts ...Option) callba
 // Close should be called before service finished
 func Close() {
 	// close fornax trace
-	ob.Close()
+	fornax_sdk.Close()
 }
 
 type fornaxTracer struct {

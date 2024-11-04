@@ -15,38 +15,29 @@ import (
 	"code.byted.org/flow/eino/components/model"
 	"code.byted.org/flow/eino/schema"
 	"code.byted.org/flowdevops/fornax_sdk"
-	"code.byted.org/flowdevops/fornax_sdk/domain"
 	"code.byted.org/flowdevops/fornax_sdk/infra/ob"
-	"code.byted.org/flowdevops/fornax_sdk/infra/openapi"
-	"code.byted.org/flowdevops/fornax_sdk/infra/service"
-	"code.byted.org/obric/flow_telemetry_go/v2/flow_interface"
 )
 
 func TestNewTraceCallbackHandler(t *testing.T) {
-	cs := service.NewCommonServiceImpl(&openapi.FornaxHTTPClient{Identity: &domain.Identity{}})
-	tracer := newTraceCallbackHandler(&fornax_sdk.Client{CommonService: cs}, &options{})
+	tracer := newTraceCallbackHandler(&fornax_sdk.Client{}, &options{})
 	assert.NotNil(t, tracer)
 }
 
 func TestTraceIntegration(t *testing.T) {
 	PatchConvey("test integration", t, func() {
-		cs := service.NewCommonServiceImpl(&openapi.FornaxHTTPClient{Identity: &domain.Identity{}})
-		cli := &fornax_sdk.Client{CommonService: cs}
+		mockCli := &fornax_sdk.Client{}
 		mockSpan := &ob.FornaxSpanImpl{}
-		mockTracer := ob.NewFornaxTracer(cli.CommonService.GetIdentity())
 
 		tracer := &einoTracer{
-			tracer:   mockTracer,
-			identity: cli.CommonService.GetIdentity(),
-			parser:   &defaultDataParser{},
+			client: mockCli,
+			parser: &defaultDataParser{},
 		}
 
-		Mock(GetMethod(mockTracer, "StartSpan")).To(func(ctx context.Context, name, spanType string, opts ...flow_interface.FlowStartSpanOption) (ob.FornaxSpan, context.Context, error) {
+		Mock(GetMethod(mockCli, "StartSpan")).To(func(ctx context.Context, name, spanType string, opts ...ob.FornaxStartSpanOption) (ob.FornaxSpan, context.Context, error) {
 			return mockSpan, ctx, nil
 		}).Build()
-		Mock(GetMethod(mockTracer, "GetSpanFromContext")).Return(mockSpan).Build()
+		Mock(GetMethod(mockCli, "GetSpanFromContext")).Return(mockSpan).Build()
 		Mock(GetMethod(mockSpan, "SetTag")).Return().Build()
-		Mock(GetMethod(mockSpan, "SetCustomTag")).Return().Build()
 
 		info := &callbacks.RunInfo{
 			Name:      "mock_name",
@@ -71,7 +62,7 @@ func TestTraceIntegration(t *testing.T) {
 			}
 
 			ctx := tracer.OnStart(context.Background(), info, ci)
-			span := tracer.tracer.GetSpanFromContext(ctx)
+			span := tracer.client.GetSpanFromContext(ctx)
 			convey.So(span, convey.ShouldNotBeNil)
 
 			_, ok := span.(*ob.FornaxSpanImpl)
@@ -118,7 +109,7 @@ func TestTraceIntegration(t *testing.T) {
 			}
 
 			ctx := tracer.OnStart(context.Background(), info, ci)
-			span := tracer.tracer.GetSpanFromContext(ctx)
+			span := tracer.client.GetSpanFromContext(ctx)
 			convey.So(span, convey.ShouldNotBeNil)
 
 			_, ok := span.(*ob.FornaxSpanImpl)
@@ -148,7 +139,7 @@ func TestTraceIntegration(t *testing.T) {
 			}
 
 			ctx := tracer.OnStart(context.Background(), info, ci)
-			span := tracer.tracer.GetSpanFromContext(ctx)
+			span := tracer.client.GetSpanFromContext(ctx)
 			convey.So(span, convey.ShouldNotBeNil)
 
 			_, ok := span.(*ob.FornaxSpanImpl)
@@ -201,7 +192,7 @@ func TestTraceIntegration(t *testing.T) {
 			}
 
 			ctx := tracer.OnStart(context.Background(), info, ci)
-			span := tracer.tracer.GetSpanFromContext(ctx)
+			span := tracer.client.GetSpanFromContext(ctx)
 			convey.So(span, convey.ShouldNotBeNil)
 
 			_, ok := span.(*ob.FornaxSpanImpl)
@@ -237,7 +228,7 @@ func TestTraceIntegration(t *testing.T) {
 			ctx := tracer.OnStartWithStreamInput(context.Background(), info, sr)
 			convey.So(ctx.Value(traceStreamInputAsyncKey{}), convey.ShouldNotBeNil)
 
-			span := tracer.tracer.GetSpanFromContext(ctx)
+			span := tracer.client.GetSpanFromContext(ctx)
 			convey.So(span, convey.ShouldNotBeNil)
 
 			_, ok := span.(*ob.FornaxSpanImpl)

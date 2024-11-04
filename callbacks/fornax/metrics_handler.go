@@ -19,17 +19,23 @@ import (
 )
 
 func newMetricsCallbackHandler(client *fornax_sdk.Client, o *options) callbacks.Handler {
+	// NOTE(wuzhenyu.zado): fake identity!
+	//   Maybe moved all FornaxMetrics logic here,
+	//   because it seems no other reference of ob.NewFornaxMetrics.
+	identity := &domain.Identity{}
+	identity.SetSpaceID(client.GetSpaceID())
+
 	m := &einoMetrics{
-		mtr:      ob.NewFornaxMetrics(client.CommonService.GetIdentity()),
-		identity: client.CommonService.GetIdentity(),
+		client: client,
+		mtr:    ob.NewFornaxMetrics(identity),
 	}
 
 	return m
 }
 
 type einoMetrics struct {
-	mtr      *ob.FornaxMetrics
-	identity *domain.Identity
+	client *fornax_sdk.Client
+	mtr    *ob.FornaxMetrics
 }
 
 func (l *einoMetrics) OnStart(ctx context.Context, info *callbacks.RunInfo, input callbacks.CallbackInput) context.Context {
@@ -52,7 +58,7 @@ func (l *einoMetrics) OnEnd(ctx context.Context, info *callbacks.RunInfo, output
 		startTime time.Time
 
 		status    = ob.TagValueStatusSuccess
-		spaceID   = l.identity.GetSpaceID()
+		spaceID   = l.client.GetSpaceID()
 		graphName = getMetricsGraphName(ctx)
 	)
 
@@ -221,7 +227,7 @@ func (l *einoMetrics) handleChatModelStreamOutput(ctx context.Context, _ *callba
 
 		status    = ob.TagValueStatusSuccess
 		graphName = getMetricsGraphName(ctx)
-		spaceID   = l.identity.GetSpaceID()
+		spaceID   = l.client.GetSpaceID()
 	)
 
 	ctxVal, ctxValOK := getMetricsVariablesValue(ctx)

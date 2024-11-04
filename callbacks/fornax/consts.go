@@ -39,3 +39,8 @@ var infraComponents = map[components.Component]struct{}{
 	compose.ComponentOfStateGraph: {},
 	compose.ComponentOfChain:      {},
 }
+
+const (
+	einoLibrary    = "eino"
+	einoImportPath = "code.byted.org/flow/eino"
+)
