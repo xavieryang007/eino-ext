@@ -18,7 +18,7 @@ func getEinoSdkVersion() string {
 }
 
 func mustInitEinoSdkVersion() {
-	einoSdkVersion = ReadBuildVersion("code.byted.org/flow/eino")
+	einoSdkVersion = ReadBuildVersion(einoImportPath)
 }
 
 func ReadBuildVersion(path string) string {
