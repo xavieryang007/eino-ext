@@ -29,7 +29,6 @@ require (
 	code.byted.org/bytedtrace/bytedtrace-compatible-lightweight-go v1.0.1 // indirect
 	code.byted.org/bytedtrace/bytedtrace-conf-provider-client-go v0.0.27 // indirect
 	code.byted.org/bytedtrace/bytedtrace-gls-switch v1.2.0 // indirect
-	code.byted.org/bytedtrace/bytedtrace-reporter-factory v1.0.0 // indirect
 	code.byted.org/bytedtrace/bytedtrace-utils-go v1.0.3 // indirect
 	code.byted.org/bytedtrace/interface-go v1.0.20 // indirect
 	code.byted.org/bytedtrace/serializer-go v1.0.1-pre // indirect
@@ -71,7 +70,6 @@ require (
 	code.byted.org/gopkg/metrics/v4 v4.1.2 // indirect
 	code.byted.org/gopkg/metrics_core v0.0.36 // indirect
 	code.byted.org/gopkg/net2 v1.5.0 // indirect
-	code.byted.org/gopkg/pid v0.0.18 // indirect
 	code.byted.org/gopkg/retry v0.0.0-20230209024914-cf290f094aa7 // indirect
 	code.byted.org/gopkg/stats v1.2.12 // indirect
 	code.byted.org/gopkg/tccclient v1.5.0-beta.10 // indirect
@@ -175,6 +173,7 @@ require (
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang-jwt/jwt/v5 v5.2.1 // indirect
+	github.com/golang/mock v1.6.0 // indirect
 	github.com/golang/protobuf v1.5.4 // indirect
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/martian v2.1.0+incompatible // indirect
@@ -215,7 +214,6 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/nikolalohinski/gonja v1.5.3 // indirect
 	github.com/nyaruka/phonenumbers v1.0.71 // indirect
-	github.com/oleiade/lane v1.0.1 // indirect
 	github.com/olivere/elastic/v7 v7.0.32 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20210726034734-bdbb7cc3a1c0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.9 // indirect
@@ -246,8 +244,6 @@ require (
 	github.com/tinylib/msgp v1.1.6 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
-	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vmihailenco/msgpack/v4 v4.3.12 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect

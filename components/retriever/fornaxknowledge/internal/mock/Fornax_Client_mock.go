@@ -14,11 +14,12 @@ import (
 	reflect "reflect"
 
 	domain "code.byted.org/flowdevops/fornax_sdk/domain"
+	chatmodel "code.byted.org/flowdevops/fornax_sdk/domain/chatmodel"
 	knowledge "code.byted.org/flowdevops/fornax_sdk/domain/knowledge"
 	node "code.byted.org/flowdevops/fornax_sdk/domain/node"
 	prompt "code.byted.org/flowdevops/fornax_sdk/domain/prompt"
+	execution "code.byted.org/flowdevops/fornax_sdk/domain/prompt/execution"
 	ob "code.byted.org/flowdevops/fornax_sdk/infra/ob"
-	flow_interface "code.byted.org/obric/flow_telemetry_go/v2/flow_interface"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -26,6 +27,7 @@ import (
 type MockIClient struct {
 	ctrl     *gomock.Controller
 	recorder *MockIClientMockRecorder
+	isgomock struct{}
 }
 
 // MockIClientMockRecorder is the mock recorder for MockIClient.
@@ -46,10 +48,10 @@ func (m *MockIClient) EXPECT() *MockIClientMockRecorder {
 }
 
 // ExecutePrompt mocks base method.
-func (m *MockIClient) ExecutePrompt(arg0 context.Context, arg1 *prompt.ExecutePromptParam, arg2 ...prompt.Option) (*prompt.ExecutePromptResult, error) {
+func (m *MockIClient) ExecutePrompt(ctx context.Context, param *prompt.ExecutePromptParam, options ...prompt.Option) (*prompt.ExecutePromptResult, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1}
-	for _, a := range arg2 {
+	varargs := []any{ctx, param}
+	for _, a := range options {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "ExecutePrompt", varargs...)
@@ -59,17 +61,67 @@ func (m *MockIClient) ExecutePrompt(arg0 context.Context, arg1 *prompt.ExecutePr
 }
 
 // ExecutePrompt indicates an expected call of ExecutePrompt.
-func (mr *MockIClientMockRecorder) ExecutePrompt(arg0, arg1 any, arg2 ...any) *gomock.Call {
+func (mr *MockIClientMockRecorder) ExecutePrompt(ctx, param any, options ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1}, arg2...)
+	varargs := append([]any{ctx, param}, options...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecutePrompt", reflect.TypeOf((*MockIClient)(nil).ExecutePrompt), varargs...)
 }
 
-// GetPrompt mocks base method.
-func (m *MockIClient) GetPrompt(arg0 context.Context, arg1 *prompt.GetPromptParam, arg2 ...prompt.Option) (*prompt.GetPromptResult, error) {
+// ExecutePromptLocal mocks base method.
+func (m *MockIClient) ExecutePromptLocal(ctx context.Context, param *execution.ExecutePromptLocalParam, options ...execution.Option) (*chatmodel.ChatCompletionResponse, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1}
-	for _, a := range arg2 {
+	varargs := []any{ctx, param}
+	for _, a := range options {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ExecutePromptLocal", varargs...)
+	ret0, _ := ret[0].(*chatmodel.ChatCompletionResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExecutePromptLocal indicates an expected call of ExecutePromptLocal.
+func (mr *MockIClientMockRecorder) ExecutePromptLocal(ctx, param any, options ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, param}, options...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecutePromptLocal", reflect.TypeOf((*MockIClient)(nil).ExecutePromptLocal), varargs...)
+}
+
+// FormatPrompt mocks base method.
+func (m *MockIClient) FormatPrompt(ctx context.Context, Prompt *prompt.Prompt, variables map[string]any) ([]*chatmodel.ChatMessage, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FormatPrompt", ctx, Prompt, variables)
+	ret0, _ := ret[0].([]*chatmodel.ChatMessage)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FormatPrompt indicates an expected call of FormatPrompt.
+func (mr *MockIClientMockRecorder) FormatPrompt(ctx, Prompt, variables any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FormatPrompt", reflect.TypeOf((*MockIClient)(nil).FormatPrompt), ctx, Prompt, variables)
+}
+
+// GetChatModel mocks base method.
+func (m *MockIClient) GetChatModel(ctx context.Context, config *chatmodel.Config) (chatmodel.ChatModel, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetChatModel", ctx, config)
+	ret0, _ := ret[0].(chatmodel.ChatModel)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetChatModel indicates an expected call of GetChatModel.
+func (mr *MockIClientMockRecorder) GetChatModel(ctx, config any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetChatModel", reflect.TypeOf((*MockIClient)(nil).GetChatModel), ctx, config)
+}
+
+// GetPrompt mocks base method.
+func (m *MockIClient) GetPrompt(ctx context.Context, param *prompt.GetPromptParam, options ...prompt.Option) (*prompt.GetPromptResult, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, param}
+	for _, a := range options {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetPrompt", varargs...)
@@ -79,61 +131,159 @@ func (m *MockIClient) GetPrompt(arg0 context.Context, arg1 *prompt.GetPromptPara
 }
 
 // GetPrompt indicates an expected call of GetPrompt.
-func (mr *MockIClientMockRecorder) GetPrompt(arg0, arg1 any, arg2 ...any) *gomock.Call {
+func (mr *MockIClientMockRecorder) GetPrompt(ctx, param any, options ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1}, arg2...)
+	varargs := append([]any{ctx, param}, options...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetPrompt", reflect.TypeOf((*MockIClient)(nil).GetPrompt), varargs...)
 }
 
-// GetSpanFromContext mocks base method.
-func (m *MockIClient) GetSpanFromContext(arg0 context.Context) ob.FornaxSpan {
+// GetSpaceID mocks base method.
+func (m *MockIClient) GetSpaceID() int64 {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetSpanFromContext", arg0)
+	ret := m.ctrl.Call(m, "GetSpaceID")
+	ret0, _ := ret[0].(int64)
+	return ret0
+}
+
+// GetSpaceID indicates an expected call of GetSpaceID.
+func (mr *MockIClientMockRecorder) GetSpaceID() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSpaceID", reflect.TypeOf((*MockIClient)(nil).GetSpaceID))
+}
+
+// GetSpanFromContext mocks base method.
+func (m *MockIClient) GetSpanFromContext(ctx context.Context) ob.FornaxSpan {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSpanFromContext", ctx)
 	ret0, _ := ret[0].(ob.FornaxSpan)
 	return ret0
 }
 
 // GetSpanFromContext indicates an expected call of GetSpanFromContext.
-func (mr *MockIClientMockRecorder) GetSpanFromContext(arg0 any) *gomock.Call {
+func (mr *MockIClientMockRecorder) GetSpanFromContext(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSpanFromContext", reflect.TypeOf((*MockIClient)(nil).GetSpanFromContext), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSpanFromContext", reflect.TypeOf((*MockIClient)(nil).GetSpanFromContext), ctx)
 }
 
 // PullNode mocks base method.
-func (m *MockIClient) PullNode(arg0 context.Context, arg1 *node.PullNodeParam) (*node.PullNodeResult, error) {
+func (m *MockIClient) PullNode(ctx context.Context, param *node.PullNodeParam) (*node.PullNodeResult, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PullNode", arg0, arg1)
+	ret := m.ctrl.Call(m, "PullNode", ctx, param)
 	ret0, _ := ret[0].(*node.PullNodeResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // PullNode indicates an expected call of PullNode.
-func (mr *MockIClientMockRecorder) PullNode(arg0, arg1 any) *gomock.Call {
+func (mr *MockIClientMockRecorder) PullNode(ctx, param any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PullNode", reflect.TypeOf((*MockIClient)(nil).PullNode), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PullNode", reflect.TypeOf((*MockIClient)(nil).PullNode), ctx, param)
 }
 
 // RetrieveKnowledge mocks base method.
-func (m *MockIClient) RetrieveKnowledge(arg0 context.Context, arg1 *knowledge.RetrieveKnowledgeParams) (*knowledge.RetrieveKnowledgeResult, error) {
+func (m *MockIClient) RetrieveKnowledge(ctx context.Context, param *knowledge.RetrieveKnowledgeParams) (*knowledge.RetrieveKnowledgeResult, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "RetrieveKnowledge", arg0, arg1)
+	ret := m.ctrl.Call(m, "RetrieveKnowledge", ctx, param)
 	ret0, _ := ret[0].(*knowledge.RetrieveKnowledgeResult)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // RetrieveKnowledge indicates an expected call of RetrieveKnowledge.
-func (mr *MockIClientMockRecorder) RetrieveKnowledge(arg0, arg1 any) *gomock.Call {
+func (mr *MockIClientMockRecorder) RetrieveKnowledge(ctx, param any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveKnowledge", reflect.TypeOf((*MockIClient)(nil).RetrieveKnowledge), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "RetrieveKnowledge", reflect.TypeOf((*MockIClient)(nil).RetrieveKnowledge), ctx, param)
+}
+
+// StartModelSpan mocks base method.
+func (m *MockIClient) StartModelSpan(ctx context.Context, name string, opts ...func(*ob.FornaxStartSpanOptions)) (ob.ModelSpan, context.Context, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, name}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "StartModelSpan", varargs...)
+	ret0, _ := ret[0].(ob.ModelSpan)
+	ret1, _ := ret[1].(context.Context)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// StartModelSpan indicates an expected call of StartModelSpan.
+func (mr *MockIClientMockRecorder) StartModelSpan(ctx, name any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, name}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartModelSpan", reflect.TypeOf((*MockIClient)(nil).StartModelSpan), varargs...)
+}
+
+// StartPromptSpan mocks base method.
+func (m *MockIClient) StartPromptSpan(ctx context.Context, name string, opts ...func(*ob.FornaxStartSpanOptions)) (ob.PromptSpan, context.Context, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, name}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "StartPromptSpan", varargs...)
+	ret0, _ := ret[0].(ob.PromptSpan)
+	ret1, _ := ret[1].(context.Context)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// StartPromptSpan indicates an expected call of StartPromptSpan.
+func (mr *MockIClientMockRecorder) StartPromptSpan(ctx, name any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, name}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartPromptSpan", reflect.TypeOf((*MockIClient)(nil).StartPromptSpan), varargs...)
+}
+
+// StartQuerySpan mocks base method.
+func (m *MockIClient) StartQuerySpan(ctx context.Context, name string, opts ...func(*ob.FornaxStartSpanOptions)) (ob.QuerySpan, context.Context, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, name}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "StartQuerySpan", varargs...)
+	ret0, _ := ret[0].(ob.QuerySpan)
+	ret1, _ := ret[1].(context.Context)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// StartQuerySpan indicates an expected call of StartQuerySpan.
+func (mr *MockIClientMockRecorder) StartQuerySpan(ctx, name any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, name}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartQuerySpan", reflect.TypeOf((*MockIClient)(nil).StartQuerySpan), varargs...)
+}
+
+// StartRetrieverSpan mocks base method.
+func (m *MockIClient) StartRetrieverSpan(ctx context.Context, name string, opts ...func(*ob.FornaxStartSpanOptions)) (ob.RetrieverSpan, context.Context, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, name}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "StartRetrieverSpan", varargs...)
+	ret0, _ := ret[0].(ob.RetrieverSpan)
+	ret1, _ := ret[1].(context.Context)
+	ret2, _ := ret[2].(error)
+	return ret0, ret1, ret2
+}
+
+// StartRetrieverSpan indicates an expected call of StartRetrieverSpan.
+func (mr *MockIClientMockRecorder) StartRetrieverSpan(ctx, name any, opts ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, name}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartRetrieverSpan", reflect.TypeOf((*MockIClient)(nil).StartRetrieverSpan), varargs...)
 }
 
 // StartSpan mocks base method.
-func (m *MockIClient) StartSpan(arg0 context.Context, arg1, arg2 string, arg3 ...flow_interface.FlowStartSpanOption) (ob.FornaxSpan, context.Context, error) {
+func (m *MockIClient) StartSpan(ctx context.Context, name, spanType string, opts ...func(*ob.FornaxStartSpanOptions)) (ob.FornaxSpan, context.Context, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1, arg2}
-	for _, a := range arg3 {
+	varargs := []any{ctx, name, spanType}
+	for _, a := range opts {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "StartSpan", varargs...)
@@ -144,17 +294,17 @@ func (m *MockIClient) StartSpan(arg0 context.Context, arg1, arg2 string, arg3 ..
 }
 
 // StartSpan indicates an expected call of StartSpan.
-func (mr *MockIClientMockRecorder) StartSpan(arg0, arg1, arg2 any, arg3 ...any) *gomock.Call {
+func (mr *MockIClientMockRecorder) StartSpan(ctx, name, spanType any, opts ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1, arg2}, arg3...)
+	varargs := append([]any{ctx, name, spanType}, opts...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartSpan", reflect.TypeOf((*MockIClient)(nil).StartSpan), varargs...)
 }
 
 // StreamExecutePrompt mocks base method.
-func (m *MockIClient) StreamExecutePrompt(arg0 context.Context, arg1 *prompt.ExecutePromptParam, arg2 ...prompt.Option) (*domain.ExecutePromptStream, error) {
+func (m *MockIClient) StreamExecutePrompt(ctx context.Context, param *prompt.ExecutePromptParam, options ...prompt.Option) (*domain.ExecutePromptStream, error) {
 	m.ctrl.T.Helper()
-	varargs := []any{arg0, arg1}
-	for _, a := range arg2 {
+	varargs := []any{ctx, param}
+	for _, a := range options {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "StreamExecutePrompt", varargs...)
@@ -164,8 +314,28 @@ func (m *MockIClient) StreamExecutePrompt(arg0 context.Context, arg1 *prompt.Exe
 }
 
 // StreamExecutePrompt indicates an expected call of StreamExecutePrompt.
-func (mr *MockIClientMockRecorder) StreamExecutePrompt(arg0, arg1 any, arg2 ...any) *gomock.Call {
+func (mr *MockIClientMockRecorder) StreamExecutePrompt(ctx, param any, options ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{arg0, arg1}, arg2...)
+	varargs := append([]any{ctx, param}, options...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StreamExecutePrompt", reflect.TypeOf((*MockIClient)(nil).StreamExecutePrompt), varargs...)
+}
+
+// StreamExecutePromptLocal mocks base method.
+func (m *MockIClient) StreamExecutePromptLocal(ctx context.Context, param *execution.ExecutePromptLocalParam, options ...execution.Option) (chatmodel.StreamReader, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, param}
+	for _, a := range options {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "StreamExecutePromptLocal", varargs...)
+	ret0, _ := ret[0].(chatmodel.StreamReader)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// StreamExecutePromptLocal indicates an expected call of StreamExecutePromptLocal.
+func (mr *MockIClientMockRecorder) StreamExecutePromptLocal(ctx, param any, options ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, param}, options...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StreamExecutePromptLocal", reflect.TypeOf((*MockIClient)(nil).StreamExecutePromptLocal), varargs...)
 }
