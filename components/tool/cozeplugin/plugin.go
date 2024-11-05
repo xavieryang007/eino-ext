@@ -6,6 +6,7 @@ import (
 	"io"
 	"runtime/debug"
 
+	"code.byted.org/flowdevops/fornax_sdk"
 	"github.com/cloudwego/kitex/client/callopt/streamcall"
 
 	"code.byted.org/flow/eino/callbacks"
@@ -203,6 +204,10 @@ func (c *cozePlugin) InvokableRun(ctx context.Context, argumentsInJSON string, o
 		})
 	}
 
+	if nCtx, err := fornax_sdk.InjectTrace(ctx); err == nil {
+		ctx = nCtx
+	}
+
 	resp, err := kitexClient.DoAction(ctx, req, append(defaultCallOpts, plgOpt.callOpts...)...)
 	if err != nil {
 		return "", fmt.Errorf("request to execute coze plugin fail: %w", err)
@@ -312,6 +317,9 @@ func (s *streamCozePlugin) StreamableRun(ctx context.Context, argumentsInJSON st
 		})
 	}
 
+	if nCtx, err := fornax_sdk.InjectTrace(ctx); err == nil {
+		ctx = nCtx
+	}
 	resp, err := streamClient.StreamDoAction(ctx, req, append(defaultStreamCallOpts, plgOpt.streamCallOpts...)...)
 	if err != nil {
 		return nil, fmt.Errorf("request to stream execute coze plugin fail: %w", err)

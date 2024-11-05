@@ -14,6 +14,7 @@ import (
 
 	"code.byted.org/flow/eino/components/tool"
 	"code.byted.org/flow/eino/schema"
+	"code.byted.org/flowdevops/fornax_sdk"
 	"code.byted.org/gopkg/logs/v2"
 	"code.byted.org/overpass/flow_devops_plugin/kitex_gen/flow/devops/plugin/domain/definition"
 )
@@ -61,6 +62,9 @@ func (i *invokablePlugin) Info(ctx context.Context) (*schema.ToolInfo, error) {
 func (i *invokablePlugin) InvokableRun(ctx context.Context, argumentsInJSON string, opts ...tool.Option) (string, error) {
 	plgOpt := tool.GetImplSpecificOptions(&pluginOptions{}, opts...)
 
+	if nCtx, err := fornax_sdk.InjectTrace(ctx); err == nil {
+		ctx = nCtx
+	}
 	content, def, err := executeTool(ctx, i.toolID, argumentsInJSON, plgOpt.callOpts...)
 	if err != nil {
 		return "", fmt.Errorf("[Fornax Plugin]execute tool failed: %w", err)
