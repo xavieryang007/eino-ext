@@ -221,27 +221,3 @@ func (l *einoTracer) setRunInfo(ctx context.Context, span *ob.FornaxSpanImpl, in
 	span.SetLibrary(ctx, einoLibrary)
 	span.SetEinoVersion(ctx, getEinoSdkVersion())
 }
-
-// setFornaxTags set fornax inner tags
-// Deprecated, because fornax span do the th
-func (l *einoTracer) setFornaxTags(ctx context.Context, span *ob.FornaxSpanImpl) {
-	//tags := make(spanTags).
-	//	set("psm_env", env.Env()).
-	//	set(obtag.SpaceID, itoa(l.identity.GetSpaceID())).
-	//	set(obtag.FornaxSpaceID, itoa(l.identity.GetSpaceID())).
-	//  set(obtag.Runtime, toJson(getStaticRuntimeTags(), false))
-	//
-	//if uid, ok := getUserID(ctx); ok {
-	//	tags.set(obtag.UserID, uid)
-	//}
-	//
-	//if did, ok := getDeviceID(ctx); ok {
-	//	tags.set(obtag.DeviceID, did)
-	//}
-	//
-	//if tid, ok := getThreadID(ctx); ok {
-	//	tags.set(obtag.ThreadID, tid)
-	//}
-	//
-	//span.SetTag(ctx, tags)
-}
