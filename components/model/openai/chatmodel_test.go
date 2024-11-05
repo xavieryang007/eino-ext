@@ -14,6 +14,8 @@ import (
 	"code.byted.org/flow/eino/callbacks"
 	"code.byted.org/flow/eino/components/model"
 	"code.byted.org/flow/eino/schema"
+
+	protocol "code.byted.org/flow/eino-ext/components/model/protocols/openai"
 )
 
 func TestOpenAIGenerate(t *testing.T) {
@@ -149,8 +151,8 @@ func TestOpenAIGenerate(t *testing.T) {
 		N:               &expectedRequestBody.N,
 		Stop:            expectedRequestBody.Stop,
 		PresencePenalty: &expectedRequestBody.PresencePenalty,
-		ResponseFormat: &ChatCompletionResponseFormat{
-			Type: ChatCompletionResponseFormatTypeJSONObject,
+		ResponseFormat: &protocol.ChatCompletionResponseFormat{
+			Type: protocol.ChatCompletionResponseFormatTypeJSONObject,
 		},
 		Seed:             expectedRequestBody.Seed,
 		FrequencyPenalty: &expectedRequestBody.FrequencyPenalty,

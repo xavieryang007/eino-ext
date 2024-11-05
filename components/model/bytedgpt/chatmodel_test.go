@@ -7,7 +7,6 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/getkin/kin-openapi/openapi3"
 	goopenai "github.com/sashabaranov/go-openai"
 	"github.com/stretchr/testify/assert"
 
@@ -59,8 +58,8 @@ func mockChatModel(returnTool bool) (url string, close func()) {
 
 func TestChatModelGenerate(t *testing.T) {
 	run := func(t *testing.T, ctx context.Context) {
-		url, close := mockChatModel(false)
-		defer close()
+		url, closed := mockChatModel(false)
+		defer closed()
 
 		chatModel, err := NewChatModel(ctx, &ChatModelConfig{ByAzure: true, BaseURL: url, Model: "gpt-3.5-turbo"})
 		assert.NoError(t, err)
@@ -84,49 +83,10 @@ func TestChatModelGenerate(t *testing.T) {
 	})
 }
 
-func TestToXXXUtils(t *testing.T) {
-	t.Run("toOpenAIMultiContent", func(t *testing.T) {
-
-		multiContents := []schema.ChatMessagePart{
-			{
-				Type: schema.ChatMessagePartTypeText,
-				Text: "image_desc",
-			},
-			{
-				Type: schema.ChatMessagePartTypeImageURL,
-				ImageURL: &schema.ChatMessageImageURL{
-					URL:    "https://{RL_ADDRESS}",
-					Detail: schema.ImageURLDetailAuto,
-				},
-			},
-		}
-
-		mc, err := toOpenAIMultiContent(multiContents)
-		assert.NoError(t, err)
-		assert.Len(t, mc, 2)
-		assert.Equal(t, mc[0], goopenai.ChatMessagePart{
-			Type: goopenai.ChatMessagePartTypeText,
-			Text: "image_desc",
-		})
-
-		assert.Equal(t, mc[1], goopenai.ChatMessagePart{
-			Type: goopenai.ChatMessagePartTypeImageURL,
-			ImageURL: &goopenai.ChatMessageImageURL{
-				URL:    "https://{RL_ADDRESS}",
-				Detail: goopenai.ImageURLDetailAuto,
-			},
-		})
-
-		mc, err = toOpenAIMultiContent(nil)
-		assert.Nil(t, err)
-		assert.Nil(t, mc)
-	})
-}
-
 func TestChatModelStream(t *testing.T) {
 	run := func(t *testing.T, ctx context.Context) {
-		url, close := mockChatModel(false)
-		defer close()
+		url, closed := mockChatModel(false)
+		defer closed()
 
 		chatModel, err := NewChatModel(ctx, &ChatModelConfig{ByAzure: true, BaseURL: url, Model: "gpt-3.5-turbo"})
 		assert.NoError(t, err)
@@ -172,8 +132,8 @@ func TestChatModelToolCall(t *testing.T) {
 
 	ctx := context.Background()
 
-	url, close := mockChatModel(true)
-	defer close()
+	url, closed := mockChatModel(true)
+	defer closed()
 
 	chatModel, err := NewChatModel(ctx, &ChatModelConfig{ByAzure: true, BaseURL: url, Model: "gpt-3.5-turbo"})
 	assert.NoError(t, err)
@@ -239,65 +199,6 @@ func TestChatModelToolCall(t *testing.T) {
 	err = chatModel.BindTools(tools)
 	assert.Nil(t, err)
 
-	// assert tools
-	assert.Len(t, chatModel.tools, 2)
-	tool1 := chatModel.tools[0]
-	assert.Equal(t, weatherToolName, tool1.Function.Name)
-	assert.Equal(t, weatherToolDesc, tool1.Function.Description)
-	expectedDefinition := &openapi3.Schema{
-		Type: openapi3.TypeObject,
-		Properties: map[string]*openapi3.SchemaRef{
-			"location": {
-				Value: &openapi3.Schema{
-					Type:        openapi3.TypeString,
-					Description: "The city and state, e.g. San Francisco, CA",
-				},
-			},
-			"unit": {
-				Value: &openapi3.Schema{
-					Type: openapi3.TypeString,
-					Enum: []any{"celsius", "fahrenheit"},
-				},
-			},
-			"days": {
-				Value: &openapi3.Schema{
-					Type:        openapi3.TypeArray,
-					Description: "The number of days to forecast",
-					Items: &openapi3.SchemaRef{
-						Value: &openapi3.Schema{
-							Type:        openapi3.TypeInteger,
-							Description: "The number of days to forecast",
-							Enum:        []any{"1", "2", "3", "4", "5", "6", "7"},
-						},
-					},
-				},
-			},
-			"infos": {
-				Value: &openapi3.Schema{
-					Type: openapi3.TypeObject,
-					Properties: map[string]*openapi3.SchemaRef{
-						"type_windy": {
-							Value: &openapi3.Schema{
-								Type:        openapi3.TypeBoolean,
-								Description: "The types of windy weather",
-							},
-						},
-						"type_rainy": {
-							Value: &openapi3.Schema{
-								Type:        openapi3.TypeBoolean,
-								Description: "The types of rainy weather",
-							},
-						},
-					},
-					Required: []string{},
-				},
-			},
-		},
-		Required: []string{"location"},
-	}
-
-	assert.EqualValues(t, tool1.Function.Parameters, expectedDefinition)
-
 	msg, err := chatModel.Generate(ctx,
 		[]*schema.Message{schema.UserMessage("what's the weather in Beijing today")})
 
@@ -337,8 +238,8 @@ func TestChatModelForceToolCall(t *testing.T) {
 	t.Run("chat model force tool call", func(t *testing.T) {
 		ctx := context.Background()
 
-		url, close := mockChatModel(true)
-		defer close()
+		url, closed := mockChatModel(true)
+		defer closed()
 
 		chatModel, err := NewChatModel(ctx, &ChatModelConfig{ByAzure: true, BaseURL: url, Model: "gpt-3.5-turbo"})
 		assert.NoError(t, err)
@@ -393,26 +294,6 @@ func randStr() string {
 		b[i] = seeds[rand.Intn(len(seeds))]
 	}
 	return string(b)
-}
-
-func TestToOpenAIToolCalls(t *testing.T) {
-	t.Run("empty tools", func(t *testing.T) {
-		tools := toOpenAIToolCalls([]schema.ToolCall{})
-		assert.Len(t, tools, 0)
-	})
-
-	t.Run("normal tools", func(t *testing.T) {
-		fakeToolCall1 := schema.ToolCall{
-			ID:       randStr(),
-			Function: schema.FunctionCall{Name: randStr(), Arguments: randStr()},
-		}
-
-		toolCalls := toOpenAIToolCalls([]schema.ToolCall{fakeToolCall1})
-
-		assert.Len(t, toolCalls, 1)
-		assert.Equal(t, fakeToolCall1.ID, toolCalls[0].ID)
-		assert.Equal(t, fakeToolCall1.Function.Name, toolCalls[0].Function.Name)
-	})
 }
 
 func TestRoleTransfer(t *testing.T) {

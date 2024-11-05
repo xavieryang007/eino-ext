@@ -11,6 +11,7 @@ import (
 	"code.byted.org/flow/eino/schema"
 
 	"code.byted.org/flow/eino-ext/components/model/openai"
+	openai2 "code.byted.org/flow/eino-ext/components/model/protocols/openai"
 )
 
 func main() {
@@ -30,9 +31,9 @@ func main() {
 	chatModel, err := openai.NewChatModel(ctx, &openai.ChatModelConfig{
 		APIKey: accessKey,
 		Model:  "gpt-4o",
-		ResponseFormat: &openai.ChatCompletionResponseFormat{
-			Type: openai.ChatCompletionResponseFormatTypeJSONSchema,
-			JSONSchema: &openai.ChatCompletionResponseFormatJSONSchema{
+		ResponseFormat: &openai2.ChatCompletionResponseFormat{
+			Type: openai2.ChatCompletionResponseFormatTypeJSONSchema,
+			JSONSchema: &openai2.ChatCompletionResponseFormatJSONSchema{
 				Name:        "person",
 				Description: "data that describes a person",
 				Strict:      false,
