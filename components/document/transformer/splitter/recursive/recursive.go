@@ -207,6 +207,10 @@ func (s *splitter) shouldPop(total, splitLen, separatorLen, currentDocLen int) b
 	return currentDocLen > 0 && (total > s.overlap || (total+splitLen > s.chunkSize && total > 0))
 }
 
+func (s *splitter) GetType() string {
+	return "RecursiveSplitter"
+}
+
 func joinDocs(docs []string, separator string, t KeepType) string {
 	if t == KeepTypeNone {
 		return strings.TrimSpace(strings.Join(docs, separator))
