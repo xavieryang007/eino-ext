@@ -72,10 +72,7 @@ type splitter struct {
 func (s *splitter) Transform(ctx context.Context, docs []*schema.Document, opts ...document.TransformerOption) ([]*schema.Document, error) {
 	ret := make([]*schema.Document, 0, len(docs))
 	for _, doc := range docs {
-		splits, err := s.splitText(ctx, doc.Content, s.separators)
-		if err != nil {
-			return nil, fmt.Errorf("split document[%s] fail: %w", doc.ID, err)
-		}
+		splits := s.splitText(ctx, doc.Content, s.separators)
 		for _, split := range splits {
 			ret = append(ret, &schema.Document{
 				ID:       doc.ID,
@@ -87,7 +84,7 @@ func (s *splitter) Transform(ctx context.Context, docs []*schema.Document, opts 
 	return ret, nil
 }
 
-func (s *splitter) splitText(ctx context.Context, text string, separators []string) (output []string, err error) {
+func (s *splitter) splitText(ctx context.Context, text string, separators []string) (output []string) {
 	finalChunks := make([]string, 0)
 
 	// find the appropriate separator
@@ -121,10 +118,7 @@ func (s *splitter) splitText(ctx context.Context, text string, separators []stri
 		if len(newSeparators) == 0 {
 			finalChunks = append(finalChunks, split)
 		} else {
-			otherInfo, err := s.splitText(ctx, split, newSeparators)
-			if err != nil {
-				return nil, err
-			}
+			otherInfo := s.splitText(ctx, split, newSeparators)
 			finalChunks = append(finalChunks, otherInfo...)
 		}
 	}
@@ -134,7 +128,7 @@ func (s *splitter) splitText(ctx context.Context, text string, separators []stri
 		finalChunks = append(finalChunks, mergedText...)
 	}
 
-	return finalChunks, nil
+	return finalChunks
 }
 
 func (s *splitter) split(text string, separator string, t KeepType) []string {
