@@ -3,7 +3,7 @@ module code.byted.org/flow/eino-ext/components/document/parser/html
 go 1.18
 
 require (
-	code.byted.org/flow/eino v0.1.6-0.20241104093521-0c3bff87c30b
+	code.byted.org/flow/eino v0.1.7-0.20241106074850-d682f6274fdd
 	github.com/PuerkitoBio/goquery v1.8.1
 	github.com/microcosm-cc/bluemonday v1.0.27
 	github.com/stretchr/testify v1.9.0
