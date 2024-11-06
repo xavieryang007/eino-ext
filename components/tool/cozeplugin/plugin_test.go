@@ -13,6 +13,7 @@ import (
 	"code.byted.org/flow/eino/components/model"
 	compTool "code.byted.org/flow/eino/components/tool"
 	"code.byted.org/flow/eino/compose"
+	"code.byted.org/flow/eino/flow/agent"
 	"code.byted.org/flow/eino/flow/agent/react"
 	"code.byted.org/flow/eino/schema"
 	"code.byted.org/kite/kitex/pkg/streaming"
@@ -68,7 +69,7 @@ func TestInvokable(t *testing.T) {
 
 	msgModifier := react.NewPersonaModifier(`你是一名信息咨询助手，针对用户的问题，进行调用 'search' 工具，并根据 'search' 工具的查询结果进行回答`)
 
-	agent, err := react.NewAgent(ctx, &react.AgentConfig{
+	ragent, err := react.NewAgent(ctx, &react.AgentConfig{
 		Model: chatModel,
 		ToolsConfig: compose.ToolsNodeConfig{
 			Tools: []compTool.BaseTool{plg},
@@ -78,12 +79,12 @@ func TestInvokable(t *testing.T) {
 	assert.NoError(t, err)
 
 	ah := &mockHandler{}
-	out, err := agent.Generate(
+	out, err := ragent.Generate(
 		ctx,
 		[]*schema.Message{
 			schema.UserMessage("中国在巴黎奥运会总过获得了多少奖牌"),
 		},
-		react.WithCallbacks(ah),
+		agent.WithComposeOptions(compose.WithCallbacks(ah)),
 	)
 	assert.NoError(t, err)
 	assert.Equal(t, "4", out.Content)
@@ -252,7 +253,7 @@ func (m *mockChatModel) BindTools(tools []*schema.ToolInfo) error {
 }
 
 type mockHandler struct {
-	react.BaseCallback
+	callbacks.HandlerBuilder
 	cnt int
 }
 
