@@ -3,7 +3,7 @@ module code.byted.org/flow/eino-ext/components/document/loader/url
 go 1.18
 
 require (
-	code.byted.org/flow/eino v0.1.7-0.20241106074850-d682f6274fdd
+	code.byted.org/flow/eino v0.2.0
 	code.byted.org/flow/eino-ext/components/document/parser/html v0.0.0-20241106093747-760283ee8f64
 	github.com/stretchr/testify v1.9.0
 )

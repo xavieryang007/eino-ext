@@ -3,7 +3,7 @@ module code.byted.org/flow/eino-ext/components/model/openai
 go 1.18
 
 require (
-	code.byted.org/flow/eino v0.1.6
+	code.byted.org/flow/eino v0.2.0
 	code.byted.org/flow/eino-ext/components/model/protocols/openai v0.0.0-20241105111603-daba137d1ca9
 	github.com/bytedance/mockey v1.2.13
 	github.com/getkin/kin-openapi v0.118.0

@@ -1,7 +1,5 @@
-code.byted.org/flow/eino v0.1.7-0.20241106074850-d682f6274fdd h1:QVuBothur74/biz8KuBFnx6m3vKnIL1DK9EUFkMxO4U=
-code.byted.org/flow/eino v0.1.7-0.20241106074850-d682f6274fdd/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
-code.byted.org/flow/eino-ext/components/document/parser/html v0.0.0-20241106061632-ae21e28ba287 h1:/Cz7CjsrVHGP5+3g09c5NrVoleBd1VVrFGv0TbjVZaE=
-code.byted.org/flow/eino-ext/components/document/parser/html v0.0.0-20241106061632-ae21e28ba287/go.mod h1:h/K4y84Es/tSJjp7y9NclVLQBJ1aZy0hD5aloF5ZE+U=
+code.byted.org/flow/eino v0.2.0 h1:ebd5rbKuZtAUarayiR0sqUIZM8cp3a5UdwKMKkOg21Q=
+code.byted.org/flow/eino v0.2.0/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
 code.byted.org/flow/eino-ext/components/document/parser/html v0.0.0-20241106093747-760283ee8f64 h1:tTIm6wjMydEEHA8qo41kbn3DsTxd0SQDS8FQDbIN9GI=
 code.byted.org/flow/eino-ext/components/document/parser/html v0.0.0-20241106093747-760283ee8f64/go.mod h1:h/K4y84Es/tSJjp7y9NclVLQBJ1aZy0hD5aloF5ZE+U=
 github.com/PuerkitoBio/goquery v1.8.1 h1:uQxhNlArOIdbrH1tr0UXwdVFgDcZDrZVdcpygAcwmWM=

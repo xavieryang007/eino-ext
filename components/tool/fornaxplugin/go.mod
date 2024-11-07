@@ -5,7 +5,8 @@ go 1.18
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
-	code.byted.org/flow/eino v0.1.3
+	code.byted.org/flow/eino v0.2.0
+	code.byted.org/flowdevops/fornax_sdk v1.0.7
 	code.byted.org/gopkg/asynccache v0.0.0-20210422090342-26f94f7676b8
 	code.byted.org/gopkg/logs/v2 v2.2.0-beta.9
 	code.byted.org/kite/kitex v1.17.2
@@ -31,7 +32,6 @@ require (
 	code.byted.org/bytedtrace/bytedtrace-compatible-lightweight-go v1.0.1 // indirect
 	code.byted.org/bytedtrace/bytedtrace-conf-provider-client-go v0.0.27 // indirect
 	code.byted.org/bytedtrace/bytedtrace-gls-switch v1.2.0 // indirect
-	code.byted.org/bytedtrace/bytedtrace-reporters v0.0.1 // indirect
 	code.byted.org/bytedtrace/bytedtrace-utils-go v1.0.3 // indirect
 	code.byted.org/bytedtrace/interface-go v1.0.20 // indirect
 	code.byted.org/bytedtrace/serializer-go v1.0.1-pre // indirect
@@ -45,7 +45,6 @@ require (
 	code.byted.org/flowdevops/errorx v0.0.6 // indirect
 	code.byted.org/flowdevops/errorx/code/gen/flow/devops/agent_server v0.0.0-20241012084451-47d6baaffb45 // indirect
 	code.byted.org/flowdevops/fornax/pkg/auth v0.0.0-20240530115429-4a4ba39f6406 // indirect
-	code.byted.org/flowdevops/fornax_sdk v1.0.7 // indirect
 	code.byted.org/golf/buffer_pool v0.1.0 // indirect
 	code.byted.org/golf/consul v2.1.13+incompatible // indirect
 	code.byted.org/golf/metrics v0.1.0 // indirect
@@ -157,9 +156,6 @@ require (
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
 	github.com/facebookgo/clock v0.0.0-20150410010913-600d898af40a // indirect
-	github.com/facebookgo/ensure v0.0.0-20200202191622-63f1cf65ac4c // indirect
-	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
-	github.com/facebookgo/subset v0.0.0-20200203212716-c811ad88dec4 // indirect
 	github.com/fatih/structtag v1.2.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/getkin/kin-openapi v0.118.0 // indirect
@@ -206,7 +202,6 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/nikolalohinski/gonja v1.5.3 // indirect
 	github.com/nyaruka/phonenumbers v1.0.71 // indirect
-	github.com/oleiade/lane v1.0.1 // indirect
 	github.com/olivere/elastic/v7 v7.0.32 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20210726034734-bdbb7cc3a1c0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.9 // indirect
@@ -262,7 +257,6 @@ require (
 	google.golang.org/grpc v1.62.1 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
-	gopkg.in/square/go-jose.v2 v2.6.0 // indirect
 	gopkg.in/vmihailenco/msgpack.v2 v2.9.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

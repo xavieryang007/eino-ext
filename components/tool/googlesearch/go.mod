@@ -3,7 +3,7 @@ module code.byted.org/flow/eino-ext/components/tool/googlesearch
 go 1.21
 
 require (
-	code.byted.org/flow/eino v0.1.6
+	code.byted.org/flow/eino v0.2.0
 	github.com/bytedance/mockey v1.2.13
 	github.com/bytedance/sonic v1.12.3
 	github.com/stretchr/testify v1.9.0

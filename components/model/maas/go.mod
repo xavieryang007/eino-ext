@@ -3,7 +3,7 @@ module code.byted.org/flow/eino-ext/components/model/maas
 go 1.18
 
 require (
-	code.byted.org/flow/eino v0.1.3
+	code.byted.org/flow/eino v0.2.0
 	code.byted.org/gopkg/logs/v2 v2.2.0-beta.9
 	code.byted.org/lang/gg v0.18.0
 	github.com/bytedance/mockey v1.2.10

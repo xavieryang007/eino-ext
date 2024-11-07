@@ -4,12 +4,11 @@ go 1.18
 
 require (
 	code.byted.org/data/mario_collector v1.3.0
-	code.byted.org/flow/eino v0.1.6
+	code.byted.org/flow/eino v0.2.0
 	code.byted.org/flow/flow-telemetry-common/go v0.0.0-20241025030756-ebcac95a58bc
 	code.byted.org/flowdevops/fornax_sdk v1.0.5
 	code.byted.org/gopkg/env v1.6.14
 	code.byted.org/gopkg/logs/v2 v2.2.0-beta.9
-	code.byted.org/lang/gg v0.19.1
 	code.byted.org/obric/flow_telemetry_go v1.0.0
 	code.byted.org/tiktok/buildinfo v0.0.2
 	github.com/bytedance/mockey v1.2.12
@@ -33,7 +32,6 @@ require (
 	code.byted.org/bytedtrace/bytedtrace-compatible-lightweight-go v1.0.1 // indirect
 	code.byted.org/bytedtrace/bytedtrace-conf-provider-client-go v0.0.27 // indirect
 	code.byted.org/bytedtrace/bytedtrace-gls-switch v1.2.0 // indirect
-	code.byted.org/bytedtrace/bytedtrace-reporter-factory v1.0.0 // indirect
 	code.byted.org/bytedtrace/bytedtrace-utils-go v1.0.3 // indirect
 	code.byted.org/bytedtrace/interface-go v1.0.20 // indirect
 	code.byted.org/bytedtrace/serializer-go v1.0.1-pre // indirect
@@ -71,7 +69,6 @@ require (
 	code.byted.org/gopkg/metrics/v4 v4.1.2 // indirect
 	code.byted.org/gopkg/metrics_core v0.0.36 // indirect
 	code.byted.org/gopkg/net2 v1.5.0 // indirect
-	code.byted.org/gopkg/pid v0.0.18 // indirect
 	code.byted.org/gopkg/retry v0.0.0-20230209024914-cf290f094aa7 // indirect
 	code.byted.org/gopkg/stats v1.2.12 // indirect
 	code.byted.org/gopkg/tccclient v1.5.0-beta.10 // indirect
@@ -89,6 +86,7 @@ require (
 	code.byted.org/kv/goredis v5.5.7+incompatible // indirect
 	code.byted.org/kv/redis-v6 v1.0.29 // indirect
 	code.byted.org/lagrange/viking_go_client v0.0.33 // indirect
+	code.byted.org/lang/gg v0.19.1 // indirect
 	code.byted.org/lang/trace v0.0.3 // indirect
 	code.byted.org/lidar/profiler v0.3.9 // indirect
 	code.byted.org/lidar/profiler/hertz v0.0.0-20230801111316-7e5562fd8659 // indirect
@@ -213,7 +211,6 @@ require (
 	github.com/mohae/deepcopy v0.0.0-20170929034955-c48cc78d4826 // indirect
 	github.com/nikolalohinski/gonja v1.5.3 // indirect
 	github.com/nyaruka/phonenumbers v1.0.71 // indirect
-	github.com/oleiade/lane v1.0.1 // indirect
 	github.com/olivere/elastic/v7 v7.0.32 // indirect
 	github.com/opentracing/opentracing-go v1.2.1-0.20210726034734-bdbb7cc3a1c0 // indirect
 	github.com/pelletier/go-toml/v2 v2.0.9 // indirect
@@ -243,8 +240,6 @@ require (
 	github.com/tinylib/msgp v1.1.6 // indirect
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.2.11 // indirect
-	github.com/valyala/bytebufferpool v1.0.0 // indirect
-	github.com/valyala/fasttemplate v1.2.2 // indirect
 	github.com/vmihailenco/msgpack v4.0.4+incompatible // indirect
 	github.com/vmihailenco/msgpack/v4 v4.3.12 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect

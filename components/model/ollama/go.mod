@@ -3,7 +3,7 @@ module code.byted.org/flow/eino-ext/components/model/ollama
 go 1.22.0
 
 require (
-	code.byted.org/flow/eino v0.1.7-0.20241106035759-a8fbc7c541df
+	code.byted.org/flow/eino v0.2.0
 	code.byted.org/gopkg/ctxvalues v0.7.0
 	code.byted.org/gopkg/logid v0.0.0-20241008043456-230d03adb830
 	code.byted.org/gopkg/logs/v2 v2.1.52

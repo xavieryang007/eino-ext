@@ -2,7 +2,7 @@ module code.byted.org/flow/eino-ext/components/document/transformer/splitter/sem
 
 go 1.18
 
-require code.byted.org/flow/eino v0.1.6
+require code.byted.org/flow/eino v0.2.0
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect

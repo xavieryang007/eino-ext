@@ -5,7 +5,7 @@ go 1.18
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
-	code.byted.org/flow/eino v0.1.7-0.20241106074850-d682f6274fdd
+	code.byted.org/flow/eino v0.2.0
 	code.byted.org/flowdevops/fornax_sdk v1.0.7
 	code.byted.org/kite/kitex v1.17.2
 	code.byted.org/kite/kitutil v3.8.8+incompatible
