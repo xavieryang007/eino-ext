@@ -178,7 +178,7 @@ func (l *einoTracer) OnStartWithStreamInput(ctx context.Context, info *callbacks
 	// Always inject
 	ctx, err = fornax_sdk.InjectTrace(ctx)
 	if err != nil {
-		logs.Warnf("[einoTracer][OnStart] inject trace failed, err: %v", err)
+		logs.Warnf("[einoTracer][OnStartWithStreamInput] inject trace failed, err: %v", err)
 	}
 
 	return setTraceVariablesValue(ctx, &traceVariablesValue{
