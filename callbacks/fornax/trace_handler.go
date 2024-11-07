@@ -15,18 +15,26 @@ func newTraceCallbackHandler(client *fornax_sdk.Client, o *options) callbacks.Ha
 	tracer := &einoTracer{
 		client: client,
 		parser: &defaultDataParser{},
+		needInject: func(ctx context.Context, runInfo *callbacks.RunInfo) (needInject bool) {
+			return true
+		},
 	}
 
 	if o.parser != nil {
 		tracer.parser = o.parser
 	}
 
+	if o.injectTraceSwitch != nil {
+		tracer.needInject = o.injectTraceSwitch
+	}
+
 	return tracer
 }
 
 type einoTracer struct {
-	client *fornax_sdk.Client
-	parser CallbackDataParser
+	client     *fornax_sdk.Client
+	parser     CallbackDataParser
+	needInject injectTraceSwitchFn
 }
 
 func (l *einoTracer) OnStart(ctx context.Context, info *callbacks.RunInfo, input callbacks.CallbackInput) context.Context {
@@ -61,10 +69,13 @@ func (l *einoTracer) OnStart(ctx context.Context, info *callbacks.RunInfo, input
 		si.SetTag(ctx, l.parser.ParseInput(ctx, info, input))
 	}
 
-	// Always inject
-	ctx, err = fornax_sdk.InjectTrace(ctx)
-	if err != nil {
-		logs.Warnf("[einoTracer][OnStart] inject trace failed, err: %v", err)
+	if l.needInject(ctx, info) {
+		nCtx, err := fornax_sdk.InjectTrace(ctx)
+		if err != nil {
+			logs.Warnf("[einoTracer][OnStart] inject trace failed, err: %v", err)
+		} else {
+			ctx = nCtx
+		}
 	}
 
 	return setTraceVariablesValue(ctx, &traceVariablesValue{
@@ -175,10 +186,13 @@ func (l *einoTracer) OnStartWithStreamInput(ctx context.Context, info *callbacks
 		}()
 	}
 
-	// Always inject
-	ctx, err = fornax_sdk.InjectTrace(ctx)
-	if err != nil {
-		logs.Warnf("[einoTracer][OnStartWithStreamInput] inject trace failed, err: %v", err)
+	if l.needInject(ctx, info) {
+		nCtx, err := fornax_sdk.InjectTrace(ctx)
+		if err != nil {
+			logs.Warnf("[einoTracer][OnStartWithStreamInput] inject trace failed, err: %v", err)
+		} else {
+			ctx = nCtx
+		}
 	}
 
 	return setTraceVariablesValue(ctx, &traceVariablesValue{

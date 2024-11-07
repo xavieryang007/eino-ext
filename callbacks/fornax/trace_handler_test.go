@@ -19,7 +19,12 @@ import (
 )
 
 func TestNewTraceCallbackHandler(t *testing.T) {
-	tracer := newTraceCallbackHandler(&fornax_sdk.Client{}, &options{})
+	tracer := newTraceCallbackHandler(&fornax_sdk.Client{},
+		&options{
+			injectTraceSwitch: func(ctx context.Context, runInfo *callbacks.RunInfo) (needInject bool) {
+				return true
+			},
+		})
 	assert.NotNil(t, tracer)
 }
 
@@ -31,6 +36,9 @@ func TestTraceIntegration(t *testing.T) {
 		tracer := &einoTracer{
 			client: mockCli,
 			parser: &defaultDataParser{},
+			needInject: func(ctx context.Context, runInfo *callbacks.RunInfo) (needInject bool) {
+				return true
+			},
 		}
 
 		Mock(GetMethod(mockCli, "StartSpan")).To(func(ctx context.Context, name, spanType string, opts ...ob.FornaxStartSpanOption) (ob.FornaxSpan, context.Context, error) {
@@ -38,6 +46,9 @@ func TestTraceIntegration(t *testing.T) {
 		}).Build()
 		Mock(GetMethod(mockCli, "GetSpanFromContext")).Return(mockSpan).Build()
 		Mock(GetMethod(mockSpan, "SetTag")).Return().Build()
+		Mock(fornax_sdk.InjectTrace).To(func(ctx context.Context) (context.Context, error) {
+			return ctx, fmt.Errorf("skip err")
+		}).Build()
 
 		info := &callbacks.RunInfo{
 			Name:      "mock_name",
