@@ -1,6 +1,6 @@
-package maas
+package ark
 
-const typ = "MaaS"
+const typ = "Ark"
 
 func getType() string {
 	return typ

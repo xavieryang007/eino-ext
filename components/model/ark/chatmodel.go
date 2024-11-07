@@ -1,5 +1,5 @@
-// Package maas implements chat model for ark runtime.
-package maas
+// Package ark implements chat model for ark runtime.
+package ark
 
 import (
 	"context"
@@ -159,7 +159,7 @@ func (cm *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ..
 
 	resp, err := cm.client.CreateChatCompletion(ctx, *req)
 	if err != nil {
-		return nil, fmt.Errorf("[MaasV3] CreateChatCompletion error, %v", err)
+		return nil, fmt.Errorf("[ArkV3] CreateChatCompletion error, %v", err)
 	}
 
 	outMsg, usage, err := cm.resolveChatResponse(resp)
@@ -231,7 +231,7 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...f
 			}
 
 			sw.Close()
-			_ = closeMaaSStreamReader(stream) // nolint: byted_returned_err_should_do_check
+			_ = closeArkStreamReader(stream) // nolint: byted_returned_err_should_do_check
 
 		}()
 
@@ -320,7 +320,7 @@ func (cm *ChatModel) genRequest(in []*schema.Message, opts ...fmodel.Option) (re
 	}, opts...)
 
 	if options.Model == nil || len(*options.Model) == 0 {
-		return nil, fmt.Errorf("maas chat model gen request with empty model")
+		return nil, fmt.Errorf("ark chat model gen request with empty model")
 	}
 
 	req = &model.ChatCompletionRequest{
@@ -342,7 +342,7 @@ func (cm *ChatModel) genRequest(in []*schema.Message, opts ...fmodel.Option) (re
 	}
 
 	for _, msg := range in {
-		content, e := toMaasContent(msg.Content, msg.MultiContent)
+		content, e := toArkContent(msg.Content, msg.MultiContent)
 		if e != nil {
 			return req, e
 		}
@@ -351,14 +351,14 @@ func (cm *ChatModel) genRequest(in []*schema.Message, opts ...fmodel.Option) (re
 			Content:    content,
 			Role:       string(msg.Role),
 			ToolCallID: msg.ToolCallID,
-			ToolCalls:  toMaasToolCalls(msg.ToolCalls),
+			ToolCalls:  toArkToolCalls(msg.ToolCalls),
 		})
 	}
 
 	req.Tools = make([]*model.Tool, 0, len(cm.tools))
 
 	for _, tool := range cm.tools {
-		maasTool := &model.Tool{
+		arkTool := &model.Tool{
 			Type: model.ToolTypeFunction,
 			Function: &model.FunctionDefinition{
 				Name:        tool.Function.Name,
@@ -367,7 +367,7 @@ func (cm *ChatModel) genRequest(in []*schema.Message, opts ...fmodel.Option) (re
 			},
 		}
 
-		req.Tools = append(req.Tools, maasTool)
+		req.Tools = append(req.Tools, arkTool)
 	}
 
 	return req, nil
@@ -492,7 +492,7 @@ func toMessageToolCalls(toolCalls []*model.ToolCall) []schema.ToolCall {
 	return ret
 }
 
-func toMaasContent(content string, multiContent []schema.ChatMessagePart) (*model.ChatCompletionMessageContent, error) {
+func toArkContent(content string, multiContent []schema.ChatMessagePart) (*model.ChatCompletionMessageContent, error) {
 	if len(multiContent) == 0 {
 		return &model.ChatCompletionMessageContent{StringValue: gptr.Of(content)}, nil
 	}
@@ -524,7 +524,7 @@ func toMaasContent(content string, multiContent []schema.ChatMessagePart) (*mode
 	}, nil
 }
 
-func toMaasToolCalls(toolCalls []schema.ToolCall) []*model.ToolCall {
+func toArkToolCalls(toolCalls []schema.ToolCall) []*model.ToolCall {
 	if len(toolCalls) == 0 {
 		return nil
 	}
@@ -570,7 +570,7 @@ func toTools(tls []*schema.ToolInfo) ([]tool, error) {
 	return tools, nil
 }
 
-func closeMaaSStreamReader(r *autils.ChatCompletionStreamReader) error {
+func closeArkStreamReader(r *autils.ChatCompletionStreamReader) error {
 	if r == nil || r.Response == nil || r.Response.Body == nil {
 		return nil
 	}

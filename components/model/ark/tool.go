@@ -1,4 +1,4 @@
-package maas
+package ark
 
 import "github.com/getkin/kin-openapi/openapi3"
 

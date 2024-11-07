@@ -1,4 +1,4 @@
-package maas
+package ark
 
 import (
 	"context"
@@ -23,9 +23,9 @@ var (
 )
 
 type EmbeddingConfig struct {
-	// URL of maas endpoint, default "https://ark.cn-beijing.volces.com/api/v3".
+	// URL of ark endpoint, default "https://ark.cn-beijing.volces.com/api/v3".
 	BaseURL string
-	// Region of maas endpoint, default "cn-beijing", see more
+	// Region of ark endpoint, default "cn-beijing", see more
 	Region string
 
 	HTTPClient *http.Client   `json:"-"`
@@ -121,7 +121,7 @@ func (e *Embedder) EmbedStrings(ctx context.Context, texts []string, opts ...emb
 
 	resp, err := e.client.CreateEmbeddings(ctx, &req)
 	if err != nil {
-		return nil, fmt.Errorf("[MaaS]EmbedStrings error: %v", err)
+		return nil, fmt.Errorf("[Ark]EmbedStrings error: %v", err)
 	}
 
 	var usage *embedding.TokenUsage

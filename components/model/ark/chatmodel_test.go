@@ -1,4 +1,4 @@
-package maas
+package ark
 
 import (
 	"context"
@@ -157,7 +157,7 @@ func Test_Generate(t *testing.T) {
 				},
 			}
 
-			req, err := toMaasContent(multiModalMsg.Content, multiModalMsg.MultiContent)
+			req, err := toArkContent(multiModalMsg.Content, multiModalMsg.MultiContent)
 			convey.So(err, convey.ShouldBeNil)
 			convey.So(req.StringValue, convey.ShouldBeNil)
 			convey.So(req.ListValue, convey.ShouldHaveLength, 2)

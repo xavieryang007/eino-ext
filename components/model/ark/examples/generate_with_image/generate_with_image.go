@@ -8,22 +8,22 @@ import (
 
 	"code.byted.org/flow/eino/schema"
 
-	"code.byted.org/flow/eino-ext/components/model/maas"
+	"code.byted.org/flow/eino-ext/components/model/ark"
 )
 
 func main() {
 	ctx := context.Background()
 
-	chatModel, err := maas.NewChatModel(ctx, &maas.ChatModelConfig{
-		APIKey: os.Getenv("MAAS_API_KEY"),
-		Model:  os.Getenv("MAAS_MODEL_ID"),
+	chatModel, err := ark.NewChatModel(ctx, &ark.ChatModelConfig{
+		APIKey: os.Getenv("ARK_API_KEY"),
+		Model:  os.Getenv("ARK_MODEL_ID"),
 	})
 	if err != nil {
 		logs.Errorf("NewChatModel failed, err=%v", err)
 		return
 	}
 
-	// Ark 平台上支持的豆包模型，均不支持多模态能力，暂未测试 MaaS 的多模态能力
+	// Ark 平台上支持的豆包模型，均不支持多模态能力，暂未测试 Ark 的多模态能力
 	multiModalMsg := schema.UserMessage("")
 	multiModalMsg.MultiContent = []schema.ChatMessagePart{
 		{
@@ -47,5 +47,5 @@ func main() {
 		return
 	}
 
-	logs.Infof("MaaS ChatModel output: \n%v", resp)
+	logs.Infof("Ark ChatModel output: \n%v", resp)
 }

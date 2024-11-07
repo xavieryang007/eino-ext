@@ -1,4 +1,4 @@
-module code.byted.org/flow/eino-ext/components/document/loader/file/pdf
+module code.byted.org/flow/eino-ext/components/document/parser/pdf
 
 go 1.18
 
