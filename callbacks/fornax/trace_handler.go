@@ -61,6 +61,12 @@ func (l *einoTracer) OnStart(ctx context.Context, info *callbacks.RunInfo, input
 		si.SetTag(ctx, l.parser.ParseInput(ctx, info, input))
 	}
 
+	// Always inject
+	ctx, err = fornax_sdk.InjectTrace(ctx)
+	if err != nil {
+		logs.Warnf("[einoTracer][OnStart] inject trace failed, err: %v", err)
+	}
+
 	return setTraceVariablesValue(ctx, &traceVariablesValue{
 		startTime: time.Now(),
 	})
@@ -167,6 +173,12 @@ func (l *einoTracer) OnStartWithStreamInput(ctx context.Context, info *callbacks
 
 			si.SetTag(ctx, l.parser.ParseStreamInput(ctx, info, input))
 		}()
+	}
+
+	// Always inject
+	ctx, err = fornax_sdk.InjectTrace(ctx)
+	if err != nil {
+		logs.Warnf("[einoTracer][OnStart] inject trace failed, err: %v", err)
 	}
 
 	return setTraceVariablesValue(ctx, &traceVariablesValue{
