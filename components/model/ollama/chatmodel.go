@@ -94,7 +94,7 @@ func (cm *ChatModel) Generate(ctx context.Context, input []*schema.Message, opts
 	}
 
 	err = cm.cli.Chat(ctx, req, func(resp api.ChatResponse) error {
-		outMsg = toEinoMessage(resp.Message)
+		outMsg = toEinoMessage(resp)
 		cbOutput.Extra[CallbackMetricsExtraKey] = resp.Metrics
 		return nil
 	})
@@ -141,7 +141,7 @@ func (cm *ChatModel) Stream(ctx context.Context, input []*schema.Message, opts .
 		}()
 
 		err := cm.cli.Chat(ctx, req, func(resp api.ChatResponse) error {
-			outMsg := toEinoMessage(resp.Message)
+			outMsg := toEinoMessage(resp)
 
 			cbOutput := &model.CallbackOutput{
 				// Notice: no token usage
@@ -294,9 +294,9 @@ func toOllamaMessage(einoMsg *schema.Message) (api.Message, error) {
 	}, nil
 }
 
-func toEinoMessage(ollamaMsg api.Message) *schema.Message {
+func toEinoMessage(resp api.ChatResponse) *schema.Message {
 	var toolCalls []schema.ToolCall
-	for _, toolCall := range ollamaMsg.ToolCalls {
+	for _, toolCall := range resp.Message.ToolCalls {
 		arguments := toolCall.Function.Arguments.String()
 		toolCalls = append(toolCalls, schema.ToolCall{
 			Type: "function",
@@ -309,9 +309,12 @@ func toEinoMessage(ollamaMsg api.Message) *schema.Message {
 
 	// Notice: not support Images
 	return &schema.Message{
-		Role:      schema.RoleType(ollamaMsg.Role),
-		Content:   ollamaMsg.Content,
+		Role:      schema.RoleType(resp.Message.Role),
+		Content:   resp.Message.Content,
 		ToolCalls: toolCalls,
+		ResponseMeta: &schema.ResponseMeta{
+			FinishReason: resp.DoneReason,
+		},
 	}
 }
 

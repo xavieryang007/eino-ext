@@ -137,6 +137,7 @@ func TestOpenAIGenerate(t *testing.T) {
 				},
 			},
 		},
+		ResponseMeta: &schema.ResponseMeta{},
 	}
 	config := &ChatModelConfig{
 		ByAzure:         false,

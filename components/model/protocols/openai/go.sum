@@ -1,5 +1,5 @@
-code.byted.org/flow/eino v0.2.0 h1:ebd5rbKuZtAUarayiR0sqUIZM8cp3a5UdwKMKkOg21Q=
-code.byted.org/flow/eino v0.2.0/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
+code.byted.org/flow/eino v0.2.2 h1:c1OYswaA0yj9jKE4iayG+OQOxW0WYf2fPskLoMjRuUk=
+code.byted.org/flow/eino v0.2.2/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
 github.com/airbrake/gobrake v3.6.1+incompatible/go.mod h1:wM4gu3Cn0W0K7GUuVWnlXZU11AGBXMILnrdOU8Kn00o=
 github.com/bitly/go-simplejson v0.5.0/go.mod h1:cXHtHw4XUPsvGaxgjIAn8PhEWG9NfngEKAMDJEczWVA=
 github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869/go.mod h1:Ekp36dRnpXw/yCqJaO+ZrUyxD+3VXMFFr56k5XYrpB4=

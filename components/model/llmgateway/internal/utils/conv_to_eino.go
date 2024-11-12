@@ -25,7 +25,10 @@ func ToEinoMessage(resp *gateway.ChatCompletion) *schema.Message {
 		Name:       EmptyIfNil(msg.Name),
 		ToolCalls:  toEinoToolCalls(msg.ToolCalls, ext),
 		ToolCallID: EmptyIfNil(msg.ToolCallId),
-		Extra:      ext,
+		ResponseMeta: &schema.ResponseMeta{
+			FinishReason: choice.FinishReason,
+		},
+		Extra: ext,
 	}
 
 	if rawData := resp.RawData; rawData != nil {

@@ -434,17 +434,15 @@ func (cm *ChatModel) resolveStreamResponse(resp model.ChatCompletionStreamRespon
 		return nil, nil, nil
 	}
 
-	err = getUnexpectedFinishReason(choice.FinishReason)
-	if err != nil {
-		return nil, nil, err
-	}
-
 	content := choice.Delta.Content
 
 	msg = &schema.Message{
 		Role:      schema.RoleType(choice.Delta.Role),
 		ToolCalls: toMessageToolCalls(choice.Delta.ToolCalls),
 		Content:   content,
+		ResponseMeta: &schema.ResponseMeta{
+			FinishReason: string(choice.FinishReason),
+		},
 	}
 
 	return msg, usage, nil

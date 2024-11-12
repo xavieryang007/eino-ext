@@ -283,22 +283,6 @@ func Test_Stream(t *testing.T) {
 	})
 }
 
-func TestUnexpectedFinishReason(t *testing.T) {
-	PatchConvey("test finish reason", t, func() {
-		err := getUnexpectedFinishReason("stop")
-		convey.So(err, convey.ShouldBeNil)
-
-		err = getUnexpectedFinishReason("tool_calls")
-		convey.So(err, convey.ShouldBeNil)
-
-		err = getUnexpectedFinishReason("length")
-		convey.So(err, convey.ShouldNotBeNil)
-
-		err = getUnexpectedFinishReason("content_filter")
-		convey.So(err, convey.ShouldNotBeNil)
-	})
-}
-
 func TestBindTools(t *testing.T) {
 
 	t.Run("chat model force tool call", func(t *testing.T) {

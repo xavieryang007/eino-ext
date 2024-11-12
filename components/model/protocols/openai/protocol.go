@@ -382,6 +382,9 @@ func (cm *Client) Generate(ctx context.Context, in []*schema.Message, opts ...mo
 			Name:       msg.Name,
 			ToolCallID: msg.ToolCallID,
 			ToolCalls:  toMessageToolCalls(msg.ToolCalls),
+			ResponseMeta: &schema.ResponseMeta{
+				FinishReason: string(choice.FinishReason),
+			},
 		}
 
 		break
