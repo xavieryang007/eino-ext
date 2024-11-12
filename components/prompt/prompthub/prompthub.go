@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"reflect"
 
+	"code.byted.org/flow/eino/callbacks"
+	"code.byted.org/flow/eino/components"
 	"code.byted.org/flow/eino/components/prompt"
 	"code.byted.org/flow/eino/schema"
+	"code.byted.org/flow/flow-telemetry-common/go/obtag"
 	"code.byted.org/flowdevops/fornax_sdk"
 	prompt2 "code.byted.org/flowdevops/fornax_sdk/domain/prompt"
 )
@@ -14,7 +17,7 @@ import (
 type Config struct {
 	Key          string
 	Version      *string
-	FornaxClient *fornax_sdk.Client
+	FornaxClient fornax_sdk.IClient
 }
 
 func NewPromptHub(_ context.Context, conf *Config) (prompt.ChatTemplate, error) {
@@ -28,12 +31,39 @@ func NewPromptHub(_ context.Context, conf *Config) (prompt.ChatTemplate, error) 
 }
 
 type promptHub struct {
-	cli     *fornax_sdk.Client
+	cli     fornax_sdk.IClient
 	key     string
 	version *string
 }
 
-func (p *promptHub) Format(ctx context.Context, vs map[string]any, opts ...prompt.Option) ([]*schema.Message, error) {
+func (p *promptHub) Format(ctx context.Context, vs map[string]any, opts ...prompt.Option) (result []*schema.Message, err error) {
+	var origTemplate *prompt2.GetPromptResult
+	var templates []schema.MessagesTemplate
+
+	extMap := map[string]any{
+		obtag.PromptKey:      p.key,
+		obtag.PromptProvider: "fornax",
+	}
+	if p.version != nil {
+		extMap[obtag.PromptVersion] = *p.version
+	}
+	ctx = callbacks.OnStart(ctx, &prompt.CallbackInput{
+		Variables: vs,
+		Templates: nil,
+		Extra:     extMap,
+	})
+	defer func() {
+		if err != nil {
+			callbacks.OnError(ctx, err)
+		} else {
+			callbacks.OnEnd(ctx, &prompt.CallbackOutput{
+				Result:    result,
+				Templates: templates,
+				Extra:     extMap,
+			})
+		}
+	}()
+
 	o := prompt.GetImplSpecificOptions[options](nil, opts...)
 	var getPromptOptions []prompt2.Option
 	if o.UserID != nil || o.DeviceID != nil || len(o.KV) != 0 {
@@ -50,32 +80,50 @@ func (p *promptHub) Format(ctx context.Context, vs map[string]any, opts ...promp
 		getPromptOptions = append(getPromptOptions, prompt2.WithGrayContext(grayContext))
 	}
 
-	template, err := p.cli.GetPrompt(ctx, &prompt2.GetPromptParam{
+	origTemplate, err = p.cli.GetPrompt(ctx, &prompt2.GetPromptParam{
 		Key:     p.key,
 		Version: p.version,
 	}, getPromptOptions...)
 	if err != nil {
 		return nil, fmt.Errorf("get prompt from prompt service fail: %w", err)
 	}
-	messages := make([]schema.MessagesTemplate, 0)
+	var m *schema.Message
 	// prompt may be not nil but a zero value if prompt doesn't exist.
-	if template != nil && template.GetPrompt().GetPromptText().GetSystemPrompt() != nil && !reflect.ValueOf(template.GetPrompt().GetPromptText().GetSystemPrompt()).Elem().IsZero() {
-		m, err := messageConv(template.GetPrompt().GetPromptText().GetSystemPrompt())
+	if origTemplate != nil && origTemplate.GetPrompt().GetPromptText().GetSystemPrompt() != nil && !reflect.ValueOf(origTemplate.GetPrompt().GetPromptText().GetSystemPrompt()).Elem().IsZero() {
+		m, err = messageConv(origTemplate.GetPrompt().GetPromptText().GetSystemPrompt())
 		if err != nil {
 			return nil, err
 		}
-		messages = append(messages, m)
+		templates = append(templates, m)
 	}
+
 	// prompt may be not nil but a zero value if prompt doesn't exist.
-	if template != nil && template.GetPrompt().GetPromptText().GetUserPrompt() != nil && !reflect.ValueOf(template.GetPrompt().GetPromptText().GetUserPrompt()).Elem().IsZero() {
-		m, err := messageConv(template.GetPrompt().GetPromptText().GetUserPrompt())
+	if origTemplate != nil && origTemplate.GetPrompt().GetPromptText().GetUserPrompt() != nil && !reflect.ValueOf(origTemplate.GetPrompt().GetPromptText().GetUserPrompt()).Elem().IsZero() {
+		m, err = messageConv(origTemplate.GetPrompt().GetPromptText().GetUserPrompt())
 		if err != nil {
 			return nil, err
 		}
-		messages = append(messages, m)
+		templates = append(templates, m)
 	}
-	tpl := prompt.FromMessages(schema.Jinja2, messages...)
-	return tpl.Format(ctx, vs, opts...)
+	tpl := prompt.FromMessages(schema.Jinja2, templates...)
+	ctx = callbacks.SwitchRunInfo(ctx, &callbacks.RunInfo{
+		Name:      tpl.GetType() + string(components.ComponentOfPrompt),
+		Type:      tpl.GetType(),
+		Component: components.ComponentOfPrompt,
+	})
+	result, err = tpl.Format(ctx, vs, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
+}
+
+func (p *promptHub) GetType() string {
+	return "PromptHub"
+}
+
+func (p *promptHub) IsCallbacksEnabled() bool {
+	return true
 }
 
 func messageConv(orig *prompt2.Message) (*schema.Message, error) {
