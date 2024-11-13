@@ -304,7 +304,7 @@ func Test_parseAny(t *testing.T) {
 
 		sb := &strings.Builder{}
 		sb.WriteString("asd")
-		convey.So(parseAny(ctx, sb, false), convey.ShouldEqual, "asd")
+		convey.So(parseAny(ctx, sb.String(), false), convey.ShouldEqual, "asd")
 
 		convey.So(parseAny(ctx, map[string]any{"asd": 1}, false), convey.ShouldEqual, "{\"asd\":1}")
 
@@ -328,6 +328,9 @@ func Test_parseAny(t *testing.T) {
 			},
 		}, false), convey.ShouldEqual, "[{\"role\":\"assistant\",\"content\":\"a\",\"name\":\"name\"},{\"role\":\"\",\"content\":\"aa\",\"name\":\"name\"},{\"role\":\"user\",\"content\":\"b\",\"name\":\"name\"}]")
 
+		convey.So(parseAny(ctx, (*ms)(nil), false), convey.ShouldEqual, "null")
+		convey.So(parseAny(ctx, &ms{""}, false), convey.ShouldEqual, "\"\"")
+		convey.So(parseAny(ctx, &ms{"test"}, false), convey.ShouldEqual, "\"test\"")
 	})
 
 	PatchConvey("test stream parseAny", t, func() {
@@ -387,7 +390,7 @@ func Test_parseAny(t *testing.T) {
 
 		sb := &strings.Builder{}
 		sb.WriteString("asd")
-		convey.So(parseAny(ctx, sb, true), convey.ShouldEqual, "{\"stream\":\"asd\"}")
+		convey.So(parseAny(ctx, sb.String(), true), convey.ShouldEqual, "{\"stream\":\"asd\"}")
 
 		convey.So(parseAny(ctx, map[string]any{"asd": 1}, true), convey.ShouldEqual, "{\"stream\":{\"asd\":1}}")
 
@@ -469,4 +472,16 @@ func (c *customDataParser) ParseInput(ctx context.Context, info *callbacks.RunIn
 	default:
 		return c.CallbackDataParser.ParseInput(ctx, info, input)
 	}
+}
+
+type ms struct {
+	str string
+}
+
+func (m *ms) MarshalJSON() ([]byte, error) {
+	if m == nil {
+		return []byte("null"), nil
+	}
+
+	return []byte(fmt.Sprintf("\"%s\"", m.str)), nil
 }

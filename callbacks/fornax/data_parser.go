@@ -2,6 +2,7 @@ package fornax
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"time"
 
@@ -331,16 +332,15 @@ func parseAny(ctx context.Context, v any, bStream bool) string {
 
 	case *schema.Message:
 		return toJson(t, bStream)
+
 	case string:
 		if bStream {
 			return toJson(t, bStream)
 		}
 		return t
-	case interface{ String() string }:
-		if bStream {
-			return toJson(t.String(), bStream)
-		}
-		return t.String()
+
+	case json.Marshaler:
+		return toJson(v, bStream)
 
 	case map[string]any:
 		return toJson(t, bStream)
