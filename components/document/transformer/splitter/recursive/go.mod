@@ -2,7 +2,7 @@ module code.byted.org/flow/eino-ext/components/document/transformer/spliter/char
 
 go 1.18
 
-require code.byted.org/flow/eino v0.2.0
+require code.byted.org/flow/eino v0.2.3
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect

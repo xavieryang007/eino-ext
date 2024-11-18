@@ -3,7 +3,7 @@ module code.byted.org/flow/eino-ext/components/embedding/protocols/openai
 go 1.18
 
 require (
-	code.byted.org/flow/eino v0.2.0
+	code.byted.org/flow/eino v0.2.3
 	github.com/sashabaranov/go-openai v1.32.5
 )
 

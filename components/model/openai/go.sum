@@ -1,7 +1,5 @@
-code.byted.org/flow/eino v0.2.2 h1:c1OYswaA0yj9jKE4iayG+OQOxW0WYf2fPskLoMjRuUk=
-code.byted.org/flow/eino v0.2.2/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
-code.byted.org/flow/eino-ext/components/model/protocols/openai v0.0.0-20241105111603-daba137d1ca9 h1:EUa/RejtDeF1wzE2XuaM9AKQpLdehCUU95IkRrYsTTo=
-code.byted.org/flow/eino-ext/components/model/protocols/openai v0.0.0-20241105111603-daba137d1ca9/go.mod h1:JQDj54NG7N6Yvuq5MVQsDvX10cjx2vy4SsLv2cGX7Qw=
+code.byted.org/flow/eino v0.2.3 h1:kFUwq9LX2M9sFa4L5fxpdXQfngDDrtsBO23lsbLwRVc=
+code.byted.org/flow/eino v0.2.3/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
 code.byted.org/flow/eino-ext/components/model/protocols/openai v0.0.0-20241112120809-4af8bef92f19 h1:OfKoNL52nR6PL+UOpqyCyIbN6TVORSIhdKxrpin3AKY=
 code.byted.org/flow/eino-ext/components/model/protocols/openai v0.0.0-20241112120809-4af8bef92f19/go.mod h1:NhOVjfj4vUgwd88tQDY3RtUvpnuQXvEH4bRww7TRl7k=
 github.com/airbrake/gobrake v3.6.1+incompatible/go.mod h1:wM4gu3Cn0W0K7GUuVWnlXZU11AGBXMILnrdOU8Kn00o=

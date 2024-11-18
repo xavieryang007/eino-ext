@@ -8,9 +8,8 @@ code.byted.org/aiops/monitoring-common-go v0.0.3 h1:5+3cI6q/tluLLqL+YeYafYIYCLIS
 code.byted.org/aiops/monitoring-common-go v0.0.3/go.mod h1:MYCHrGQLl0wN6AsPTt9C2wDiwlWBXCbWcqsB4BK8LUI=
 code.byted.org/bytedtrace/serializer-go v1.0.0 h1:SBAOW8cXf0HP+RdLiRoZj5guhmwLdgu1bzBXJjGw5XM=
 code.byted.org/bytedtrace/serializer-go v1.0.0/go.mod h1:fOL6VcdN3BGeCIevGebxZW0GvpTo9sjR5s0pYckObjw=
-code.byted.org/flow/eino v0.2.0 h1:ebd5rbKuZtAUarayiR0sqUIZM8cp3a5UdwKMKkOg21Q=
-code.byted.org/flow/eino v0.2.0/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
-code.byted.org/flow/eino v0.2.2/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
+code.byted.org/flow/eino v0.2.3 h1:kFUwq9LX2M9sFa4L5fxpdXQfngDDrtsBO23lsbLwRVc=
+code.byted.org/flow/eino v0.2.3/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
 code.byted.org/gopkg/apm_vendor_interface v0.0.2 h1:pQcmlXDXipHSD+1hNZ5SjaL/j5Q+MXvVNHAai5yhXu8=
 code.byted.org/gopkg/apm_vendor_interface v0.0.2/go.mod h1:njhrS0YBKyO11ufZKOq2xfZHR6ku4HJ9yBVszWxLQuA=
 code.byted.org/gopkg/consul v1.1.17/go.mod h1:TALNl7RlbbVsO+79vrr4IymlAYgIHzjkZao97jeAJog=
