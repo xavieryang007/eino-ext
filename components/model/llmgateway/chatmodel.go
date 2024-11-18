@@ -1,11 +1,14 @@
 package llmgateway
 
 import (
+	"code.byted.org/kite/kitex/client"
 	"context"
 	"errors"
 	"fmt"
+	"github.com/cloudwego/kitex/client/streamclient"
 	"io"
 	"runtime/debug"
+	"sync"
 
 	"code.byted.org/flow/eino/callbacks"
 	"code.byted.org/flow/eino/components/model"
@@ -53,9 +56,30 @@ type ChatModel struct {
 	tools  []*gateway.Tool
 }
 
+var (
+	initOnce         sync.Once
+	llmGatewayClient llm_gateway.StreamClient
+)
+
+func getLlmGatewayClient(cluster string) llm_gateway.StreamClient {
+	initOnce.Do(func() {
+		var options []streamclient.Option
+		if len(cluster) > 0 {
+			options = append(options, streamclient.ConvertOptionFrom(client.WithCluster(cluster)))
+		}
+		llmGatewayClient = llm_gateway.MustNewStreamClient(PSM, options...)
+	})
+	return llmGatewayClient
+}
+
 func NewChatModel(_ context.Context, config *ChatModelConfig) (*ChatModel, error) {
-	cli, err := llm_gateway.NewStreamClient(PSM)
-	return &ChatModel{config: config, client: cli}, err
+	cli := getLlmGatewayClient("")
+	return &ChatModel{config: config, client: cli}, nil
+}
+
+func NewChatModelWithCluster(_ context.Context, cluster string, config *ChatModelConfig) (*ChatModel, error) {
+	cli := getLlmGatewayClient(cluster)
+	return &ChatModel{config: config, client: cli}, nil
 }
 
 func (cm *ChatModel) BindTools(tools []*schema.ToolInfo) error {
