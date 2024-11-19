@@ -6,6 +6,9 @@ import (
 	"code.byted.org/flow/eino/callbacks"
 	"code.byted.org/flow/eino/schema"
 	"code.byted.org/flowdevops/fornax_sdk"
+	"code.byted.org/gopkg/logs/v2"
+
+	"code.byted.org/flow/eino-ext/callbacks/metrics"
 )
 
 // NewDefaultCallbackHandler customize with options
@@ -28,6 +31,12 @@ func NewDefaultCallbackHandler(client *fornax_sdk.Client, opts ...Option) callba
 
 	if o.enableMetrics {
 		handlers = append(handlers, newMetricsCallbackHandler(client, o))
+		h, err := metrics.NewMetricsHandler()
+		if err != nil {
+			logs.Errorf("init metrics handler fail: %v", err)
+		} else {
+			handlers = append(handlers, h)
+		}
 	}
 
 	return &fornaxTracer{handlers: handlers}

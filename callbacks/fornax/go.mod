@@ -11,7 +11,7 @@ require (
 	code.byted.org/gopkg/logs/v2 v2.2.0-beta.9
 	code.byted.org/obric/flow_telemetry_go v1.0.0
 	code.byted.org/tiktok/buildinfo v0.0.2
-	github.com/bytedance/mockey v1.2.12
+	github.com/bytedance/mockey v1.2.13
 	github.com/bytedance/sonic v1.12.2
 	github.com/getkin/kin-openapi v0.118.0
 	github.com/smartystreets/goconvey v1.8.1
@@ -19,8 +19,8 @@ require (
 )
 
 require (
-	code.byted.org/aiops/apm_vendor_byted v0.0.24 // indirect
-	code.byted.org/aiops/metrics_codec v0.0.21 // indirect
+	code.byted.org/aiops/apm_vendor_byted v0.0.27 // indirect
+	code.byted.org/aiops/metrics_codec v0.0.24 // indirect
 	code.byted.org/aiops/monitoring-common-go v0.0.4 // indirect
 	code.byted.org/bcc/bcc-go-client v0.1.37 // indirect
 	code.byted.org/bcc/bcc-go-client/internal/sidecar/idl v0.0.4 // indirect
@@ -40,6 +40,7 @@ require (
 	code.byted.org/data/databus_client v1.3.8 // indirect
 	code.byted.org/dp/mario_common v1.0.4 // indirect
 	code.byted.org/duanyi.aster/gopkg v0.0.3 // indirect
+	code.byted.org/flow/eino-ext/callbacks/metrics v0.0.0-20241122032743-f091096cad52 // indirect
 	code.byted.org/flowdevops/errorx v0.0.6 // indirect
 	code.byted.org/flowdevops/errorx/code/gen/flow/devops/agent_server v0.0.0-20241012084451-47d6baaffb45 // indirect
 	code.byted.org/flowdevops/fornax/pkg/auth v0.0.0-20240530115429-4a4ba39f6406 // indirect
@@ -64,10 +65,10 @@ require (
 	code.byted.org/gopkg/logid v0.0.0-20211104042040-f78600e482f2 // indirect
 	code.byted.org/gopkg/logs v1.2.23 // indirect
 	code.byted.org/gopkg/metainfo v0.1.1 // indirect
-	code.byted.org/gopkg/metrics v1.4.24 // indirect
-	code.byted.org/gopkg/metrics/v3 v3.1.30 // indirect
-	code.byted.org/gopkg/metrics/v4 v4.1.2 // indirect
-	code.byted.org/gopkg/metrics_core v0.0.36 // indirect
+	code.byted.org/gopkg/metrics v1.4.25 // indirect
+	code.byted.org/gopkg/metrics/v3 v3.1.31 // indirect
+	code.byted.org/gopkg/metrics/v4 v4.1.4 // indirect
+	code.byted.org/gopkg/metrics_core v0.0.39 // indirect
 	code.byted.org/gopkg/net2 v1.5.0 // indirect
 	code.byted.org/gopkg/retry v0.0.0-20230209024914-cf290f094aa7 // indirect
 	code.byted.org/gopkg/stats v1.2.12 // indirect
@@ -217,6 +218,7 @@ require (
 	github.com/perimeterx/marshmallow v1.1.4 // indirect
 	github.com/philhofer/fwd v1.1.1 // indirect
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
+	github.com/pierrec/lz4/v4 v4.1.15 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pkoukk/tiktoken-go v0.1.7 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
@@ -251,12 +253,12 @@ require (
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	github.com/zeebo/errs v1.3.0 // indirect
 	go4.org/unsafe/assume-no-moving-gc v0.0.0-20230525183740-e7c30c78aeb2 // indirect
-	golang.org/x/arch v0.4.0 // indirect
+	golang.org/x/arch v0.11.0 // indirect
 	golang.org/x/crypto v0.22.0 // indirect
 	golang.org/x/exp v0.0.0-20240222234643-814bf88cf225 // indirect
 	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sync v0.8.0 // indirect
-	golang.org/x/sys v0.24.0 // indirect
+	golang.org/x/sys v0.26.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
 	google.golang.org/appengine v1.6.8 // indirect

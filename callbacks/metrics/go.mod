@@ -3,7 +3,7 @@ module code.byted.org/flow/eino-ext/callbacks/metrics
 go 1.18
 
 require (
-	code.byted.org/flow/eino v0.2.3
+	code.byted.org/flow/eino v0.2.5
 	code.byted.org/gopkg/logs/v2 v2.1.53
 	code.byted.org/gopkg/metrics/v4 v4.1.4
 	github.com/bytedance/mockey v1.2.13
