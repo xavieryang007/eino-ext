@@ -1,10 +1,12 @@
 package llmgateway
 
 import (
+	"code.byted.org/gopkg/lang/conv"
 	"code.byted.org/kite/kitex/client"
 	"context"
 	"errors"
 	"fmt"
+	"github.com/bytedance/sonic"
 	"github.com/cloudwego/kitex/client/streamclient"
 	"io"
 	"runtime/debug"
@@ -26,6 +28,11 @@ const (
 	PSM = "stone.llm.gateway"
 	TYP = "LLMGateway"
 )
+
+type ModelMetaMap struct {
+	ModelMetaIDMap map[int64]int64 `json:"model_meta_id_map"`
+	connectorUID   string
+}
 
 var (
 	errEmptyResp = errors.New("empty response from model")
@@ -319,6 +326,21 @@ func (cm *ChatModel) genRequest(stream bool, options *model.Options, messages []
 	gwMsgs, err := utils.ToGWMessages(messages)
 	if err != nil {
 		return nil, err
+	}
+
+	if gwOpts.extra != nil {
+		if val, ok := gwOpts.extra[utils.MetaId]; ok {
+			modelMetaMap := &ModelMetaMap{
+				ModelMetaIDMap: map[int64]int64{
+					conv.StrToInt64(*options.Model, 0): conv.StrToInt64(val, 0),
+				},
+			}
+			var data string
+			data, err := sonic.MarshalString(modelMetaMap)
+			if err == nil {
+				gwOpts.extra["model_meta_map"] = data
+			}
+		}
 	}
 
 	// Init gateway chat request.
