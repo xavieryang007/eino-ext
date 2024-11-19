@@ -25,7 +25,7 @@ func WithChatOption(opt *string) model.Option {
 		o.chatOptions = opt
 	})
 }
-func WithMetaIdMap(metaId int64) model.Option {
+func WithMetaId(metaId int64) model.Option {
 	return model.WrapImplSpecificOptFn[gatewayOptions](func(o *gatewayOptions) {
 		if o.extra != nil {
 			o.extra[utils.MetaId] = conv.StringDefault(metaId, "")
