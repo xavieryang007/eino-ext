@@ -1,10 +1,12 @@
 package llmgateway
 
 import (
+	"code.byted.org/flow/eino-ext/components/model/llmgateway/internal/utils"
 	"code.byted.org/flow/eino/components/model"
 	"code.byted.org/flow/eino/schema"
+	"code.byted.org/gopkg/lang/conv"
 	"code.byted.org/overpass/stone_llm_gateway/kitex_gen/stone/llm/gateway"
-	"github.com/bytedance/sonic"
+	"maps"
 )
 
 type PreProcessor func([]*schema.Message) ([]*schema.Message, error)
@@ -23,24 +25,24 @@ func WithChatOption(opt *string) model.Option {
 		o.chatOptions = opt
 	})
 }
-func WithModel2MetaMap(modelId int64, metaId int64) model.Option {
+func WithMetaIdMap(metaId int64) model.Option {
 	return model.WrapImplSpecificOptFn[gatewayOptions](func(o *gatewayOptions) {
-
-		metaMap := make(map[int64]int64)
-		metaMap[modelId] = metaId
 		if o.extra != nil {
-			data, err := sonic.MarshalString(metaMap)
-			if err == nil {
-				o.extra["model_meta_map"] = data
-			}
-
+			o.extra[utils.MetaId] = conv.StringDefault(metaId, "")
+		} else {
+			o.extra = make(map[string]string)
+			o.extra[utils.MetaId] = conv.StringDefault(metaId, "")
 		}
 	})
 }
 
 func WithExtra(extra map[string]string) model.Option {
 	return model.WrapImplSpecificOptFn[gatewayOptions](func(o *gatewayOptions) {
-		o.extra = extra
+		if o.extra != nil {
+			maps.Copy(o.extra, extra)
+		} else {
+			o.extra = extra
+		}
 	})
 }
 

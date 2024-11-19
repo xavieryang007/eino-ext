@@ -12,4 +12,5 @@ const (
 	MessageID = "gw:request:message_id"
 	Extra     = "gw:request:extra"
 	Thought   = "thought"
+	MetaId    = "meta_id"
 )
