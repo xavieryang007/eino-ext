@@ -6,8 +6,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/bytedance/sonic"
-	"github.com/cloudwego/kitex/client/streamclient"
 	"io"
 	"runtime/debug"
 	"sync"
@@ -20,6 +18,8 @@ import (
 	"code.byted.org/lang/gg/optional"
 	"code.byted.org/overpass/stone_llm_gateway/kitex_gen/stone/llm/gateway"
 	llm_gateway "code.byted.org/overpass/stone_llm_gateway/kitex_gen/stone/llm/gateway/llmgatewayservice"
+	"github.com/bytedance/sonic"
+	"github.com/cloudwego/kitex/client/streamclient"
 
 	"code.byted.org/flow/eino-ext/components/model/llmgateway/internal/utils"
 )
