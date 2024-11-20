@@ -1,8 +1,6 @@
 package llmgateway
 
 import (
-	"code.byted.org/gopkg/lang/conv"
-	"code.byted.org/kite/kitex/client"
 	"context"
 	"errors"
 	"fmt"
@@ -10,18 +8,20 @@ import (
 	"runtime/debug"
 	"sync"
 
-	"code.byted.org/flow/eino/callbacks"
-	"code.byted.org/flow/eino/components/model"
-	"code.byted.org/flow/eino/schema"
-	"code.byted.org/flow/eino/utils/safe"
-	"code.byted.org/lang/gg/gptr"
-	"code.byted.org/lang/gg/optional"
-	"code.byted.org/overpass/stone_llm_gateway/kitex_gen/stone/llm/gateway"
-	llm_gateway "code.byted.org/overpass/stone_llm_gateway/kitex_gen/stone/llm/gateway/llmgatewayservice"
 	"github.com/bytedance/sonic"
 	"github.com/cloudwego/kitex/client/streamclient"
 
 	"code.byted.org/flow/eino-ext/components/model/llmgateway/internal/utils"
+	"code.byted.org/flow/eino/callbacks"
+	"code.byted.org/flow/eino/components/model"
+	"code.byted.org/flow/eino/schema"
+	"code.byted.org/flow/eino/utils/safe"
+	"code.byted.org/gopkg/lang/conv"
+	"code.byted.org/kite/kitex/client"
+	"code.byted.org/lang/gg/gptr"
+	"code.byted.org/lang/gg/optional"
+	"code.byted.org/overpass/stone_llm_gateway/kitex_gen/stone/llm/gateway"
+	llm_gateway "code.byted.org/overpass/stone_llm_gateway/kitex_gen/stone/llm/gateway/llmgatewayservice"
 )
 
 const (
