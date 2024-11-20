@@ -164,8 +164,7 @@ func TestChatModel(t *testing.T) {
 		SetExtra(message, map[string]string{"m_key": "m_val"})
 
 		res, err := model.Generate(ctx, []*schema.Message{message},
-			WithExtra(map[string]string{"key": "value"}),
-		)
+			WithExtra(map[string]string{"key": "value"}), WithMetaId(12324))
 		if err != nil {
 			t.Fatalf("Generate failed: %v", err)
 		}
