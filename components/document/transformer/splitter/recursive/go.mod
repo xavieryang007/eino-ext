@@ -1,4 +1,4 @@
-module code.byted.org/flow/eino-ext/components/document/transformer/spliter/recursive
+module code.byted.org/flow/eino-ext/components/document/transformer/splitter/recursive
 
 go 1.18
 
