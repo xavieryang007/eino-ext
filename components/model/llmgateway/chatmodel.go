@@ -11,7 +11,6 @@ import (
 	"github.com/bytedance/sonic"
 	"github.com/cloudwego/kitex/client/streamclient"
 
-	"code.byted.org/flow/eino-ext/components/model/llmgateway/internal/utils"
 	"code.byted.org/flow/eino/callbacks"
 	"code.byted.org/flow/eino/components/model"
 	"code.byted.org/flow/eino/schema"
@@ -22,6 +21,8 @@ import (
 	"code.byted.org/lang/gg/optional"
 	"code.byted.org/overpass/stone_llm_gateway/kitex_gen/stone/llm/gateway"
 	llm_gateway "code.byted.org/overpass/stone_llm_gateway/kitex_gen/stone/llm/gateway/llmgatewayservice"
+
+	"code.byted.org/flow/eino-ext/components/model/llmgateway/internal/utils"
 )
 
 const (
@@ -188,32 +189,24 @@ func (cm *ChatModel) stream(ctx context.Context, streamMode bool, input []*schem
 			if err != nil {
 				if !errors.Is(err, io.EOF) {
 					_ = sw.Send(nil, err)
+				} else if lastEmptyMsg != nil {
+					_ = sw.Send(&model.CallbackOutput{
+						Message:    lastEmptyMsg,
+						Config:     config,
+						TokenUsage: utils.ToModelCallbackUsage(lastEmptyMsg.ResponseMeta),
+					}, nil)
+
 				}
 				return
 			}
 
-			msg, usage, rErr := cm.genResponse(chunk)
+			msg, found, rErr := cm.genResponse(chunk)
 			if rErr != nil {
 				_ = sw.Send(nil, rErr)
 				return
 			}
 
-			if usage != nil {
-				// stream usage return in last chunk without message content, then
-				// last message received from callback output stream: Message == nil and TokenUsage != nil
-				// last message received from outStream: Message != nil
-				if closed := sw.Send(&model.CallbackOutput{
-					Message:    msg,
-					Config:     config,
-					TokenUsage: usage,
-				}, nil); closed {
-					return
-				}
-
-				continue
-			}
-
-			if msg == nil && usage == nil {
+			if !found {
 				continue
 			}
 
@@ -238,8 +231,9 @@ func (cm *ChatModel) stream(ctx context.Context, streamMode bool, input []*schem
 			lastEmptyMsg = nil
 
 			closed := sw.Send(&model.CallbackOutput{
-				Message: msg,
-				Config:  config,
+				Message:    msg,
+				Config:     config,
+				TokenUsage: utils.ToModelCallbackUsage(msg.ResponseMeta),
 			}, nil)
 
 			if closed {
@@ -275,20 +269,19 @@ func (cm *ChatModel) stream(ctx context.Context, streamMode bool, input []*schem
 	return outStream, nil
 }
 
-func (cm *ChatModel) genResponse(resp *gateway.ChatCompletion) (msg *schema.Message, usg *model.TokenUsage, err error) {
+func (cm *ChatModel) genResponse(resp *gateway.ChatCompletion) (msg *schema.Message, msgFound bool, err error) {
 	if resp == nil {
-		return nil, nil, nil
+		return nil, false, nil
 	}
 
 	if resp.Error != nil {
-		return nil, nil, &Error{
+		return nil, false, &Error{
 			Message: resp.Error.Message,
 			Code:    resp.Error.Code,
 		}
 	}
-	msg = utils.ToEinoMessage(resp)
-	usg = utils.ToEinoUsage(resp.Usage)
-	return
+	msg, msgFound = utils.ToEinoMessage(resp)
+	return msg, msgFound, nil
 }
 
 func (cm *ChatModel) genOptions(opts ...model.Option) (*model.Options, *model.Config, error) {

@@ -3,8 +3,9 @@ module code.byted.org/flow/eino-ext/components/retriever/bytees
 go 1.18
 
 require (
-	code.byted.org/flow/eino v0.1.7-0.20241105091239-06254b0ecdda
+	code.byted.org/flow/eino v0.2.5
 	code.byted.org/flow/flow-telemetry-common/go v0.0.0-20241031091736-49e56784a7e4
+	code.byted.org/gopkg/logs v1.2.13
 	code.byted.org/lang/gg v0.19.1
 	code.byted.org/toutiao/elastic/v7 v7.0.46
 	github.com/bytedance/mockey v1.2.13
@@ -18,7 +19,6 @@ require (
 	code.byted.org/gopkg/ctxvalues v0.2.0 // indirect
 	code.byted.org/gopkg/env v1.5.8 // indirect
 	code.byted.org/gopkg/logid v0.0.0-20200327113313-9c05366f32f9 // indirect
-	code.byted.org/gopkg/logs v1.2.13 // indirect
 	code.byted.org/gopkg/metrics v1.4.21 // indirect
 	code.byted.org/gopkg/net2 v1.4.1 // indirect
 	code.byted.org/gopkg/pid v0.0.19 // indirect

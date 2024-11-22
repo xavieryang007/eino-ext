@@ -15,6 +15,7 @@ import (
 
 func main() {
 	ctx := context.Background()
+
 	chatModel, err := ark.NewChatModel(ctx, &ark.ChatModelConfig{
 		APIKey: os.Getenv("ARK_API_KEY"),
 		Model:  os.Getenv("ARK_MODEL_ID"),

@@ -1,5 +1,5 @@
-code.byted.org/flow/eino v0.2.3 h1:kFUwq9LX2M9sFa4L5fxpdXQfngDDrtsBO23lsbLwRVc=
-code.byted.org/flow/eino v0.2.3/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
+code.byted.org/flow/eino v0.2.5 h1:uPXgTMSfGZZvKhY4c44vt+CPe0FlIQ7/tfFZ/AfF8nI=
+code.byted.org/flow/eino v0.2.5/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
 code.byted.org/flow/eino-ext/components/document/parser/html v0.0.0-20241106093747-760283ee8f64 h1:tTIm6wjMydEEHA8qo41kbn3DsTxd0SQDS8FQDbIN9GI=
 code.byted.org/flow/eino-ext/components/document/parser/html v0.0.0-20241106093747-760283ee8f64/go.mod h1:h/K4y84Es/tSJjp7y9NclVLQBJ1aZy0hD5aloF5ZE+U=
 github.com/PuerkitoBio/goquery v1.8.1 h1:uQxhNlArOIdbrH1tr0UXwdVFgDcZDrZVdcpygAcwmWM=

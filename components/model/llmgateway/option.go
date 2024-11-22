@@ -1,12 +1,12 @@
 package llmgateway
 
 import (
-	"code.byted.org/flow/eino-ext/components/model/llmgateway/internal/utils"
 	"code.byted.org/flow/eino/components/model"
 	"code.byted.org/flow/eino/schema"
 	"code.byted.org/gopkg/lang/conv"
 	"code.byted.org/overpass/stone_llm_gateway/kitex_gen/stone/llm/gateway"
-	"maps"
+
+	"code.byted.org/flow/eino-ext/components/model/llmgateway/internal/utils"
 )
 
 type PreProcessor func([]*schema.Message) ([]*schema.Message, error)
@@ -39,7 +39,7 @@ func WithMetaId(metaId int64) model.Option {
 func WithExtra(extra map[string]string) model.Option {
 	return model.WrapImplSpecificOptFn[gatewayOptions](func(o *gatewayOptions) {
 		if o.extra != nil {
-			maps.Copy(o.extra, extra)
+			copyMap(o.extra, extra)
 		} else {
 			o.extra = extra
 		}

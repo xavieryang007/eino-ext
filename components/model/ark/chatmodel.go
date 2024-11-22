@@ -162,7 +162,7 @@ func (cm *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ..
 		return nil, fmt.Errorf("[ArkV3] CreateChatCompletion error, %v", err)
 	}
 
-	outMsg, usage, err := cm.resolveChatResponse(resp)
+	outMsg, err = cm.resolveChatResponse(resp)
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +171,7 @@ func (cm *ChatModel) Generate(ctx context.Context, in []*schema.Message, opts ..
 		_ = cbm.OnEnd(ctx, &fmodel.CallbackOutput{
 			Message:    outMsg,
 			Config:     reqConf,
-			TokenUsage: usage,
+			TokenUsage: toModelCallbackUsage(outMsg.ResponseMeta),
 		})
 	}
 
@@ -225,7 +225,6 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...f
 	go func() {
 		defer func() {
 			panicErr := recover()
-
 			if panicErr != nil {
 				_ = sw.Send(nil, safe.NewPanicErr(panicErr, debug.Stack()))
 			}
@@ -246,34 +245,20 @@ func (cm *ChatModel) Stream(ctx context.Context, in []*schema.Message, opts ...f
 				return
 			}
 
-			msg, usage, e := cm.resolveStreamResponse(resp)
+			msg, msgFound, e := cm.resolveStreamResponse(resp)
 			if e != nil {
 				_ = sw.Send(nil, e)
 				return
 			}
 
-			if usage != nil {
-				// stream usage return in last chunk without message content, then
-				// last message received from callback output stream: Message == nil and TokenUsage != nil
-				// last message received from outStream: Message != nil
-				if closed := sw.Send(&fmodel.CallbackOutput{
-					Message:    msg,
-					Config:     reqConf,
-					TokenUsage: usage,
-				}, nil); closed {
-					return
-				}
-
-				continue
-			}
-
-			if msg == nil {
+			if !msgFound {
 				continue
 			}
 
 			closed := sw.Send(&fmodel.CallbackOutput{
-				Message: msg,
-				Config:  reqConf,
+				Message:    msg,
+				Config:     reqConf,
+				TokenUsage: toModelCallbackUsage(msg.ResponseMeta),
 			}, nil)
 			if closed {
 				return
@@ -373,9 +358,9 @@ func (cm *ChatModel) genRequest(in []*schema.Message, opts ...fmodel.Option) (re
 	return req, nil
 }
 
-func (cm *ChatModel) resolveChatResponse(resp model.ChatCompletionResponse) (msg *schema.Message, usage *fmodel.TokenUsage, err error) {
+func (cm *ChatModel) resolveChatResponse(resp model.ChatCompletionResponse) (msg *schema.Message, err error) {
 	if len(resp.Choices) == 0 {
-		return nil, nil, ErrEmptyResponse
+		return nil, ErrEmptyResponse
 	}
 
 	var choice *model.ChatCompletionChoice
@@ -388,64 +373,64 @@ func (cm *ChatModel) resolveChatResponse(resp model.ChatCompletionResponse) (msg
 	}
 
 	if choice == nil { // unexpected
-		return nil, nil, fmt.Errorf("unexpected completion choices without index=0")
+		return nil, fmt.Errorf("unexpected completion choices without index=0")
 	}
 
 	content := choice.Message.Content
 	if content == nil && len(choice.Message.ToolCalls) == 0 {
-		return nil, nil, fmt.Errorf("unexpected message, nil content and no tool calls")
+		return nil, fmt.Errorf("unexpected message, nil content and no tool calls")
 	}
 
 	msg = &schema.Message{
 		Role:       schema.RoleType(choice.Message.Role),
 		ToolCallID: choice.Message.ToolCallID,
 		ToolCalls:  toMessageToolCalls(choice.Message.ToolCalls),
+		ResponseMeta: &schema.ResponseMeta{
+			FinishReason: string(choice.FinishReason),
+			Usage:        toEinoTokenUsage(&resp.Usage),
+		},
 	}
 
 	if content.StringValue != nil {
 		msg.Content = *content.StringValue
 	}
 
-	usage = &fmodel.TokenUsage{
-		PromptTokens:     resp.Usage.PromptTokens,
-		CompletionTokens: resp.Usage.CompletionTokens,
-		TotalTokens:      resp.Usage.TotalTokens,
-	}
-
-	return msg, usage, nil
+	return msg, nil
 }
 
-func (cm *ChatModel) resolveStreamResponse(resp model.ChatCompletionStreamResponse) (msg *schema.Message, usage *fmodel.TokenUsage, err error) {
-	if len(resp.Choices) == 0 {
-		if resp.Usage != nil { // stream last chunk return usage
-			return nil, &fmodel.TokenUsage{
-				PromptTokens:     resp.Usage.PromptTokens,
-				CompletionTokens: resp.Usage.CompletionTokens,
-				TotalTokens:      resp.Usage.TotalTokens,
-			}, nil
+func (cm *ChatModel) resolveStreamResponse(resp model.ChatCompletionStreamResponse) (msg *schema.Message, msgFound bool, err error) {
+	if len(resp.Choices) > 0 {
+
+		for _, choice := range resp.Choices {
+			if choice.Index != 0 {
+				continue
+			}
+
+			msgFound = true
+			msg = &schema.Message{
+				Role:      schema.RoleType(choice.Delta.Role),
+				ToolCalls: toMessageToolCalls(choice.Delta.ToolCalls),
+				Content:   choice.Delta.Content,
+				ResponseMeta: &schema.ResponseMeta{
+					FinishReason: string(choice.FinishReason),
+					Usage:        toEinoTokenUsage(resp.Usage),
+				},
+			}
+
+			break
 		}
-
-		return nil, nil, ErrEmptyResponse
 	}
 
-	choice := resp.Choices[0]
-	// take 0 index as response, rewrite if needed
-	if choice.Index != 0 {
-		return nil, nil, nil
+	if !msgFound && resp.Usage != nil {
+		msgFound = true
+		msg = &schema.Message{
+			ResponseMeta: &schema.ResponseMeta{
+				Usage: toEinoTokenUsage(resp.Usage),
+			},
+		}
 	}
 
-	content := choice.Delta.Content
-
-	msg = &schema.Message{
-		Role:      schema.RoleType(choice.Delta.Role),
-		ToolCalls: toMessageToolCalls(choice.Delta.ToolCalls),
-		Content:   content,
-		ResponseMeta: &schema.ResponseMeta{
-			FinishReason: string(choice.FinishReason),
-		},
-	}
-
-	return msg, usage, nil
+	return msg, msgFound, nil
 }
 
 func (cm *ChatModel) GetType() string {
@@ -466,6 +451,32 @@ func (cm *ChatModel) BindTools(tools []*schema.ToolInfo) error {
 	cm.rawTools = tools
 
 	return nil
+}
+
+func toEinoTokenUsage(usage *model.Usage) *schema.TokenUsage {
+	if usage == nil {
+		return nil
+	}
+	return &schema.TokenUsage{
+		CompletionTokens: usage.CompletionTokens,
+		PromptTokens:     usage.PromptTokens,
+		TotalTokens:      usage.TotalTokens,
+	}
+}
+
+func toModelCallbackUsage(respMeta *schema.ResponseMeta) *fmodel.TokenUsage {
+	if respMeta == nil {
+		return nil
+	}
+	usage := respMeta.Usage
+	if usage == nil {
+		return nil
+	}
+	return &fmodel.TokenUsage{
+		CompletionTokens: usage.CompletionTokens,
+		PromptTokens:     usage.PromptTokens,
+		TotalTokens:      usage.TotalTokens,
+	}
 }
 
 func toMessageToolCalls(toolCalls []*model.ToolCall) []schema.ToolCall {

@@ -5,12 +5,13 @@ go 1.18
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
-	code.byted.org/flow/eino v0.2.3
+	code.byted.org/flow/eino v0.2.5
 	code.byted.org/gopkg/ctxvalues v0.6.0
 	code.byted.org/gopkg/lang v0.21.8
 	code.byted.org/gopkg/lang/v2 v2.1.3
 	code.byted.org/gopkg/logid v0.0.0-20211104042040-f78600e482f2
 	code.byted.org/gopkg/logs/v2 v2.2.0-beta.9
+	code.byted.org/kite/kitex v1.17.2
 	code.byted.org/kite/kitutil v3.8.8+incompatible
 	code.byted.org/lang/gg v0.18.0
 	code.byted.org/overpass/stone_llm_gateway v0.0.0-20241104094232-76e9a1de03da
@@ -57,7 +58,6 @@ require (
 	code.byted.org/gopkg/thrift v1.14.1 // indirect
 	code.byted.org/kite/endpoint v3.7.5+incompatible // indirect
 	code.byted.org/kite/kitc v3.10.26+incompatible // indirect
-	code.byted.org/kite/kitex v1.17.2 // indirect
 	code.byted.org/kite/rpal v0.1.19 // indirect
 	code.byted.org/lang/trace v0.0.3 // indirect
 	code.byted.org/lidar/profiler v0.3.9 // indirect

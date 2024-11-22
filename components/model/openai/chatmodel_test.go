@@ -2,6 +2,7 @@ package openai
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"strings"
@@ -137,7 +138,13 @@ func TestOpenAIGenerate(t *testing.T) {
 				},
 			},
 		},
-		ResponseMeta: &schema.ResponseMeta{},
+		ResponseMeta: &schema.ResponseMeta{
+			Usage: &schema.TokenUsage{
+				PromptTokens:     1,
+				CompletionTokens: 2,
+				TotalTokens:      3,
+			},
+		},
 	}
 	config := &ChatModelConfig{
 		ByAzure:         false,
@@ -229,7 +236,9 @@ func TestOpenAIGenerate(t *testing.T) {
 			t.Fatal(err)
 		}
 		if !reflect.DeepEqual(result, expectedMessages) {
-			t.Fatal("result is unexpected")
+			resultData, _ := json.Marshal(result)
+			expectMsgData, _ := json.Marshal(expectedMessages)
+			t.Fatalf("result is unexpected, given=%v, expected=%v", string(resultData), string(expectMsgData))
 		}
 	})
 	t.Run("stream all param", func(t *testing.T) {

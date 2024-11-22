@@ -4,8 +4,8 @@ code.byted.org/bytedtrace/interface-go v1.0.16 h1:oTa5QmuTBqAne323J14n/Cm3u69YvH
 code.byted.org/bytedtrace/interface-go v1.0.16/go.mod h1:b5dUY1vcys9UDUdLbg0FKhqRC8z7kQqdF+g6OOBkCH8=
 code.byted.org/bytees/olivere_elastic/v7 v7.0.35 h1:+1ah4TfXJcQx2TPq2sA72wmfDON0QSb5KWr6mrfSG1Y=
 code.byted.org/bytees/olivere_elastic/v7 v7.0.35/go.mod h1:96hWBgzq7FGpovIUA1l7deCNlf7MW8JE3Qtvys2ioDA=
-code.byted.org/flow/eino v0.1.7-0.20241105091239-06254b0ecdda h1:JrJsJb2A904GPBCn9MAqVhkzDrHJIO0cwCppZGnGUYo=
-code.byted.org/flow/eino v0.1.7-0.20241105091239-06254b0ecdda/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
+code.byted.org/flow/eino v0.2.5 h1:uPXgTMSfGZZvKhY4c44vt+CPe0FlIQ7/tfFZ/AfF8nI=
+code.byted.org/flow/eino v0.2.5/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
 code.byted.org/flow/flow-telemetry-common/go v0.0.0-20241031091736-49e56784a7e4 h1:b3CoYPaTL3RLqujSPRTZj7Yg0V3g7Xh8yy+f1wpsFbM=
 code.byted.org/flow/flow-telemetry-common/go v0.0.0-20241031091736-49e56784a7e4/go.mod h1:s5Xm+wOPHP5/E0W2EtyogaHJmiMC5b/H5ke28u/PkZk=
 code.byted.org/gopkg/consul v1.1.12/go.mod h1:TALNl7RlbbVsO+79vrr4IymlAYgIHzjkZao97jeAJog=

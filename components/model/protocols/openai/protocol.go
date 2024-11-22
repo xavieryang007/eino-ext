@@ -384,6 +384,7 @@ func (cm *Client) Generate(ctx context.Context, in []*schema.Message, opts ...mo
 			ToolCalls:  toMessageToolCalls(msg.ToolCalls),
 			ResponseMeta: &schema.ResponseMeta{
 				FinishReason: string(choice.FinishReason),
+				Usage:        toEinoTokenUsage(&resp.Usage),
 			},
 		}
 
@@ -479,7 +480,14 @@ func (cm *Client) Stream(ctx context.Context, in []*schema.Message, // nolint: b
 
 		for {
 			chunk, chunkErr := stream.Recv()
-			if chunkErr == io.EOF {
+			if errors.Is(chunkErr, io.EOF) {
+				if lastEmptyMsg != nil {
+					sw.Send(&model.CallbackOutput{
+						Message:    lastEmptyMsg,
+						Config:     reqConf,
+						TokenUsage: toModelCallbackUsage(lastEmptyMsg.ResponseMeta),
+					}, nil)
+				}
 				return
 			}
 
@@ -488,22 +496,10 @@ func (cm *Client) Stream(ctx context.Context, in []*schema.Message, // nolint: b
 				return
 			}
 
-			msg, usage, found := cm.resolveStreamResponse(chunk)
-			if usage != nil {
-				// stream usage return in last chunk without message content, then
-				// last message received from callback output stream: Message == nil and TokenUsage != nil
-				// last message received from outStream: Message != nil
-				if closed := sw.Send(&model.CallbackOutput{
-					Message:    msg,
-					Config:     reqConf,
-					TokenUsage: usage,
-				}, nil); closed {
-					return
-				}
-
-				continue
-			}
-
+			// stream usage return in last chunk without message content, then
+			// last message received from callback output stream: Message == nil and TokenUsage != nil
+			// last message received from outStream: Message != nil
+			msg, found := cm.resolveStreamResponse(chunk)
 			if !found {
 				continue
 			}
@@ -529,14 +525,16 @@ func (cm *Client) Stream(ctx context.Context, in []*schema.Message, // nolint: b
 			lastEmptyMsg = nil
 
 			closed := sw.Send(&model.CallbackOutput{
-				Message: msg,
-				Config:  reqConf,
+				Message:    msg,
+				Config:     reqConf,
+				TokenUsage: toModelCallbackUsage(msg.ResponseMeta),
 			}, nil)
 
 			if closed {
 				return
 			}
 		}
+
 	}()
 
 	rawStreamArr := make([]*schema.StreamReader[*model.CallbackOutput], 2)
@@ -567,7 +565,7 @@ func (cm *Client) Stream(ctx context.Context, in []*schema.Message, // nolint: b
 	return outStream, nil
 }
 
-func (cm *Client) resolveStreamResponse(resp openai.ChatCompletionStreamResponse) (msg *schema.Message, usage *model.TokenUsage, found bool) {
+func (cm *Client) resolveStreamResponse(resp openai.ChatCompletionStreamResponse) (msg *schema.Message, found bool) {
 	for _, choice := range resp.Choices {
 		// take 0 index as response, rewrite if needed
 		if choice.Index != 0 {
@@ -579,21 +577,27 @@ func (cm *Client) resolveStreamResponse(resp openai.ChatCompletionStreamResponse
 			Role:      toMessageRole(choice.Delta.Role),
 			Content:   choice.Delta.Content,
 			ToolCalls: toMessageToolCalls(choice.Delta.ToolCalls),
+			ResponseMeta: &schema.ResponseMeta{
+				FinishReason: string(choice.FinishReason),
+				Usage:        toEinoTokenUsage(resp.Usage),
+			},
 		}
 
 		break
 	}
 
-	if resp.Usage != nil {
-		usage = &model.TokenUsage{
-			PromptTokens:     resp.Usage.PromptTokens,
-			CompletionTokens: resp.Usage.CompletionTokens,
-			TotalTokens:      resp.Usage.TotalTokens,
+	if resp.Usage != nil && !found {
+		msg = &schema.Message{
+			ResponseMeta: &schema.ResponseMeta{
+				Usage: toEinoTokenUsage(resp.Usage),
+			},
 		}
+		found = true
 	}
 
-	return msg, usage, found
+	return msg, found
 }
+
 func toTools(tis []*schema.ToolInfo) ([]tool, error) {
 	tools := make([]tool, len(tis))
 	for i := range tis {
@@ -617,6 +621,32 @@ func toTools(tis []*schema.ToolInfo) ([]tool, error) {
 	}
 
 	return tools, nil
+}
+
+func toEinoTokenUsage(usage *openai.Usage) *schema.TokenUsage {
+	if usage == nil {
+		return nil
+	}
+	return &schema.TokenUsage{
+		PromptTokens:     usage.PromptTokens,
+		CompletionTokens: usage.CompletionTokens,
+		TotalTokens:      usage.TotalTokens,
+	}
+}
+
+func toModelCallbackUsage(respMeta *schema.ResponseMeta) *model.TokenUsage {
+	if respMeta == nil {
+		return nil
+	}
+	usage := respMeta.Usage
+	if usage == nil {
+		return nil
+	}
+	return &model.TokenUsage{
+		PromptTokens:     usage.PromptTokens,
+		CompletionTokens: usage.CompletionTokens,
+		TotalTokens:      usage.TotalTokens,
+	}
 }
 
 func (cm *Client) BindTools(tools []*schema.ToolInfo) error {

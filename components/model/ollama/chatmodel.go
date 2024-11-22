@@ -314,6 +314,7 @@ func toEinoMessage(resp api.ChatResponse) *schema.Message {
 		ToolCalls: toolCalls,
 		ResponseMeta: &schema.ResponseMeta{
 			FinishReason: resp.DoneReason,
+			Usage:        nil,
 		},
 	}
 }

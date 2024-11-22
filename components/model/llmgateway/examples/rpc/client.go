@@ -1,11 +1,12 @@
 package main
 
 import (
+	"context"
+	"io"
+
 	"code.byted.org/gopkg/logs/v2"
 	"code.byted.org/overpass/stone_llm_gateway/kitex_gen/stone/llm/gateway"
 	"code.byted.org/overpass/stone_llm_gateway/kitex_gen/stone/llm/gateway/llmgatewayservice"
-	"context"
-	"io"
 )
 
 func main() {

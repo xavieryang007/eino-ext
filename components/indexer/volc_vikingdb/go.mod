@@ -3,7 +3,7 @@ module code.byted.org/flow/eino-ext/components/indexer/volc_vikingdb
 go 1.18
 
 require (
-	code.byted.org/flow/eino v0.2.3
+	code.byted.org/flow/eino v0.2.5
 	github.com/bytedance/mockey v1.2.13
 	github.com/smartystreets/goconvey v1.8.1
 	github.com/volcengine/volc-sdk-golang v1.0.182

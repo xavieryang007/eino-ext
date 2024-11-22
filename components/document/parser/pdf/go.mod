@@ -3,7 +3,7 @@ module code.byted.org/flow/eino-ext/components/document/parser/pdf
 go 1.18
 
 require (
-	code.byted.org/flow/eino v0.2.3
+	code.byted.org/flow/eino v0.2.5
 	github.com/dslipak/pdf v0.0.2
 	github.com/stretchr/testify v1.9.0
 )
