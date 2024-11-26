@@ -4,7 +4,8 @@ go 1.18
 
 require (
 	code.byted.org/data/mario_collector v1.3.0
-	code.byted.org/flow/eino v0.2.5
+	code.byted.org/flow/eino v0.2.6
+	code.byted.org/flow/eino-ext/callbacks/metrics v0.0.0-20241122032743-f091096cad52
 	code.byted.org/flow/flow-telemetry-common/go v0.0.0-20241025030756-ebcac95a58bc
 	code.byted.org/flowdevops/fornax_sdk v1.0.5
 	code.byted.org/gopkg/env v1.6.14
@@ -40,7 +41,6 @@ require (
 	code.byted.org/data/databus_client v1.3.8 // indirect
 	code.byted.org/dp/mario_common v1.0.4 // indirect
 	code.byted.org/duanyi.aster/gopkg v0.0.3 // indirect
-	code.byted.org/flow/eino-ext/callbacks/metrics v0.0.0-20241122032743-f091096cad52 // indirect
 	code.byted.org/flowdevops/errorx v0.0.6 // indirect
 	code.byted.org/flowdevops/errorx/code/gen/flow/devops/agent_server v0.0.0-20241012084451-47d6baaffb45 // indirect
 	code.byted.org/flowdevops/fornax/pkg/auth v0.0.0-20240530115429-4a4ba39f6406 // indirect

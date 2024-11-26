@@ -3,7 +3,7 @@ module code.byted.org/flow/eino-ext/components/model/bytedgpt
 go 1.18
 
 require (
-	code.byted.org/flow/eino v0.2.5
+	code.byted.org/flow/eino v0.2.6
 	code.byted.org/flow/eino-ext/components/model/protocols/openai v0.0.0-20241112120809-4af8bef92f19
 	code.byted.org/flowdevops/mockoai v0.0.10
 	code.byted.org/gopkg/ctxvalues v0.6.0
@@ -30,7 +30,11 @@ require (
 	code.byted.org/log_market/ttlogagent_gosdk/v4 v4.0.52 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bytedance/gopkg v0.0.0-20211103090529-d4719f74be3d // indirect
+	github.com/bytedance/sonic v1.12.2 // indirect
+	github.com/bytedance/sonic/loader v0.2.0 // indirect
 	github.com/caarlos0/env/v6 v6.2.2 // indirect
+	github.com/cloudwego/base64x v0.1.4 // indirect
+	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/getkin/kin-openapi v0.118.0 // indirect
@@ -45,6 +49,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/klauspost/compress v1.15.9 // indirect
+	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
@@ -56,7 +61,9 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/slongfield/pyfmt v0.0.0-20220222012616-ea85ff4c361f // indirect
+	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/yargevad/filepathx v1.0.0 // indirect
+	golang.org/x/arch v0.0.0-20210923205945-b76863e36670 // indirect
 	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1 // indirect
 	golang.org/x/sys v0.10.0 // indirect
 	golang.org/x/time v0.1.0 // indirect

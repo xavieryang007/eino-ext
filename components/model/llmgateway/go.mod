@@ -5,7 +5,7 @@ go 1.18
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
-	code.byted.org/flow/eino v0.2.5
+	code.byted.org/flow/eino v0.2.6
 	code.byted.org/gopkg/ctxvalues v0.6.0
 	code.byted.org/gopkg/lang v0.21.8
 	code.byted.org/gopkg/lang/v2 v2.1.3

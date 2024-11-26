@@ -5,7 +5,7 @@ go 1.18
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
-	code.byted.org/flow/eino v0.2.5
+	code.byted.org/flow/eino v0.2.6
 	code.byted.org/flowdevops/fornax_sdk v1.0.7
 	code.byted.org/gopkg/asynccache v0.0.0-20210422090342-26f94f7676b8
 	code.byted.org/gopkg/logs/v2 v2.2.0-beta.9

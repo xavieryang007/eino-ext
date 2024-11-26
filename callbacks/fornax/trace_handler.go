@@ -100,14 +100,16 @@ func (l *einoTracer) OnEnd(ctx context.Context, info *callbacks.RunInfo, output 
 		return ctx
 	}
 
+	var tags map[string]any
 	if l.parser != nil {
-		si.SetTag(ctx, l.parser.ParseOutput(ctx, info, output))
+		tags = l.parser.ParseOutput(ctx, info, output)
 	}
 
 	if stopCh, ok := ctx.Value(traceStreamInputAsyncKey{}).(streamInputAsyncVal); ok {
 		<-stopCh
 	}
 
+	si.SetTag(ctx, tags)
 	span.Finish(ctx)
 
 	return ctx
@@ -130,12 +132,13 @@ func (l *einoTracer) OnError(ctx context.Context, info *callbacks.RunInfo, err e
 		return ctx
 	}
 
-	si.SetTag(ctx, getErrorTags(ctx, err))
+	tags := getErrorTags(ctx, err)
 
 	if stopCh, ok := ctx.Value(traceStreamInputAsyncKey{}).(streamInputAsyncVal); ok {
 		<-stopCh
 	}
 
+	si.SetTag(ctx, tags)
 	span.Finish(ctx)
 
 	return ctx
@@ -184,6 +187,9 @@ func (l *einoTracer) OnStartWithStreamInput(ctx context.Context, info *callbacks
 
 			si.SetTag(ctx, l.parser.ParseStreamInput(ctx, info, input))
 		}()
+	} else {
+		input.Close()
+		close(stopCh)
 	}
 
 	if l.needInject(ctx, info) {
@@ -225,14 +231,22 @@ func (l *einoTracer) OnEndWithStreamOutput(ctx context.Context, info *callbacks.
 				}
 			}()
 
-			si.SetTag(ctx, l.parser.ParseStreamOutput(ctx, info, output))
+			tags := l.parser.ParseStreamOutput(ctx, info, output)
 
 			if stopCh, ok := ctx.Value(traceStreamInputAsyncKey{}).(streamInputAsyncVal); ok {
 				<-stopCh
 			}
 
+			si.SetTag(ctx, tags)
 			span.Finish(ctx)
 		}()
+	} else {
+		output.Close()
+		if stopCh, ok := ctx.Value(traceStreamInputAsyncKey{}).(streamInputAsyncVal); ok {
+			<-stopCh
+		}
+
+		span.Finish(ctx)
 	}
 
 	return ctx

@@ -3,7 +3,7 @@ module code.byted.org/flow/eino-ext/components/indexer/bytees
 go 1.18
 
 require (
-	code.byted.org/flow/eino v0.2.5
+	code.byted.org/flow/eino v0.2.6
 	code.byted.org/gopkg/logs v1.2.13
 	code.byted.org/lang/gg v0.19.1
 	code.byted.org/toutiao/elastic/v7 v7.0.46
@@ -31,6 +31,10 @@ require (
 	github.com/apaxa-go/eval v0.0.0-20171223182326-1d18b251d679 // indirect
 	github.com/apaxa-go/helper v0.0.0-20180607175117-61d31b1c31c3 // indirect
 	github.com/bytedance/gopkg v0.0.0-20220519031347-b9c1c36b51a6 // indirect
+	github.com/bytedance/sonic v1.12.2 // indirect
+	github.com/bytedance/sonic/loader v0.2.0 // indirect
+	github.com/cloudwego/base64x v0.1.4 // indirect
+	github.com/cloudwego/iasm v0.2.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/getkin/kin-openapi v0.118.0 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.0 // indirect
@@ -44,6 +48,7 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/jtolds/gls v4.20.0+incompatible // indirect
+	github.com/klauspost/cpuid/v2 v2.0.9 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
@@ -57,6 +62,7 @@ require (
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/slongfield/pyfmt v0.0.0-20220222012616-ea85ff4c361f // indirect
 	github.com/smarty/assertions v1.15.0 // indirect
+	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/yargevad/filepathx v1.0.0 // indirect
 	github.com/zeebo/errs v1.2.2 // indirect
 	golang.org/x/arch v0.11.0 // indirect
