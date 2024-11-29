@@ -3,7 +3,7 @@ package utils
 import (
 	"fmt"
 
-	"github.com/bytedance/sonic"
+	"github.com/getkin/kin-openapi/openapi3"
 
 	"code.byted.org/flow/eino/schema"
 	"code.byted.org/gopkg/lang/conv"
@@ -22,14 +22,18 @@ func ToGWMessages(msgs []*schema.Message) ([]*gateway.Message, error) {
 	return res, nil
 }
 
-func ToGWTools(tools []*schema.ToolInfo) []*gateway.Tool {
+func ToGWTools(tools []*schema.ToolInfo) ([]*gateway.Tool, error) {
 	res := make([]*gateway.Tool, 0, len(tools))
 
 	for _, t := range tools {
-		res = append(res, toGWTool(t))
+		gwTool, err := toGWTool(t)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, gwTool)
 	}
 
-	return res
+	return res, nil
 }
 
 func toGWMessage(msg *schema.Message) (*gateway.Message, error) {
@@ -157,9 +161,9 @@ func toGWToolCall(toolCall schema.ToolCall) *gateway.ToolCall {
 	return res
 }
 
-func toGWTool(tool *schema.ToolInfo) *gateway.Tool {
+func toGWTool(tool *schema.ToolInfo) (*gateway.Tool, error) {
 	if tool == nil {
-		return nil
+		return nil, nil
 	}
 
 	res := gateway.NewTool()
@@ -168,54 +172,53 @@ func toGWTool(tool *schema.ToolInfo) *gateway.Tool {
 	res.Function_.Name = tool.Name
 	res.Function_.Description = toStringPtr(tool.Desc)
 
-	if tool.OpenAPIV3 != nil {
-		var param gateway.JSONSchema
-		data, err := sonic.Marshal(tool.OpenAPIV3)
-		if err == nil {
-			err = sonic.Unmarshal(data, &param)
-		}
-		if err == nil {
-			res.Function_.Parameters = &param
-			return res
-		}
+	stdSchema, err := tool.ToOpenAPIV3()
+	if err != nil {
+		return nil, fmt.Errorf("get openapi3 schema failed: %w", err)
 	}
 
-	res.Function_.Parameters = toGWParameters(&schema.ParameterInfo{
-		Type:      schema.Object,
-		SubParams: tool.Params,
-	})
-
-	return res
+	res.Function_.Parameters = convertOpenAPI3SchemaToGWSchema(stdSchema)
+	return res, nil
 }
 
-func toGWParameters(param *schema.ParameterInfo) *gateway.JSONSchema {
-	if param == nil {
+// convertOpenAPI3SchemaToGWSchema convert *openapi3.Schema to *gateway.JSONSchema
+func convertOpenAPI3SchemaToGWSchema(sc *openapi3.Schema) *gateway.JSONSchema {
+	if sc == nil {
 		return nil
 	}
 
-	res := gateway.NewJSONSchema()
-	res.Type = toGWSchemaType(param.Type)
-	res.Description = toStringPtr(param.Desc)
+	// init JSONSchema
+	gwSchema := &gateway.JSONSchema{
+		Type:        sc.Type,
+		Properties:  make(map[string]*gateway.JSONSchema),
+		Required:    sc.Required,
+		Description: toStringPtr(sc.Description),
+		Enum:        nil,
+	}
 
-	if len(param.SubParams) > 0 {
-		res.Properties = make(map[string]*gateway.JSONSchema, len(param.SubParams))
-		for k, v := range param.SubParams {
-			res.Properties[k] = toGWParameters(v)
-		}
-		res.Required = make([]string, 0, len(param.SubParams))
-		for k, v := range param.SubParams {
-			if v.Required {
-				res.Required = append(res.Required, k)
+	// convert enums
+	if len(sc.Enum) > 0 {
+		strEnums := make([]string, 0, len(sc.Enum))
+		for _, enumValue := range sc.Enum {
+			// 假设枚举值是字符串类型（根据 OpenAPI 规范的常见用法）
+			if strValue, ok := enumValue.(string); ok {
+				strEnums = append(strEnums, strValue)
 			}
 		}
+		gwSchema.Enum = strEnums
 	}
 
-	if param.ElemInfo != nil {
-		res.Items = toGWParameters(param.ElemInfo)
+	// deal Properties
+	if sc.Properties != nil {
+		for propName, propSchemaRef := range sc.Properties {
+			gwSchema.Properties[propName] = convertOpenAPI3SchemaToGWSchema(propSchemaRef.Value)
+		}
 	}
-	return res
-}
 
-func toGWSchemaType(t schema.DataType) string {
-	return string(t)
+	// deal Items
+	if sc.Items != nil {
+		gwSchema.Items = convertOpenAPI3SchemaToGWSchema(sc.Items.Value)
+	}
+
+	return gwSchema
 }

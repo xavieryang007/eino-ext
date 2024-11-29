@@ -91,7 +91,11 @@ func NewChatModelWithCluster(_ context.Context, cluster string, config *ChatMode
 }
 
 func (cm *ChatModel) BindTools(tools []*schema.ToolInfo) error {
-	cm.tools = utils.ToGWTools(tools)
+	gwTools, err := utils.ToGWTools(tools)
+	if err != nil {
+		return err
+	}
+	cm.tools = gwTools
 	return nil
 }
 
