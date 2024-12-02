@@ -17,7 +17,7 @@ func main() {
 	N := 3
 	ctx := context.Background()
 	chatModel, err := openai.NewChatModel(ctx, &openai.ChatModelConfig{
-		BaseURL: "https://search.bytedance.net/gpt/openapi/online/multimodal/crawl",
+		BaseURL: "https://api.openai.com/v1",
 		N:       &N,
 		APIKey:  accessKey,
 		ByAzure: true,
