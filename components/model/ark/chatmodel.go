@@ -18,7 +18,6 @@ import (
 	fmodel "code.byted.org/flow/eino/components/model"
 	"code.byted.org/flow/eino/schema"
 	"code.byted.org/flow/eino/utils/safe"
-	"code.byted.org/lang/gg/gptr"
 )
 
 var (
@@ -503,7 +502,7 @@ func toMessageToolCalls(toolCalls []*model.ToolCall) []schema.ToolCall {
 
 func toArkContent(content string, multiContent []schema.ChatMessagePart) (*model.ChatCompletionMessageContent, error) {
 	if len(multiContent) == 0 {
-		return &model.ChatCompletionMessageContent{StringValue: gptr.Of(content)}, nil
+		return &model.ChatCompletionMessageContent{StringValue: ptrOf(content)}, nil
 	}
 
 	parts := make([]*model.ChatCompletionMessageContentPart, 0, len(multiContent))
@@ -585,4 +584,8 @@ func closeArkStreamReader(r *autils.ChatCompletionStreamReader) error {
 	}
 
 	return r.Close()
+}
+
+func ptrOf[T any](v T) *T {
+	return &v
 }

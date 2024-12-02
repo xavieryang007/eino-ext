@@ -2,13 +2,11 @@ package main
 
 import (
 	"context"
+	"log"
 	"os"
 
-	"code.byted.org/gopkg/logs/v2"
-
-	"code.byted.org/flow/eino/schema"
-
 	"code.byted.org/flow/eino-ext/components/model/ark"
+	"code.byted.org/flow/eino/schema"
 )
 
 func main() {
@@ -19,7 +17,7 @@ func main() {
 		Model:  os.Getenv("ARK_MODEL_ID"),
 	})
 	if err != nil {
-		logs.Errorf("NewChatModel failed, err=%v", err)
+		log.Printf("NewChatModel failed, err=%v", err)
 		return
 	}
 
@@ -43,9 +41,9 @@ func main() {
 		multiModalMsg,
 	})
 	if err != nil {
-		logs.Errorf("Generate failed, err=%v", err)
+		log.Printf("Generate failed, err=%v", err)
 		return
 	}
 
-	logs.Infof("Ark ChatModel output: \n%v", resp)
+	log.Printf("Ark ChatModel output: \n%v", resp)
 }

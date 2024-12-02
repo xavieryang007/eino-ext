@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 
 	"code.byted.org/flow/eino/schema"
-	"code.byted.org/gopkg/logs/v2"
 
 	"code.byted.org/flow/eino-ext/components/model/ollama"
 )
@@ -18,7 +18,7 @@ func main() {
 		Model:   "llama3",
 	})
 	if err != nil {
-		logs.Errorf("NewChatModel failed, err=%v", err)
+		log.Printf("NewChatModel failed, err=%v", err)
 		return
 	}
 
@@ -30,20 +30,20 @@ func main() {
 	})
 
 	if err != nil {
-		logs.Errorf("Generate failed, err=%v", err)
+		log.Printf("Generate failed, err=%v", err)
 		return
 	}
 
 	defer streamMsgs.Close()
 
-	logs.Infof("typewriter output:")
+	log.Println("typewriter output:")
 	for {
 		msg, err := streamMsgs.Recv()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
-			logs.Errorf("\nstream.Recv failed, err=%v", err)
+			log.Printf("\nstream.Recv failed, err=%v", err)
 			return
 		}
 		fmt.Print(msg.Content)

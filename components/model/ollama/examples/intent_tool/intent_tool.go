@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
+	"log"
 
 	"code.byted.org/flow/eino/schema"
-	"code.byted.org/gopkg/logs/v2"
 
 	"code.byted.org/flow/eino-ext/components/model/ollama"
 )
@@ -17,7 +17,7 @@ func main() {
 		Model:   "llama3-groq-tool-use",
 	})
 	if err != nil {
-		logs.Errorf("NewChatModel failed, err=%v", err)
+		log.Printf("NewChatModel failed, err=%v", err)
 		return
 	}
 
@@ -54,7 +54,7 @@ func main() {
 		},
 	})
 	if err != nil {
-		logs.Errorf("BindForcedTools failed, err=%v", err)
+		log.Printf("BindForcedTools failed, err=%v", err)
 		return
 	}
 
@@ -70,9 +70,9 @@ func main() {
 	})
 
 	if err != nil {
-		logs.Errorf("Generate failed, err=%v", err)
+		log.Printf("Generate failed, err=%v", err)
 		return
 	}
 
-	logs.Infof("output: \n%+v", resp)
+	log.Printf("output: \n%+v", resp)
 }

@@ -15,7 +15,6 @@ import (
 
 	fmodel "code.byted.org/flow/eino/components/model"
 	"code.byted.org/flow/eino/schema"
-	"code.byted.org/lang/gg/gptr"
 )
 
 func Test_Generate(t *testing.T) {
@@ -111,7 +110,7 @@ func Test_Generate(t *testing.T) {
 					Choices: []*model.ChatCompletionChoice{
 						{
 							Message: model.ChatCompletionMessage{
-								Content:    &model.ChatCompletionMessageContent{StringValue: gptr.Of("test_content")},
+								Content:    &model.ChatCompletionMessageContent{StringValue: ptrOf("test_content")},
 								Role:       model.ChatMessageRoleAssistant,
 								ToolCallID: "",
 								ToolCalls: []*model.ToolCall{

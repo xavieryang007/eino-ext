@@ -2,25 +2,21 @@ package main
 
 import (
 	"context"
+	"log"
 
 	"code.byted.org/flow/eino-ext/components/model/ollama"
 	"code.byted.org/flow/eino/schema"
-	"code.byted.org/gopkg/ctxvalues"
-	"code.byted.org/gopkg/logid"
-	"code.byted.org/gopkg/logs/v2"
 )
 
 func main() {
-	id := logid.GenLogID()
 	ctx := context.Background()
-	ctx = ctxvalues.SetLogID(ctx, id)
 
 	chatModel, err := ollama.NewChatModel(ctx, &ollama.ChatModelConfig{
 		BaseURL: "http://localhost:11434",
 		Model:   "llama3",
 	})
 	if err != nil {
-		logs.Errorf("NewChatModel failed, err=%v", err)
+		log.Printf("NewChatModel failed, err=%v\n", err)
 		return
 	}
 
@@ -31,9 +27,9 @@ func main() {
 		},
 	})
 	if err != nil {
-		logs.Errorf("Generate failed, err=%v", err)
+		log.Printf("Generate failed, err=%v\n", err)
 		return
 	}
 
-	logs.Infof("log_id=%v, output: \n%v", id, resp)
+	log.Printf("output: \n%v\n", resp)
 }

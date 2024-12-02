@@ -4,13 +4,11 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"os"
 
-	"code.byted.org/gopkg/logs/v2"
-
-	"code.byted.org/flow/eino/schema"
-
 	"code.byted.org/flow/eino-ext/components/model/ark"
+	"code.byted.org/flow/eino/schema"
 )
 
 func main() {
@@ -21,7 +19,7 @@ func main() {
 		Model:  os.Getenv("ARK_MODEL_ID"),
 	})
 	if err != nil {
-		logs.Errorf("NewChatModel failed, err=%v", err)
+		log.Printf("NewChatModel failed, err=%v", err)
 		return
 	}
 
@@ -33,7 +31,7 @@ func main() {
 	})
 
 	if err != nil {
-		logs.Errorf("Generate failed, err=%v", err)
+		log.Printf("Generate failed, err=%v", err)
 		return
 	}
 
@@ -41,7 +39,7 @@ func main() {
 
 	msgs := make([]*schema.Message, 0)
 
-	logs.Infof("typewriter output:")
+	log.Printf("typewriter output:")
 	for {
 		msg, err := streamMsgs.Recv()
 		if err == io.EOF {
@@ -49,7 +47,7 @@ func main() {
 		}
 		msgs = append(msgs, msg)
 		if err != nil {
-			logs.Errorf("\nstream.Recv failed, err=%v", err)
+			log.Printf("\nstream.Recv failed, err=%v", err)
 			return
 		}
 		fmt.Print(msg.Content)
@@ -57,9 +55,9 @@ func main() {
 
 	msg, err := schema.ConcatMessages(msgs)
 	if err != nil {
-		logs.Errorf("ConcatMessages failed, err=%v", err)
+		log.Printf("ConcatMessages failed, err=%v", err)
 		return
 	}
 
-	logs.Infof("output: %s\n", msg.Content)
+	log.Printf("output: %s\n", msg.Content)
 }
