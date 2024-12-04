@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"strings"
 
 	"code.byted.org/flow/eino/callbacks"
 	"code.byted.org/flow/eino/components"
@@ -88,6 +89,8 @@ func (p *promptHub) Format(ctx context.Context, vs map[string]any, opts ...promp
 		return nil, fmt.Errorf("get prompt from prompt service fail: %w", err)
 	}
 	var m *schema.Message
+	// apply prompt hub message to template
+	// 1. system message
 	// prompt may be not nil but a zero value if prompt doesn't exist.
 	if origTemplate != nil && origTemplate.GetPrompt().GetPromptText().GetSystemPrompt() != nil && !reflect.ValueOf(origTemplate.GetPrompt().GetPromptText().GetSystemPrompt()).Elem().IsZero() {
 		m, err = messageConv(origTemplate.GetPrompt().GetPromptText().GetSystemPrompt())
@@ -97,6 +100,22 @@ func (p *promptHub) Format(ctx context.Context, vs map[string]any, opts ...promp
 		templates = append(templates, m)
 	}
 
+	// 2. dynamic message list, maybe message placeholder
+	if origTemplate != nil {
+		for _, message := range origTemplate.GetPrompt().GetPromptText().GetMessageList() {
+			if message.MessageType == prompt2.MessageTypePlaceholder {
+				templates = append(templates, schema.MessagesPlaceholder(strings.TrimLeft(strings.TrimRight(message.Content, "} "), "{ "), true /* follow fornax */))
+			} else {
+				m, err = messageConv(message)
+				if err != nil {
+					return nil, err
+				}
+				templates = append(templates, m)
+			}
+		}
+	}
+
+	// 3. user message, only used to generate but not chat
 	// prompt may be not nil but a zero value if prompt doesn't exist.
 	if origTemplate != nil && origTemplate.GetPrompt().GetPromptText().GetUserPrompt() != nil && !reflect.ValueOf(origTemplate.GetPrompt().GetPromptText().GetUserPrompt()).Elem().IsZero() {
 		m, err = messageConv(origTemplate.GetPrompt().GetPromptText().GetUserPrompt())
