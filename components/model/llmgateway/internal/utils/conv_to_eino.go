@@ -7,107 +7,51 @@ import (
 	"code.byted.org/overpass/stone_llm_gateway/kitex_gen/stone/llm/gateway"
 )
 
-func ToEinoMessage(resp *gateway.ChatCompletion) (*schema.Message, bool) {
-	if resp == nil {
-		return nil, false
+func ToEinoMessage(resp *gateway.ChatCompletion) *schema.Message {
+	if resp == nil || len(resp.Choices) == 0 {
+		return nil
 	}
 
-	for _, choice := range resp.Choices {
-		if choice.Index != 0 {
-			continue
-		}
-
-		if choice.Delta == nil {
-			res := &schema.Message{
-				ResponseMeta: &schema.ResponseMeta{
-					FinishReason: choice.FinishReason,
-					Usage:        ToEinoUsage(resp.Usage),
-				},
-			}
-			return res, true
-		}
-
-		msg := choice.Delta
-
-		ext := make(map[string]any)
-		if rawData := resp.RawData; rawData != nil {
-			ext[RawResp] = *rawData
-		}
-		if len(msg.Extra) > 0 {
-			for k, v := range msg.Extra {
-				ext[k] = v
-			}
-		}
-
-		res := &schema.Message{
-			Role:       toEinoRole(msg.Role),
-			Content:    msg.Content,
-			Name:       EmptyIfNil(msg.Name),
-			ToolCalls:  toEinoToolCalls(msg.ToolCalls, ext),
-			ToolCallID: EmptyIfNil(msg.ToolCallId),
-			ResponseMeta: &schema.ResponseMeta{
-				FinishReason: choice.FinishReason,
-				Usage:        ToEinoUsage(resp.Usage),
-			},
-			Extra: ext,
-		}
-
-		return res, true
+	choice := resp.Choices[0]
+	if choice == nil || choice.Delta == nil {
+		return nil
 	}
 
-	if resp.Usage != nil {
-		ext := make(map[string]any)
-		if rawData := resp.RawData; rawData != nil {
-			ext[RawResp] = *rawData
-		}
-
-		finishReason := ""
-		for _, choice := range resp.Choices {
-			if choice.FinishReason != "" {
-				finishReason = choice.FinishReason
-				break
-			}
-		}
-
-		res := &schema.Message{
-
-			ResponseMeta: &schema.ResponseMeta{
-				FinishReason: finishReason,
-				Usage:        ToEinoUsage(resp.Usage),
-			},
-			Extra: ext,
-		}
-
-		return res, true
+	ext := make(map[string]any)
+	msg := choice.Delta
+	res := &schema.Message{
+		Role:       toEinoRole(msg.Role),
+		Content:    msg.Content,
+		Name:       EmptyIfNil(msg.Name),
+		ToolCalls:  toEinoToolCalls(msg.ToolCalls, ext),
+		ToolCallID: EmptyIfNil(msg.ToolCallId),
+		ResponseMeta: &schema.ResponseMeta{
+			FinishReason: choice.FinishReason,
+		},
+		Extra: ext,
 	}
 
-	return nil, false
+	if rawData := resp.RawData; rawData != nil {
+		ext[RawResp] = *rawData
+	}
+	if len(msg.Extra) > 0 {
+		for k, v := range msg.Extra {
+			ext[k] = v
+		}
+	}
+
+	return res
 }
 
-func ToEinoUsage(usage *gateway.Usage) *schema.TokenUsage {
+func ToEinoUsage(usage *gateway.Usage) *model.TokenUsage {
 	if usage == nil {
 		return nil
 	}
 
-	return &schema.TokenUsage{
+	return &model.TokenUsage{
 		CompletionTokens: int(usage.CompletionTokens),
 		PromptTokens:     int(usage.PromptTokens),
 		TotalTokens:      int(usage.TotalTokens),
-	}
-}
-
-func ToModelCallbackUsage(respMeta *schema.ResponseMeta) *model.TokenUsage {
-	if respMeta == nil {
-		return nil
-	}
-	usage := respMeta.Usage
-	if usage == nil {
-		return nil
-	}
-	return &model.TokenUsage{
-		CompletionTokens: usage.CompletionTokens,
-		PromptTokens:     usage.PromptTokens,
-		TotalTokens:      usage.TotalTokens,
 	}
 }
 

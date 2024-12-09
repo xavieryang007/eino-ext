@@ -1,13 +1,14 @@
 package main
 
 import (
-	"code.byted.org/flow/eino-ext/components/model/llmgateway"
-	"code.byted.org/overpass/stone_llm_gateway/kitex_gen/stone/llm/gateway"
 	"context"
 	"encoding/json"
 
 	"code.byted.org/flow/eino/schema"
 	"code.byted.org/gopkg/logs/v2"
+	"code.byted.org/overpass/stone_llm_gateway/kitex_gen/stone/llm/gateway"
+
+	"code.byted.org/flow/eino-ext/components/model/llmgateway"
 )
 
 func main() {

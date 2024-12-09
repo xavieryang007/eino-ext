@@ -193,24 +193,32 @@ func (cm *ChatModel) stream(ctx context.Context, streamMode bool, input []*schem
 			if err != nil {
 				if !errors.Is(err, io.EOF) {
 					_ = sw.Send(nil, err)
-				} else if lastEmptyMsg != nil {
-					_ = sw.Send(&model.CallbackOutput{
-						Message:    lastEmptyMsg,
-						Config:     config,
-						TokenUsage: utils.ToModelCallbackUsage(lastEmptyMsg.ResponseMeta),
-					}, nil)
-
 				}
 				return
 			}
 
-			msg, found, rErr := cm.genResponse(chunk)
+			msg, usage, rErr := cm.genResponse(chunk)
 			if rErr != nil {
 				_ = sw.Send(nil, rErr)
 				return
 			}
 
-			if !found {
+			if usage != nil {
+				// stream usage return in last chunk without message content, then
+				// last message received from callback output stream: Message == nil and TokenUsage != nil
+				// last message received from outStream: Message != nil
+				if closed := sw.Send(&model.CallbackOutput{
+					Message:    msg,
+					Config:     config,
+					TokenUsage: usage,
+				}, nil); closed {
+					return
+				}
+
+				continue
+			}
+
+			if msg == nil && usage == nil {
 				continue
 			}
 
@@ -235,9 +243,8 @@ func (cm *ChatModel) stream(ctx context.Context, streamMode bool, input []*schem
 			lastEmptyMsg = nil
 
 			closed := sw.Send(&model.CallbackOutput{
-				Message:    msg,
-				Config:     config,
-				TokenUsage: utils.ToModelCallbackUsage(msg.ResponseMeta),
+				Message: msg,
+				Config:  config,
 			}, nil)
 
 			if closed {
@@ -273,19 +280,20 @@ func (cm *ChatModel) stream(ctx context.Context, streamMode bool, input []*schem
 	return outStream, nil
 }
 
-func (cm *ChatModel) genResponse(resp *gateway.ChatCompletion) (msg *schema.Message, msgFound bool, err error) {
+func (cm *ChatModel) genResponse(resp *gateway.ChatCompletion) (msg *schema.Message, usg *model.TokenUsage, err error) {
 	if resp == nil {
-		return nil, false, nil
+		return nil, nil, nil
 	}
 
 	if resp.Error != nil {
-		return nil, false, &Error{
+		return nil, nil, &Error{
 			Message: resp.Error.Message,
 			Code:    resp.Error.Code,
 		}
 	}
-	msg, msgFound = utils.ToEinoMessage(resp)
-	return msg, msgFound, nil
+	msg = utils.ToEinoMessage(resp)
+	usg = utils.ToEinoUsage(resp.Usage)
+	return
 }
 
 func (cm *ChatModel) genOptions(opts ...model.Option) (*model.Options, *model.Config, error) {

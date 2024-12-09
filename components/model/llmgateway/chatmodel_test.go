@@ -13,9 +13,9 @@ import (
 	"code.byted.org/flow/eino/callbacks"
 	"code.byted.org/flow/eino/schema"
 	"code.byted.org/gopkg/lang/conv"
+	"code.byted.org/overpass/stone_llm_gateway/kitex_gen/stone/llm/gateway"
 
 	"code.byted.org/flow/eino-ext/components/model/llmgateway/internal/mock/llmgatewayservice"
-	"code.byted.org/overpass/stone_llm_gateway/kitex_gen/stone/llm/gateway"
 )
 
 func mockStreamMessage(cli *llmgatewayservice.MockLLMGatewayService_ChatClient) {
