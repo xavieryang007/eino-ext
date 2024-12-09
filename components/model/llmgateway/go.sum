@@ -1129,8 +1129,8 @@ code.byted.org/middleware/netpoll v0.9.0/go.mod h1:kFst3B19jC64cxxT16BxkNwyuGwfx
 code.byted.org/middleware/netpoll v0.9.9/go.mod h1:kFst3B19jC64cxxT16BxkNwyuGwfxZ7HzMR84enseW8=
 code.byted.org/middleware/nhttp2 v0.1.1/go.mod h1:ABr3AqeiqsMjIhODmGNbHwrnUOtNL+Y5ZjLlzYKfa4I=
 code.byted.org/overpass/common v0.0.0-20240815141408-18f972b75038/go.mod h1:K/QmPZHS25vLk9n9AVtM2SHkD5PVHImcIWRAnAyvfRI=
-code.byted.org/overpass/stone_llm_gateway v0.0.0-20241104094232-76e9a1de03da h1:A4x//2WIkNFpz4u2y5UoEDGhJhPJchIqDsShIcTi7E0=
-code.byted.org/overpass/stone_llm_gateway v0.0.0-20241104094232-76e9a1de03da/go.mod h1:nZfjzGebDEEaGL5Z4cxd8kEZCE5cxBQdjjZyN8RVguc=
+code.byted.org/overpass/stone_llm_gateway v0.0.0-20241209123631-77cf7aa60e81 h1:uakTqZvEnvGnXeXKev98gANeo69g6JsKIKeSyWC2CwI=
+code.byted.org/overpass/stone_llm_gateway v0.0.0-20241209123631-77cf7aa60e81/go.mod h1:nZfjzGebDEEaGL5Z4cxd8kEZCE5cxBQdjjZyN8RVguc=
 code.byted.org/security/go-spiffe-v2 v1.0.0/go.mod h1:sdKeSxqKhgq3rBdfBoaY1H1WPBzIv2L1HRAehz6AK4c=
 code.byted.org/security/go-spiffe-v2 v1.0.1/go.mod h1:sdKeSxqKhgq3rBdfBoaY1H1WPBzIv2L1HRAehz6AK4c=
 code.byted.org/security/go-spiffe-v2 v1.0.3/go.mod h1:sdKeSxqKhgq3rBdfBoaY1H1WPBzIv2L1HRAehz6AK4c=

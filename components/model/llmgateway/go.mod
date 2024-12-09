@@ -14,7 +14,7 @@ require (
 	code.byted.org/kite/kitex v1.17.2
 	code.byted.org/kite/kitutil v3.8.8+incompatible
 	code.byted.org/lang/gg v0.18.0
-	code.byted.org/overpass/stone_llm_gateway v0.0.0-20241104094232-76e9a1de03da
+	code.byted.org/overpass/stone_llm_gateway v0.0.0-20241209123631-77cf7aa60e81
 	github.com/bytedance/mockey v1.2.10
 	github.com/bytedance/sonic v1.12.2
 	github.com/cloudwego/kitex v0.11.3
