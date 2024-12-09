@@ -111,7 +111,7 @@ func toGWMultiContent(mc []schema.ChatMessagePart) ([]*gateway.MessageMultiPart,
 			})
 		case schema.ChatMessagePartTypeVideoURL:
 			if part.VideoURL == nil {
-				return nil, fmt.Errorf("video_url should not be nil")
+				return nil, fmt.Errorf("video_url should not be nil ")
 			}
 			ret = append(ret, &gateway.MessageMultiPart{
 				Type: gateway.ChatMessagePartType_VideoURL,
