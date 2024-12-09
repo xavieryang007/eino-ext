@@ -12,10 +12,12 @@ code.byted.org/bytedtrace/serializer-go v1.0.0 h1:SBAOW8cXf0HP+RdLiRoZj5guhmwLdg
 code.byted.org/bytedtrace/serializer-go v1.0.0/go.mod h1:fOL6VcdN3BGeCIevGebxZW0GvpTo9sjR5s0pYckObjw=
 code.byted.org/duanyi.aster/gopkg v0.0.3 h1:vQve62C3QiafPw2w8kAK/P+VVwW5Bi+p6foeVxlFydo=
 code.byted.org/duanyi.aster/gopkg v0.0.3/go.mod h1:gxOcKCeV3yQ+J37/A3h5kQqxu/On27n+zdkZuzCbPac=
-code.byted.org/flow/eino v0.2.6 h1:CqIdp0RmiMMVk5B+apdbIUbErE4OqEcPzzcVuFN2jVw=
-code.byted.org/flow/eino v0.2.6/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
+code.byted.org/flow/eino v0.3.0 h1:g3VItxXtcnSo4pzloHfEDk70I3kZqwcxLIIzyRM+v24=
+code.byted.org/flow/eino v0.3.0/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
 code.byted.org/flow/eino-ext/components/model/protocols/openai v0.0.0-20241112120809-4af8bef92f19 h1:OfKoNL52nR6PL+UOpqyCyIbN6TVORSIhdKxrpin3AKY=
 code.byted.org/flow/eino-ext/components/model/protocols/openai v0.0.0-20241112120809-4af8bef92f19/go.mod h1:NhOVjfj4vUgwd88tQDY3RtUvpnuQXvEH4bRww7TRl7k=
+code.byted.org/flow/eino-ext/components/model/protocols/openai v0.0.0-20241209081138-13e29fae3c62 h1:NbDQsu3a5xG5J7sJf9xy5kVEs3tDTWf8idXoaNvyVpc=
+code.byted.org/flow/eino-ext/components/model/protocols/openai v0.0.0-20241209081138-13e29fae3c62/go.mod h1:cZmCEldrrahJml7ozSFr9DoVTPqC8ay5VDBjJrb1lak=
 code.byted.org/flowdevops/mockoai v0.0.10 h1:8Qxgs/5bvO6dDmshQ88MHUKcsDgg9u5MHNNXlCyYd68=
 code.byted.org/flowdevops/mockoai v0.0.10/go.mod h1:ywax0BKNUGSJ5uGL/8lpyD/Mcfvasv6seljHXYG/Hig=
 code.byted.org/gopkg/apm_vendor_interface v0.0.0-20221009080406-e34204c65cba/go.mod h1:njhrS0YBKyO11ufZKOq2xfZHR6ku4HJ9yBVszWxLQuA=

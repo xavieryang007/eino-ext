@@ -3,7 +3,7 @@ module code.byted.org/flow/eino-ext/components/model/ollama
 go 1.22.0
 
 require (
-	code.byted.org/flow/eino v0.2.6
+	code.byted.org/flow/eino v0.3.0
 	github.com/bytedance/mockey v1.2.13
 	github.com/ollama/ollama v0.3.0
 	github.com/smartystreets/goconvey v1.8.1

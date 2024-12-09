@@ -256,3 +256,4 @@ require (
 )
 
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
+replace code.byted.org/flow/eino => code.byted.org/flow/eino v0.2.6

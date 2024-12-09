@@ -3,8 +3,8 @@ module code.byted.org/flow/eino-ext/components/model/bytedgpt
 go 1.18
 
 require (
-	code.byted.org/flow/eino v0.2.6
-	code.byted.org/flow/eino-ext/components/model/protocols/openai v0.0.0-20241112120809-4af8bef92f19
+	code.byted.org/flow/eino v0.3.0
+	code.byted.org/flow/eino-ext/components/model/protocols/openai v0.0.0-20241209081138-13e29fae3c62
 	code.byted.org/flowdevops/mockoai v0.0.10
 	code.byted.org/gopkg/ctxvalues v0.6.0
 	code.byted.org/gopkg/logid v0.0.0-20211104042040-f78600e482f2

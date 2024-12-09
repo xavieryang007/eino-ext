@@ -5,7 +5,7 @@ go 1.18
 replace github.com/apache/thrift => github.com/apache/thrift v0.13.0
 
 require (
-	code.byted.org/flow/eino v0.2.6
+	code.byted.org/flow/eino v0.3.0
 	code.byted.org/gopkg/ctxvalues v0.6.0
 	code.byted.org/gopkg/lang v0.21.8
 	code.byted.org/gopkg/lang/v2 v2.1.3
@@ -18,7 +18,9 @@ require (
 	github.com/bytedance/mockey v1.2.10
 	github.com/bytedance/sonic v1.12.2
 	github.com/cloudwego/kitex v0.11.3
+	github.com/getkin/kin-openapi v0.118.0
 	github.com/smartystreets/goconvey v1.8.1
+	github.com/stretchr/testify v1.9.0
 	go.uber.org/mock v0.4.0
 )
 
@@ -103,7 +105,6 @@ require (
 	github.com/facebookgo/stack v0.0.0-20160209184415-751773369052 // indirect
 	github.com/facebookgo/subset v0.0.0-20200203212716-c811ad88dec4 // indirect
 	github.com/fatih/structtag v1.2.0 // indirect
-	github.com/getkin/kin-openapi v0.118.0 // indirect
 	github.com/go-jose/go-jose/v3 v3.0.3 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
@@ -148,7 +149,6 @@ require (
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/slongfield/pyfmt v0.0.0-20220222012616-ea85ff4c361f // indirect
 	github.com/smarty/assertions v1.15.0 // indirect
-	github.com/stretchr/testify v1.9.0 // indirect
 	github.com/tidwall/gjson v1.17.3 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/pretty v1.2.1 // indirect

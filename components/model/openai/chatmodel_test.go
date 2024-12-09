@@ -186,12 +186,12 @@ func TestOpenAIGenerate(t *testing.T) {
 			{
 				Name:        "tool1",
 				Desc:        "tool1",
-				ParamsOneOf: schema.ParamsOneOf{OpenAPIV3: testToolParam.Value},
+				ParamsOneOf: schema.NewParamsOneOfByOpenAPIV3(testToolParam.Value),
 			},
 			{
 				Name:        "tool2",
 				Desc:        "tool2",
-				ParamsOneOf: schema.ParamsOneOf{OpenAPIV3: testToolParam.Value},
+				ParamsOneOf: schema.NewParamsOneOfByOpenAPIV3(testToolParam.Value),
 			},
 		})
 		if err != nil {
@@ -260,12 +260,12 @@ func TestOpenAIGenerate(t *testing.T) {
 			{
 				Name:        "tool1",
 				Desc:        "tool1",
-				ParamsOneOf: schema.ParamsOneOf{OpenAPIV3: testToolParam.Value},
+				ParamsOneOf: schema.NewParamsOneOfByOpenAPIV3(testToolParam.Value),
 			},
 			{
 				Name:        "tool2",
 				Desc:        "tool2",
-				ParamsOneOf: schema.ParamsOneOf{OpenAPIV3: testToolParam.Value},
+				ParamsOneOf: schema.NewParamsOneOfByOpenAPIV3(testToolParam.Value),
 			},
 		})
 		if err != nil {
