@@ -74,13 +74,9 @@ func NewOpenAIClient(ctx context.Context, config *OpenAIConfig) (*OpenAIClient, 
 func (e *OpenAIClient) EmbedStrings(ctx context.Context, texts []string, opts ...embedding.Option) (
 	embeddings [][]float64, err error) {
 
-	var (
-		cbm, cbmOK = callbacks.ManagerFromCtx(ctx)
-	)
-
 	defer func() {
-		if err != nil && cbmOK {
-			_ = cbm.OnError(ctx, err)
+		if err != nil {
+			_ = callbacks.OnError(ctx, err)
 		}
 	}()
 
@@ -106,7 +102,7 @@ func (e *OpenAIClient) EmbedStrings(ctx context.Context, texts []string, opts ..
 		EncodingFormat: string(req.EncodingFormat),
 	}
 
-	ctx = cbm.OnStart(ctx, &embedding.CallbackInput{
+	ctx = callbacks.OnStart(ctx, &embedding.CallbackInput{
 		Texts:  texts,
 		Config: conf,
 	})
@@ -131,13 +127,11 @@ func (e *OpenAIClient) EmbedStrings(ctx context.Context, texts []string, opts ..
 		TotalTokens:      resp.Usage.TotalTokens,
 	}
 
-	if cbmOK {
-		_ = cbm.OnEnd(ctx, &embedding.CallbackOutput{
-			Embeddings: embeddings,
-			Config:     conf,
-			TokenUsage: usage,
-		})
-	}
+	_ = callbacks.OnEnd(ctx, &embedding.CallbackOutput{
+		Embeddings: embeddings,
+		Config:     conf,
+		TokenUsage: usage,
+	})
 
 	return embeddings, nil
 }
