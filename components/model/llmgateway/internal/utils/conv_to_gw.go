@@ -195,7 +195,10 @@ func toGWTool(tool *schema.ToolInfo) (*gateway.Tool, error) {
 // convertOpenAPI3SchemaToGWSchema convert *openapi3.Schema to *gateway.JSONSchema
 func convertOpenAPI3SchemaToGWSchema(sc *openapi3.Schema) *gateway.JSONSchema {
 	if sc == nil {
-		return nil
+		return &gateway.JSONSchema{
+			Type:       openapi3.TypeObject,
+			Properties: make(map[string]*gateway.JSONSchema),
+		}
 	}
 
 	// init JSONSchema
