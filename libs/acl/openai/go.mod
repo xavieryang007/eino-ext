@@ -1,4 +1,4 @@
-module code.byted.org/flow/eino-ext/components/model/protocols/openai
+module code.byted.org/flow/eino-ext/libs/acl/openai
 
 go 1.18
 

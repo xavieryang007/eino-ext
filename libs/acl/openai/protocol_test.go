@@ -1,11 +1,13 @@
 package openai
 
 import (
-	"code.byted.org/flow/eino/schema"
-	goopenai "github.com/sashabaranov/go-openai"
-	"github.com/stretchr/testify/assert"
 	"math/rand"
 	"testing"
+
+	goopenai "github.com/sashabaranov/go-openai"
+	"github.com/stretchr/testify/assert"
+
+	"code.byted.org/flow/eino/schema"
 )
 
 func TestToXXXUtils(t *testing.T) {
