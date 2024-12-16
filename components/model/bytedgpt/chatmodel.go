@@ -9,7 +9,7 @@ import (
 	"code.byted.org/flow/eino/schema"
 
 	"code.byted.org/flow/eino-ext/components/model/bytedgpt/internal/transport"
-	"code.byted.org/flow/eino-ext/components/model/protocols/openai"
+	"code.byted.org/flow/eino-ext/libs/acl/openai"
 )
 
 var _ model.ChatModel = (*ChatModel)(nil)

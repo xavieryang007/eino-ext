@@ -16,7 +16,7 @@ import (
 	"code.byted.org/flow/eino/components/model"
 	"code.byted.org/flow/eino/schema"
 
-	protocol "code.byted.org/flow/eino-ext/components/model/protocols/openai"
+	protocol "code.byted.org/flow/eino-ext/libs/acl/openai"
 )
 
 func TestOpenAIGenerate(t *testing.T) {

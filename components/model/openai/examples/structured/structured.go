@@ -11,7 +11,7 @@ import (
 	"code.byted.org/flow/eino/schema"
 
 	"code.byted.org/flow/eino-ext/components/model/openai"
-	openai2 "code.byted.org/flow/eino-ext/components/model/protocols/openai"
+	openai2 "code.byted.org/flow/eino-ext/libs/acl/openai"
 )
 
 func main() {

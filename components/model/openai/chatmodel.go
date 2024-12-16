@@ -8,7 +8,7 @@ import (
 	"code.byted.org/flow/eino/components/model"
 	"code.byted.org/flow/eino/schema"
 
-	"code.byted.org/flow/eino-ext/components/model/protocols/openai"
+	"code.byted.org/flow/eino-ext/libs/acl/openai"
 )
 
 type ChatModelConfig struct {

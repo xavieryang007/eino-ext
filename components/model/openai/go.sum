@@ -1,7 +1,7 @@
 code.byted.org/flow/eino v0.3.0 h1:g3VItxXtcnSo4pzloHfEDk70I3kZqwcxLIIzyRM+v24=
 code.byted.org/flow/eino v0.3.0/go.mod h1:+o4CnsT/qFrbqhRMBbi70qS7mseWv1md/SD0Jo1kKEA=
-code.byted.org/flow/eino-ext/components/model/protocols/openai v0.0.0-20241209113439-fb71aacb3a28 h1:T1oMOWsjdveRpMsZ/IF5wm9sgvXAFCkwdJfC8ym84Uw=
-code.byted.org/flow/eino-ext/components/model/protocols/openai v0.0.0-20241209113439-fb71aacb3a28/go.mod h1:JeW0FbtOTjos53ylHFNvLUCApjZngh3bi2UsDOg02xI=
+code.byted.org/flow/eino-ext/libs/acl/openai v0.0.0-20241216035700-be6201f4194e h1:ZKriyMatsT0Tb/i9uP8cjHJJLnB9fa4WLr6iUVHl3aA=
+code.byted.org/flow/eino-ext/libs/acl/openai v0.0.0-20241216035700-be6201f4194e/go.mod h1:iyh7Jelw4PeYRoIFUPVc/VbEvjxK//ijKgs0A1CFTp0=
 github.com/airbrake/gobrake v3.6.1+incompatible/go.mod h1:wM4gu3Cn0W0K7GUuVWnlXZU11AGBXMILnrdOU8Kn00o=
 github.com/bitly/go-simplejson v0.5.0/go.mod h1:cXHtHw4XUPsvGaxgjIAn8PhEWG9NfngEKAMDJEczWVA=
 github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869/go.mod h1:Ekp36dRnpXw/yCqJaO+ZrUyxD+3VXMFFr56k5XYrpB4=

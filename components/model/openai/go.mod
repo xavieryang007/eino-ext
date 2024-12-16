@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	code.byted.org/flow/eino v0.3.0
-	code.byted.org/flow/eino-ext/components/model/protocols/openai v0.0.0-20241209113439-fb71aacb3a28
+	code.byted.org/flow/eino-ext/libs/acl/openai v0.0.0-20241216035700-be6201f4194e
 	github.com/bytedance/mockey v1.2.13
 	github.com/getkin/kin-openapi v0.118.0
 	github.com/sashabaranov/go-openai v1.32.5
