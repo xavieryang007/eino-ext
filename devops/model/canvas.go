@@ -72,7 +72,7 @@ type Node struct {
 	InferInput   *JsonSchema `json:"infer_input,omitempty"` // inferred input parameters of TypeMeta, currently only used when start run
 	AllowOperate bool        `json:"allow_operate"`         //  used to indicate whether the node can be operated on
 
-	Extra map[string]any
+	Extra map[string]any // used to store extra information
 }
 
 type NodeOption struct {
@@ -88,7 +88,7 @@ type Edge struct {
 	SourceNodeKey string `json:"source_node_key,omitempty"`
 	TargetNodeKey string `json:"target_node_key,omitempty"`
 
-	Extra map[string]any
+	Extra map[string]any // used to store extra information
 }
 
 type Branch struct {
@@ -97,7 +97,7 @@ type Branch struct {
 	SourceNodeKey  string     `json:"source_node_key"`
 	TargetNodeKeys []string   `json:"target_node_keys"`
 
-	Extra map[string]any
+	Extra map[string]any // used to store extra information
 }
 
 type Condition struct {
