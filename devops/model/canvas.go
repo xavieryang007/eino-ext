@@ -83,10 +83,20 @@ type Node struct {
 }
 
 type NodeOption struct {
-	InputKey         *string `json:"input_key,omitempty"`
-	OutputKey        *string `json:"output_key,omitempty"`
-	StatePreHandler  *string `json:"state_pre_handler,omitempty"`
-	StatePostHandler *string `json:"state_post_handler,omitempty"`
+	InputKey         *string           `json:"input_key,omitempty"`
+	OutputKey        *string           `json:"output_key,omitempty"`
+	StatePreHandler  *StatePreHandler  `json:"state_pre_handler,omitempty"`
+	StatePostHandler *StatePostHandler `json:"state_post_handler,omitempty"`
+}
+
+type StatePreHandler struct {
+	Method    string `json:"method"`
+	InputType string `json:"input_type"`
+}
+
+type StatePostHandler struct {
+	Method     string `json:"method"`
+	OutputType string `json:"output_type"`
 }
 
 type Edge struct {
