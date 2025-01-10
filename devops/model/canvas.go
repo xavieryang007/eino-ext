@@ -177,7 +177,7 @@ const (
 	ComponentOfChatModel    Component = "ChatModel"
 	ComponentOfChatTemplate Component = "ChatTemplate"
 	ComponentOfIndexer      Component = "Indexer"
-	ComponentOfEmbedder     Component = "Embedder"
+	ComponentOfEmbedding    Component = "Embedding"
 	ComponentOfRetriever    Component = "Retriever"
 	ComponentOfPassthrough  Component = "Passthrough"
 	ComponentOfGraph        Component = "Graph"
