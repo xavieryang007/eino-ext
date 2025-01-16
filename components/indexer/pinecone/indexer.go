@@ -31,8 +31,8 @@ import (
 )
 
 const (
-	batchSize  = 200
-	contentKey = "content"
+	batchSize         = 200
+	defaultContentKey = "content"
 )
 
 type IndexerConfig struct {
@@ -49,9 +49,18 @@ type IndexerConfig struct {
 	AdditionalMetadata map[string]string // optional
 
 	// Store parameters
-	BatchSize  int    // default 200
-	ContentKey string // default "content"
-
+	// BatchSize max size for pinecone UpsertVectors and Embedding.
+	// Default is 200.
+	BatchSize int
+	// DocumentToMetadata converts eino document to pinecone Metadata.
+	// Metadata payloads must be key-value pairs in a JSON object.
+	// Keys must be strings, and values can be one of the following data types:
+	// 1. String
+	// 2. Number (integer or floating point, gets converted to a 64 bit floating point)
+	// 3. Booleans (true, false)
+	// 4. List of strings
+	// If DocumentToMetadata is not set, will use defaultDocumentToMetadata as default.
+	DocumentToMetadata func(ctx context.Context, doc *schema.Document) (map[string]any, error)
 	// Embedding vectorization method when dense vector not provided in document extra
 	Embedding embedding.Embedder
 }
@@ -93,8 +102,8 @@ func NewIndexer(ctx context.Context, config *IndexerConfig) (*Indexer, error) {
 		config.BatchSize = batchSize
 	}
 
-	if config.ContentKey == "" {
-		config.ContentKey = contentKey
+	if config.DocumentToMetadata == nil {
+		config.DocumentToMetadata = defaultDocumentToMetadata
 	}
 
 	return &Indexer{
@@ -156,28 +165,28 @@ func (i *Indexer) makeBatchRequest(ctx context.Context, batch []*schema.Document
 			SparseValues: toPineconeSparseVector(doc.SparseVector()),
 		}
 
-		// Metadata payloads must be key-value pairs in a JSON object.
-		// Keys must be strings, and values can be one of the following data types:
-		// 1. String
-		// 2. Number (integer or floating point, gets converted to a 64 bit floating point)
-		// 3. Booleans (true, false)
-		// 4. List of strings
-		if doc.MetaData != nil {
-			md, err := structpb.NewStruct(i.toPineconeMetadata(doc))
-			if err != nil {
-				return nil, err
-			}
-
-			pv.Metadata = md
+		metadata, err := i.conf.DocumentToMetadata(ctx, doc)
+		if err != nil {
+			return nil, fmt.Errorf("[makeBatchRequest] DocumentToMetadata failed, %w", err)
 		}
 
+		md, err := structpb.NewStruct(metadata)
+		if err != nil {
+			return nil, err
+		}
+
+		pv.Metadata = md
 		pvs = append(pvs, pv)
 	}
 
 	if len(texts) > 0 {
+		if emb == nil {
+			return nil, fmt.Errorf("[makeBatchRequest] embedding not provided from config")
+		}
+
 		vectors, err := emb.EmbedStrings(i.makeEmbeddingCtx(ctx, emb), texts)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("[makeBatchRequest] embed error, %w", err)
 		}
 
 		if len(vectors) != len(indices) {
@@ -217,7 +226,7 @@ func (i *Indexer) IsCallbacksEnabled() bool {
 	return true
 }
 
-func (i *Indexer) toPineconeMetadata(doc *schema.Document) map[string]interface{} {
+func defaultDocumentToMetadata(ctx context.Context, doc *schema.Document) (map[string]any, error) {
 	r := make(map[string]interface{})
 
 	for k := range doc.MetaData {
@@ -227,9 +236,9 @@ func (i *Indexer) toPineconeMetadata(doc *schema.Document) map[string]interface{
 		}
 	}
 
-	r[i.conf.ContentKey] = doc.Content
+	r[defaultContentKey] = doc.Content
 
-	return r
+	return r, nil
 }
 
 func toPineconeSparseVector(sparse map[int]float64) *pinecone.SparseValues {

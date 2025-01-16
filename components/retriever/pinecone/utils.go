@@ -37,6 +37,10 @@ func f32To64(f32 []float32) []float64 {
 }
 
 func marshalStringNoErr(in any) string {
+	if in == nil {
+		return ""
+	}
+
 	b, _ := json.Marshal(in)
 	return string(b)
 }

@@ -18,7 +18,6 @@ package pinecone
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -32,8 +31,8 @@ import (
 )
 
 const (
-	topK       = 5
-	contentKey = "content"
+	topK              = 5
+	defaultContentKey = "content"
 )
 
 type RetrieverConfig struct {
@@ -50,9 +49,10 @@ type RetrieverConfig struct {
 	AdditionalMetadata map[string]string // optional
 
 	// Retrieve parameters
-	TopK       int    // default 5
-	ContentKey string // default "content"
-
+	TopK int // default 5
+	// ScoredVectorToDocument converts pinecone retrieve result to eino document
+	// If ScoredVectorToDocument is not set, will use defaultScoredVectorToDocument as default.
+	ScoredVectorToDocument func(ctx context.Context, sv *pinecone.ScoredVector) (*schema.Document, error)
 	// Embedding vectorization method when dense vector not provided in document extra
 	Embedding embedding.Embedder
 }
@@ -94,8 +94,8 @@ func NewRetriever(ctx context.Context, config *RetrieverConfig) (*Retriever, err
 		config.TopK = topK
 	}
 
-	if config.ContentKey == "" {
-		config.ContentKey = contentKey
+	if config.ScoredVectorToDocument == nil {
+		config.ScoredVectorToDocument = defaultScoredVectorToDocument
 	}
 
 	return &Retriever{
@@ -113,24 +113,20 @@ func (r *Retriever) Retrieve(ctx context.Context, query string, opts ...retrieve
 		}
 	}()
 
-	options := retriever.GetCommonOptions(&retriever.Options{
+	co := retriever.GetCommonOptions(&retriever.Options{
 		Index:     &r.conf.IndexName,
 		TopK:      &r.conf.TopK,
 		Embedding: r.conf.Embedding,
 	}, opts...)
-
-	q := &Query{}
-	if err := json.Unmarshal([]byte(query), q); err != nil {
-		q.Text = query
-	}
+	io := retriever.GetImplSpecificOptions(&options{}, opts...)
 
 	ctx = callbacks.OnStart(ctx, &retriever.CallbackInput{
 		Query:  query,
-		TopK:   *options.TopK,
-		Filter: marshalStringNoErr(q.MetaDataFilter),
+		TopK:   *co.TopK,
+		Filter: marshalStringNoErr(io.MetadataFilter),
 	})
 
-	req, err := r.makeQueryRequest(ctx, q, options)
+	req, err := r.makeQueryRequest(ctx, query, co, io)
 	if err != nil {
 		return nil, err
 	}
@@ -141,21 +137,10 @@ func (r *Retriever) Retrieve(ctx context.Context, query string, opts ...retrieve
 	}
 
 	for _, match := range resp.Matches {
-		mp := match.Vector.Metadata.AsMap()
-		content, ok := mp[r.conf.ContentKey].(string)
-		if !ok {
-			return nil, fmt.Errorf("[Retrieve] pinecone retrieve content not found in metadata, key=%s", r.conf.ContentKey)
+		doc, err := r.conf.ScoredVectorToDocument(ctx, match)
+		if err != nil {
+			return nil, fmt.Errorf("[Retrieve] pinecone retriever ScoredVectorToDocument failed, %w", err)
 		}
-
-		doc := &schema.Document{
-			ID:       match.Vector.Id,
-			Content:  content,
-			MetaData: mp,
-		}
-
-		doc.WithScore(float64(match.Score)).
-			WithDenseVector(f32To64(match.Vector.Values)).
-			WithSparseVector(fromPineconeSparseVector(match.Vector.SparseValues))
 
 		docs = append(docs, doc)
 	}
@@ -165,26 +150,27 @@ func (r *Retriever) Retrieve(ctx context.Context, query string, opts ...retrieve
 	return docs, nil
 }
 
-func (r *Retriever) makeQueryRequest(ctx context.Context, q *Query, options *retriever.Options) (
+func (r *Retriever) makeQueryRequest(ctx context.Context, query string, co *retriever.Options, io *options) (
 	*pinecone.QueryByVectorValuesRequest, error) {
 
 	req := &pinecone.QueryByVectorValuesRequest{
 		Vector:          nil,
-		TopK:            uint32(*options.TopK),
+		TopK:            uint32(*co.TopK),
 		MetadataFilter:  nil,
 		IncludeValues:   true,
 		IncludeMetadata: true,
-		SparseValues:    toPineconeSparseVector(q.SparseVector),
+		SparseValues:    toPineconeSparseVector(io.SparseVector),
 	}
 
-	if q.DenseVector == nil {
-		if options.Embedding == nil {
+	if io.DenseVector == nil {
+		emb := co.Embedding
+		if emb == nil {
 			return nil, fmt.Errorf("[makeQueryRequest] embedding method in config must not be nil when query not contains dense vector")
 		}
 
-		vectors, err := options.Embedding.EmbedStrings(r.makeEmbeddingCtx(ctx, options.Embedding), []string{q.Text})
+		vectors, err := emb.EmbedStrings(r.makeEmbeddingCtx(ctx, emb), []string{query})
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("[makeQueryRequest] embed failed, %w", err)
 		}
 
 		if len(vectors) != 1 {
@@ -193,11 +179,11 @@ func (r *Retriever) makeQueryRequest(ctx context.Context, q *Query, options *ret
 
 		req.Vector = f64To32(vectors[0])
 	} else {
-		req.Vector = f64To32(q.DenseVector)
+		req.Vector = f64To32(io.DenseVector)
 	}
 
-	if q.MetaDataFilter != nil {
-		filter, err := structpb.NewStruct(q.MetaDataFilter)
+	if io.MetadataFilter != nil {
+		filter, err := structpb.NewStruct(io.MetadataFilter)
 		if err != nil {
 			return nil, err
 		}
@@ -220,6 +206,29 @@ func (r *Retriever) makeEmbeddingCtx(ctx context.Context, emb embedding.Embedder
 	runInfo.Name = runInfo.Type + string(runInfo.Component)
 
 	return callbacks.ReuseHandlers(ctx, runInfo)
+}
+
+func defaultScoredVectorToDocument(ctx context.Context, sv *pinecone.ScoredVector) (*schema.Document, error) {
+	metadata := sv.Vector.Metadata.AsMap()
+
+	content, ok := metadata[defaultContentKey].(string)
+	if !ok {
+		return nil, fmt.Errorf("[defaultScoredVectorToDocument] pinecone retrieve content not found in metadata, key=%s", defaultContentKey)
+	}
+
+	doc := &schema.Document{
+		ID:       sv.Vector.Id,
+		Content:  content,
+		MetaData: metadata,
+	}
+
+	doc.WithScore(float64(sv.Score)).WithDenseVector(f32To64(sv.Vector.Values))
+
+	if sv.Vector.SparseValues != nil {
+		doc.WithSparseVector(fromPineconeSparseVector(sv.Vector.SparseValues))
+	}
+
+	return doc, nil
 }
 
 func toPineconeSparseVector(sparse map[int]float64) *pinecone.SparseValues {

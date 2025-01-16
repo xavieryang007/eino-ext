@@ -69,22 +69,12 @@ func main() {
 		Indexes created before February 22, 2023 do not support sparse vectors.
 	*/
 
-	retrieveQuery := &pinecone.Query{
-		Text:         "中国旅游景点",
-		DenseVector:  vs.Dense[0],  // (optional) dense vector here will be used preferentially and will not trigger the embedding operation.
-		SparseVector: vs.Sparse[0], // (optional) set sparse vector for retrieve
-		MetaDataFilter: map[string]interface{}{ // (optional) meta data filter
-			"location": "中国",
-		},
-	}
-
-	query, err := retrieveQuery.ToQuery()
-	if err != nil {
-		panic(err)
-	}
-
-	// query by plain text
-	resp, err := retriever.Retrieve(ctx, query)
+	// query is plain text, provide additional info by options
+	resp, err := retriever.Retrieve(ctx, "tourist attraction",
+		pinecone.WithQueryDenseVector(vs.Dense[0]),                                 // (optional) dense vector here will be used preferentially and will not trigger the embedding operation.
+		pinecone.WithQuerySparseVector(vs.Sparse[0]),                               // (optional) set sparse vector for retrieve
+		pinecone.WithQueryMetadataFilter(map[string]interface{}{"location": "中国"}), // (optional) meta data filter
+	)
 	if err != nil {
 		panic(err)
 	}
