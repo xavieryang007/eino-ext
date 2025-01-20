@@ -37,6 +37,9 @@ var registeredTypeMap = make(map[string]reflect.Type)
 func init() {
 	for i, rt := range registeredTypes {
 		registeredTypes[i].Schema = parseReflectTypeToJsonSchema(rt.Type)
+		if rt.Type.Kind() == reflect.Ptr {
+			registeredTypes[i].Schema.Title = "*" + registeredTypes[i].Schema.Title
+		}
 		registeredTypeMap[rt.Identifier] = rt.Type
 	}
 }
