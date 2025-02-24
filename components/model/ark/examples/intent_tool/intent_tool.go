@@ -19,17 +19,17 @@ package main
 import (
 	"context"
 	"log"
-	"os"
+
+	"github.com/cloudwego/eino/schema"
 
 	"github.com/cloudwego/eino-ext/components/model/ark"
-	"github.com/cloudwego/eino/schema"
 )
 
 func main() {
 	ctx := context.Background()
 	chatModel, err := ark.NewChatModel(ctx, &ark.ChatModelConfig{
-		APIKey: os.Getenv("ARK_API_KEY"),
-		Model:  os.Getenv("ARK_MODEL_ID"),
+		APIKey: "97c356bf-d13d-4398-aca6-29852c8e0123",
+		Model:  "ep-20250224144839-rdwmp",
 	})
 	if err != nil {
 		log.Printf("NewChatModel failed, err=%v", err)

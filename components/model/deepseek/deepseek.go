@@ -420,7 +420,8 @@ func toDeepSeekMessage(m *schema.Message) (*deepseek.ChatCompletionMessage, erro
 		Role:    role,
 		Content: m.Content,
 		// TODO: tool call id
-		Prefix: HasPrefix(m),
+		Prefix:     HasPrefix(m),
+		ToolCallID: m.ToolCallID,
 	}
 	if ret.Role != roleAssistant && ret.Prefix {
 		return nil, fmt.Errorf("prefix only supported for assistant message")
