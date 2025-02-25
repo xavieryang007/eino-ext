@@ -19,11 +19,9 @@ package generic
 import (
 	"reflect"
 	"strings"
-
-	"github.com/cloudwego/eino/utils/generic"
 )
 
-func GetJsonTag(field reflect.StructField) string {
+func GetJsonName(field reflect.StructField) string {
 	tag, ok := field.Tag.Lookup("json")
 	if !ok {
 		return field.Name
@@ -31,6 +29,7 @@ func GetJsonTag(field reflect.StructField) string {
 	tagList := strings.Split(tag, ",")
 	return tagList[0]
 }
+
 func HasRequired(field reflect.StructField) bool {
 	tag, ok := field.Tag.Lookup("binding")
 	if !ok {
@@ -43,13 +42,17 @@ func IsMapType[K, V any](t reflect.Type) bool {
 	if t.Kind() != reflect.Map {
 		return false
 	}
-	if t.Key().Kind() != generic.TypeOf[K]().Kind() {
+	if t.Key().Kind() != typeOf[K]().Kind() {
 		return false
 	}
-	if t.Elem().Kind() != generic.TypeOf[V]().Kind() {
+	if t.Elem().Kind() != typeOf[V]().Kind() {
 		return false
 	}
 	return true
+}
+
+func typeOf[T any]() reflect.Type {
+	return reflect.TypeOf((*T)(nil)).Elem()
 }
 
 var comfortableKind = map[reflect.Kind]bool{
@@ -67,6 +70,23 @@ var comfortableKind = map[reflect.Kind]bool{
 	reflect.Uint64:  true,
 	reflect.Float32: true,
 	reflect.Float64: true,
+}
+
+func ComfortableKind(kind reflect.Kind) bool {
+	return comfortableKind[kind]
+}
+
+var unsupportedInputKind = map[reflect.Kind]bool{
+	reflect.Invalid:       true,
+	reflect.Complex64:     true,
+	reflect.Complex128:    true,
+	reflect.Chan:          true,
+	reflect.Func:          true,
+	reflect.UnsafePointer: true,
+}
+
+func UnsupportedInputKind(kind reflect.Kind) bool {
+	return unsupportedInputKind[kind]
 }
 
 func ValidateInputReflectTypeSupported(typ reflect.Type) (supported bool) {
