@@ -564,7 +564,7 @@ func (cm *Client) Stream(ctx context.Context, in []*schema.Message,
 				msg = cMsg
 			}
 
-			if msg.Content == "" && len(msg.ToolCalls) == 0 {
+			if msg.Content == "" && msg.ReasoningContent == "" && len(msg.ToolCalls) == 0 {
 				lastEmptyMsg = msg
 				continue
 			}
@@ -614,6 +614,7 @@ func resolveStreamResponse(resp openai.ChatCompletionStreamResponse) (msg *schem
 		msg = &schema.Message{
 			Role:      toMessageRole(choice.Delta.Role),
 			Content:   choice.Delta.Content,
+			ReasoningContent: choice.Delta.ReasoningContent,
 			ToolCalls: toMessageToolCalls(choice.Delta.ToolCalls),
 			ResponseMeta: &schema.ResponseMeta{
 				FinishReason: string(choice.FinishReason),
